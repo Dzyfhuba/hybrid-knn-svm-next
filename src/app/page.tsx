@@ -1,9 +1,9 @@
+import Data from '@/components/Data'
+import Normalisasi from '@/components/Normalisasi'
+import Perhitungan from '@/components/Perhitungan'
 // import dynamic from 'next/dynamic'
 
-import Footer from '@/components/Footer'
-import Navbar from '@/components/Navbar'
-
-// const SwitchTheme = dynamic(() => import('@/components/SwitchTheme'), 
+// const SkelData = dynamic(() => import('@/components/Data'), 
 //   {
 //     ssr: false,
 //     loading: () => (
@@ -15,8 +15,9 @@ import Navbar from '@/components/Navbar'
 export default function Home() {
   return (
     <>
-      <Navbar />
-      <Footer />
+      <Data />
+      <Normalisasi />
+      <Perhitungan />
     </>
   )
 }
