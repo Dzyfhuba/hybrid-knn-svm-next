@@ -1,6 +1,8 @@
+import Link from 'next/link'
 import React from 'react'
 import { BiMenuAltLeft } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
+import NavLink from './NavLink'
 
 type Props = {}
 
@@ -31,8 +33,12 @@ const Sidebar = (props: Props) => {
               <IoMdClose size={24} />
             </label>
           </li>
-          <li><a>Sidebar Item 1</a></li>
-          <li><a>Sidebar Item 2</a></li>
+          <NavLink href={'/'}
+            inputId='my-drawer'
+          >KNN</NavLink>
+          <NavLink href={'/'}
+            inputId='my-drawer'
+          >SVM</NavLink>
         </ul>
       </div>
     </div>

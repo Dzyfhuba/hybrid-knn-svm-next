@@ -9,7 +9,7 @@ const SwitchTheme = () => {
 
   return (
     <div>
-      <div className="join rounded-full p-1 bg-base-200 w-max">
+      <div className="join rounded-full p-1 bg-base-200 w-max self-end">
         {/* <input type="radio" name="theme-buttons" className="btn theme-controller join-item" aria-label="Default" value="default" /> */}
         <button className={`btn btn-sm join-item !rounded-full btn-ghost ${theme == 'light' ? ' bg-base-100':''}`}
           onClick={() => setTheme('light')}

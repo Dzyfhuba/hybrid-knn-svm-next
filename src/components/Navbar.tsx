@@ -14,20 +14,32 @@ const Navbar = (props: Props) => {
           <button className="btn btn-ghost text-xl">daisyUI</button>
         </div>
         <div className="flex-none hidden sm:block">
-          <ul className="menu menu-horizontal px-1">
-            <li><Link href={'/'}>Link</Link></li>
-            <li>
-              <details>
-                <summary>
-                  Parent
-                </summary>
-                <ul className="p-2 bg-base-100 rounded-t-none">
-                  <li><Link href={'/'}>Link 1</Link></li>
-                  <li><Link href={'/'}>Link 2</Link></li>
-                </ul>
-              </details>
-            </li>
-          </ul>
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <div tabIndex={0}
+              role="button"
+              className="btn m-1 btn-ghost"
+            >KNN</div>
+            <ul tabIndex={0}
+              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <Link href={'#'}>Item 1</Link>
+              </li>
+              <li><Link href={'#'}>Item 2</Link></li>
+            </ul>
+          </div>
+          <div className="dropdown dropdown-bottom dropdown-end">
+            <div tabIndex={0}
+              role="button"
+              className="btn m-1 btn-ghost"
+            >SVM</div>
+            <ul tabIndex={0}
+              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li><Link href={'#'}>Item 1</Link></li>
+              <li><Link href={'#'}>Item 2</Link></li>
+            </ul>
+          </div>
         </div>
         <Sidebar />
       </div>
