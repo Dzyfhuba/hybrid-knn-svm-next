@@ -1,3 +1,42 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "camelcase": [
+      "warn",
+      {
+        "properties": "never"
+      }
+    ],
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "semi": [
+      "error",
+      "never"
+    ],
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    "indent": [
+      "warn",
+      2
+    ],
+    "object-curly-spacing": [
+      "warn",
+      "always"
+    ],
+    "react/jsx-max-props-per-line": [
+      1,
+      {
+        "maximum": 1
+      }
+    ],
+    "react/jsx-tag-spacing": [
+      1,
+      {
+        "beforeSelfClosing": "proportional-always",
+        "beforeClosing": "proportional-always"
+      }
+    ]
+  }
 }
