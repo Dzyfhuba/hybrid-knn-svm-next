@@ -1,13 +1,22 @@
-import Data from '@/components/Data'
-import Normalisasi from '@/components/Normalisasi'
-import Perhitungan from '@/components/Perhitungan'
+import axios from 'axios'
+import dynamic from 'next/dynamic'
 
-export default function Home() {
+
+const SkelData = dynamic(() => import('@/components/Data'), 
+  {
+    ssr: false,
+    loading: () => (
+      <div className="skeleton h-[40px] w-[126px]"></div>
+    )
+  }
+)
+
+export default async function Home() {
   return (
     <>
-      <Data />
-      <Normalisasi />
-      <Perhitungan />
+      <SkelData />
+      {/* <Normalisasi />
+      <Perhitungan /> */}
     </>
   )
 }
