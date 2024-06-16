@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.swal2-popup {
+  @apply !bg-base-100 !text-base-content
+}

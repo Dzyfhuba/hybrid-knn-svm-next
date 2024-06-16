@@ -1,15 +1,12 @@
-import React from 'react'
+import React, { ButtonHTMLAttributes } from 'react'
 
-type Props = {
-  data: string
-  className: string
-  children: string
-}
+type Props = ButtonHTMLAttributes<HTMLButtonElement>
 
-const Button = (props: Props) => {
+const Button = ({ className, ...props }: Props) => {
   return (
-    <button data-id={`${props.data}`}
-      className={`${props.className}`}
+    <button
+      className={`${className}`}
+      {...props}
     >
       {props.children}
     </button>

@@ -1,11 +1,12 @@
 export default interface Data {
-  co: number | null
-  date: string | null
-  id: number
-  location: string | null
-  no2: number | null
-  o3: number | null
-  pm10: number | null
-  pm2_5: number | null
-  so2: number | null
+  co?: number 
+  date?: string 
+  id?: number
+  location?: string 
+  no2?: number 
+  o3?: number 
+  pm10?: number 
+  pm2_5?: number 
+  so2?: number
+  deleted_at?: string
 }
