@@ -1,32 +1,20 @@
 'use client'
+
 import supabase from '@/config/supabase'
-import { today } from '@/helpers/date'
 import Data from '@/types/data'
+import axios from 'axios'
 import moment from 'moment'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ModalCreate from './ModalCreate'
 import ModalUpdate from './ModalUpdate'
 
-type Props = {
-  data: Data[]
-}
+type Props = {}
 
 const DataSection = (props: Props) => {
-  const [data, setData] = useState(props.data)
+  const [data, setData] = useState<Data[]>([])
   const ReactSwal = withReactContent(Swal)
-
-  // const [formData, setFormData] = useState<Data>({
-  //   date: today(),
-  //   pm10: 0,
-  //   pm2_5: 0,
-  //   so2: 0,
-  //   co: 0,
-  //   o3: 0,
-  //   no2: 0,
-  //   location: ''
-  // })
 
   const handleDelete = (id: number) => {
     ReactSwal.fire({
@@ -70,6 +58,13 @@ const DataSection = (props: Props) => {
       )
     })
   }
+
+  useEffect(() => {
+    const getData = async () => {
+      const res = await axios.get('http://localhost:3000/api/data')
+    }
+    getData()
+  }, [])
 
   return (
     <>
