@@ -1,8 +1,6 @@
 import Cleaning from '@/components/Cleaning'
-import Normalisasi from '@/components/Normalisasi'
-import axios from 'axios'
+import Client from '@/components/Client'
 import dynamic from 'next/dynamic'
-
 
 const SkelData = dynamic(() => import('@/components/Data'), 
   {
@@ -16,10 +14,12 @@ const SkelData = dynamic(() => import('@/components/Data'),
 export default async function Home() {
   return (
     <>
-      <SkelData />
-      <Cleaning />
-      {/* <Normalisasi /> */}
-      {/* <Perhitungan /> */}
+      <Client>
+        <SkelData />
+        <Cleaning />
+        {/* <Normalisasi /> */}
+        {/* <Perhitungan /> */}
+      </Client>
     </>
   )
 }

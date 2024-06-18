@@ -1,20 +1,19 @@
 'use client'
 
 import supabase from '@/config/supabase'
-import Data from '@/types/data'
-import axios from 'axios'
+import { useStoreActions, useStoreState } from '@/state/hooks'
 import moment from 'moment'
-import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ModalCreate from './ModalCreate'
 import ModalUpdate from './ModalUpdate'
-import db from '@/helpers/idb'
+import { useEffect } from 'react'
 
 type Props = {}
 
 const DataSection = (props: Props) => {
-  const [data, setData] = useState<Data[]>([])
+  const data = useStoreState((state) => state.data)
+  const { setData, getData } = useStoreActions((actions) => actions )
   const ReactSwal = withReactContent(Swal)
 
   const handleDelete = (id: number) => {
@@ -61,18 +60,9 @@ const DataSection = (props: Props) => {
   }
 
   useEffect(() => {
-    const getData = async () => {
-      if( navigator.onLine) {
-        const res = await axios.get('http://localhost:3000/api/data')
-        db.dataRaw.bulkPut(res.data)
-        setData(res.data)
-      } else {
-        setData(await db.dataRaw.toArray())
-      }
-      // console.log(res)
-    }
     getData()
   }, [])
+  
 
   return (
     <>
