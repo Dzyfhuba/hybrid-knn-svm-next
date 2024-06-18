@@ -61,7 +61,7 @@ const DataSection = (props: Props) => {
 
   useEffect(() => {
     getData()
-  }, [getData])
+  }, [])
   
 
   return (
