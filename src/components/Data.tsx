@@ -62,6 +62,8 @@ const DataSection = (props: Props) => {
   useEffect(() => {
     const getData = async () => {
       const res = await axios.get('http://localhost:3000/api/data')
+      setData(res.data)
+      console.log(res)
     }
     getData()
   }, [])
@@ -75,51 +77,52 @@ const DataSection = (props: Props) => {
           <ModalCreate  inputId='createmodal'>Add Data</ModalCreate>
           <button className="btn join-item">Export</button>
         </div>
-
-        <table id='data'>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Date</th>
-              <th>PM10</th>
-              <th>PM2.5</th>
-              <th>SO2</th>
-              <th>CO</th>
-              <th>O3</th>
-              <th>NO2</th>
-              <th>Location</th>
-              <th>Extras</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map(item => (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.date}</td>
-                <td>{item.pm10}</td>
-                <td>{item.pm2_5}</td>
-                <td>{item.so2}</td>
-                <td>{item.co}</td>
-                <td>{item.o3}</td>
-                <td>{item.no2}</td>
-                <td>{item.location}</td>
-                <td><div className="join join-vertical lg:join-horizontal">
-                  {/* <ModalUpdate data={data}
+        <div className='flex flex-col gap-5 overflow-y-auto h-[500px]'>
+          <table id='data'>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>PM10</th>
+                <th>PM2.5</th>
+                <th>SO2</th>
+                <th>CO</th>
+                <th>O3</th>
+                <th>NO2</th>
+                <th>Location</th>
+                <th>Extras</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map(item => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.date}</td>
+                  <td>{item.pm10}</td>
+                  <td>{item.pm2_5}</td>
+                  <td>{item.so2}</td>
+                  <td>{item.co}</td>
+                  <td>{item.o3}</td>
+                  <td>{item.no2}</td>
+                  <td>{item.location}</td>
+                  <td><div className="join join-vertical lg:join-horizontal">
+                    {/* <ModalUpdate data={data}
                     inputId='updatemodal'
                   >Update</ModalUpdate> */}
-                  <button onClick={() => handleUpdate(item.id!)}
-                    className='btn join-item'
-                  >Update</button>
-                  <button onClick={() => handleDelete(item.id!)}
-                    className='btn join-item'
-                  >Delete</button>
-                </div></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    <button onClick={() => handleUpdate(item.id!)}
+                      className='btn join-item'
+                    >Update</button>
+                    <button onClick={() => handleDelete(item.id!)}
+                      className='btn join-item'
+                    >Delete</button>
+                  </div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         
-        <div className="skeleton h-[50vh] w-full mx-auto"></div>
+        {/* <div className="skeleton h-[50vh] w-full mx-auto"></div> */}
       </div>
     </>
   )
