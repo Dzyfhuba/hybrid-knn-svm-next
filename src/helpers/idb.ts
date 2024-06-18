@@ -7,6 +7,10 @@ const db = new Dexie('KNN_SVM') as Dexie & {
     'id' // primary key "id" (for the typings only)
   >,
   dataClean: EntityTable<
+    Data,
+    'id' // primary key "id" (for the typings only)
+  >,
+  dataNormalized: EntityTable<
   Data,
   'id' // primary key "id" (for the typings only)
 >,
@@ -14,7 +18,8 @@ const db = new Dexie('KNN_SVM') as Dexie & {
 
 db.version(process.env.NEXT_PUBLIC_IDB_VERSION).stores({
   dataRaw: 'id', // primary key "id" (for the runtime!)
-  dataClean: 'id' // primary key "id" (for the runtime!)
+  dataClean: 'id', // primary key "id" (for the runtime!)
+  dataNormalized: 'id' // primary key "id" (for the runtime!)
 })
 
 
