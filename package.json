@@ -21,6 +21,8 @@
     "datatables.net-rowgroup-dt": "^1.5.0",
     "datatables.net-select-dt": "^2.0.3",
     "datatables.net-staterestore-dt": "^1.4.1",
+    "dexie": "^4.0.7",
+    "dexie-react-hooks": "^1.1.7",
     "jquery": "^3.7.1",
     "js-cookie": "^3.0.5",
     "jszip": "^3.10.1",

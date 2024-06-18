@@ -1,9 +1,10 @@
 'use client'
 
+import db from '@/helpers/idb'
 import Data from '@/types/data'
 import axios from 'axios'
-import React, { SyntheticEvent, useEffect, useState } from 'react'
 import * as dfd from 'danfojs'
+import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 
 type Props = {}
@@ -29,6 +30,7 @@ const Cleaning = (props: Props) => {
         { columns: ['pm10', 'pm2_5', 'so2', 'co', 'o3', 'no2'] })
         // console.log(meanData)
         const jsonData = dfd.toJSON(meanData) as Data[]
+        db.dataClean.bulkAdd(jsonData)
         setCleanData(jsonData)
       }
     })

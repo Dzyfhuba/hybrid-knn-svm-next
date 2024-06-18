@@ -9,6 +9,7 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ModalCreate from './ModalCreate'
 import ModalUpdate from './ModalUpdate'
+import db from '@/helpers/idb'
 
 type Props = {}
 
@@ -61,9 +62,14 @@ const DataSection = (props: Props) => {
 
   useEffect(() => {
     const getData = async () => {
-      const res = await axios.get('http://localhost:3000/api/data')
-      setData(res.data)
-      console.log(res)
+      if( navigator.onLine) {
+        const res = await axios.get('http://localhost:3000/api/data')
+        db.dataRaw.bulkPut(res.data)
+        setData(res.data)
+      } else {
+        setData(await db.dataRaw.toArray())
+      }
+      // console.log(res)
     }
     getData()
   }, [])
