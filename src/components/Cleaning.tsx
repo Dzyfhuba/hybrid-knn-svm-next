@@ -1,15 +1,16 @@
 'use client'
 
+import db from '@/helpers/idb'
+import { useStoreState } from '@/state/hooks'
 import Data from '@/types/data'
-import axios from 'axios'
-import React, { SyntheticEvent, useEffect, useState } from 'react'
 import * as dfd from 'danfojs'
+import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 
 type Props = {}
 
 const Cleaning = (props: Props) => {
-  const [data, setData] = useState<Data[]>([])
+  const data = useStoreState((state) => state.data)
   const [cleanData, setCleanData] = useState<Data[]>([])
   const df = new dfd.DataFrame(data)
 
@@ -23,24 +24,23 @@ const Cleaning = (props: Props) => {
           df['pm10'].mean(), 
           df['pm2_5'].mean(), 
           df['so2'].mean(), 
-          df['co'].mean(), 
+          df['co'].mean(),  
           df['o3'].mean(), 
           df['no2'].mean()], 
         { columns: ['pm10', 'pm2_5', 'so2', 'co', 'o3', 'no2'] })
         // console.log(meanData)
         const jsonData = dfd.toJSON(meanData) as Data[]
+        db.dataClean.bulkAdd(jsonData)
         setCleanData(jsonData)
       }
     })
   }
 
-
   useEffect(() => {
-    const getData = async () => {
-      const res = await axios.get('http://localhost:3000/api/data')
-      setData(res.data)
-    }
-    getData()
+    (async () => {
+      const data = await db.dataClean.toArray()
+      setCleanData(data)
+    })()
   }, [])
 
   return (

@@ -1,4 +1,5 @@
 export {}
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -8,6 +9,7 @@ declare global {
 
       NEXT_PUBLIC_APP_NAME: string;
       NEXT_PUBLIC_BADGE: string;
+      NEXT_PUBLIC_IDB_VERSION: number;
 
       SUPABASE_PROJECT_REF: string;
       SUPABASE_URL: string;
@@ -15,3 +17,4 @@ declare global {
     }
   }
 }
+    
