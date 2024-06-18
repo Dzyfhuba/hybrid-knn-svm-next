@@ -1,8 +1,7 @@
 import supabase from '@/config/supabase'
-import { today } from '@/helpers/date'
 import Data from '@/types/data'
 import moment from 'moment'
-import React, { ReactNode, SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useState } from 'react'
 import Swal from 'sweetalert2'
 
 type Props = {
@@ -34,7 +33,11 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
     Swal.fire({
       title: 'Updated!',
       text: 'Your file has been updated.',
-      icon: 'success'
+      icon: 'success',
+    }).then((result) => {
+      if(result.isConfirmed){
+        window.location.reload()
+      }
     })
   }
   return (

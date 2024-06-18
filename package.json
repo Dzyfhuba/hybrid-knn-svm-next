@@ -7,13 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-     "update-types": "npx supabase gen types typescript --project-id yweomcrqdcosmmgvoqfi > src/types/supabase.ts"
+    "update-types": "npx supabase gen types typescript --project-id yweomcrqdcosmmgvoqfi > src/types/supabase.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",
     "axios": "^1.7.2",
     "daisyui": "^4.12.2",
+    "danfojs": "^1.1.2",
     "datatables.net-buttons-dt": "^3.0.2",
     "datatables.net-dt": "^2.0.8",
     "datatables.net-responsive-dt": "^3.0.2",
