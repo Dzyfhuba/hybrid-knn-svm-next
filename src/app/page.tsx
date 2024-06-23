@@ -2,6 +2,7 @@ import Cleaning from '@/components/Cleaning'
 import Client from '@/components/Client'
 import Normalisasi from '@/components/Normalisasi'
 import dynamic from 'next/dynamic'
+import DatatableSkeleton from '@/components/DatatableSkeleton'
 
 const SkelData = dynamic(() => import('@/components/Data'), 
   {
@@ -19,7 +20,17 @@ export default async function Home() {
         <SkelData />
         <Cleaning />
         <Normalisasi />
+
         {/* <Perhitungan /> */}
+
+        <section id='normalisasidata'>
+          <h1 className='text-center text-xl font-medium mb-3' >NORMALISASI DATA</h1>
+          
+          <DatatableSkeleton />          
+          
+        </section>
+
+             
       </Client>
     </>
   )
