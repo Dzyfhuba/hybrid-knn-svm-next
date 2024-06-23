@@ -33,14 +33,37 @@ const Sidebar = (props: Props) => {
               <IoMdClose size={24} />
             </label>
           </li>
-          <NavLink href={'/'}
+          {/* <NavLink href={'/'}
             inputId='my-drawer'
           >KNN</NavLink>
           <NavLink href={'/'}
             inputId='my-drawer'
-          >SVM</NavLink>
+          >SVM</NavLink> */}
+          <li><NavLink href={'#datamentah'} inputId='my-drawer'>Data Mentah</NavLink></li>
+          <li>
+            <details>
+              <summary>Preprocessing</summary>
+              <ul>
+                <li><NavLink href={'#cleaning'} inputId='my-drawer'>Cleaning Data</NavLink></li>
+                <li><NavLink href={'#normalisasidata'} inputId='my-drawer'>Normalisasi Data</NavLink></li>
+              </ul>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Processing</summary>
+              <ul>
+                <li>
+                  <NavLink href={'#svm'} inputId='my-drawer'>SVM</NavLink>
+                  <NavLink href={'#knn'} inputId='my-drawer'>KNN</NavLink>
+                </li>
+              </ul>
+            </details>
+          </li>
+          <li><NavLink href={'#confusingmatrix'} inputId='my-drawer'>Confusing Matrix</NavLink></li>
         </ul>
       </div>
+      
     </div>
   )
 }

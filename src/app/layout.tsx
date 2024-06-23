@@ -5,6 +5,7 @@ import './globals.css'
 import Footer from '@/components/Footer'
 import Navbar from '@/components/Navbar'
 import moment from 'moment'
+import ScrollToTop from '@/components/ScrollToTop'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,6 +32,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <ScrollToTop />
         </ThemeProvider>
       </body>
     </html>

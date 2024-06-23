@@ -5,3 +5,7 @@
 .swal2-popup {
   @apply !bg-base-100 !text-base-content
 }
+
+html {
+  scroll-behavior : smooth;
+}

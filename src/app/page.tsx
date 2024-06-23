@@ -23,8 +23,22 @@ export default async function Home() {
 
         {/* <Perhitungan /> */}
 
-        <section id='normalisasidata'>
-          <h1 className='text-center text-xl font-medium mb-3' >NORMALISASI DATA</h1>
+        <section id='svm'>
+          <h1 className='text-center text-xl font-medium mb-3' >SVM</h1>
+          
+          <DatatableSkeleton />          
+          
+        </section>
+
+        <section id='knn'>
+          <h1 className='text-center text-xl font-medium mb-3' >KNN</h1>
+          
+          <DatatableSkeleton />          
+          
+        </section>
+
+        <section id='confusingmatrix'>
+          <h1 className='text-center text-xl font-medium mb-3' >CONFUSING MATRIX</h1>
           
           <DatatableSkeleton />          
           
