@@ -32,7 +32,7 @@ const Normalisasi = (props: Props) => {
   }
 
   return (
-    <div className='text-center flex flex-col gap-5 mb-5'>
+    <div className='text-center flex flex-col gap-5 mb-5' id='normalisasidata'>
       <div className="text-center flex flex-col gap-5 mb-5">
         <button onClick={() => handleNormal()}
           className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-max self-center"

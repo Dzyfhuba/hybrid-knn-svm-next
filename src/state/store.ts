@@ -22,7 +22,7 @@ const store = createStore<GlobalState>({
   }),
   getData: thunk(async (actions) => {
     actions.setLoading(true)
-    const { data } = await axios.get('http://localhost:3000/api/data')
+    const { data } = await axios.get('/api/data')
     if (data) {
       actions.setData(data)
     }

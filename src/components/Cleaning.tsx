@@ -44,7 +44,7 @@ const Cleaning = (props: Props) => {
   }, [])
 
   return (
-    <div className='text-center flex flex-col gap-5 mb-5'>
+    <div className='text-center flex flex-col gap-5 mb-5'id='cleaning'>
       {/* <div className="skeleton h-[48px] w-[79px] mx-auto sm: sm:join-horizontal"></div> */}
       {/* <div className="skeleton h-[50vh] w-full mx-auto"></div> */}
       <div>
