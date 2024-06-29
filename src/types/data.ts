@@ -9,4 +9,5 @@ export default interface Data {
   pm2_5?: number 
   so2?: number
   deleted_at?: string
+  category? : string
 }

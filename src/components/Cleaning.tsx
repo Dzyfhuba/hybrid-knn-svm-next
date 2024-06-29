@@ -44,7 +44,9 @@ const Cleaning = (props: Props) => {
   }, [])
 
   return (
-    <div className='text-center flex flex-col gap-5 mb-5'id='cleaning'>
+    <div className='text-center flex flex-col gap-5 mb-5'
+      id='cleaning'
+    >
       {/* <div className="skeleton h-[48px] w-[79px] mx-auto sm: sm:join-horizontal"></div> */}
       {/* <div className="skeleton h-[50vh] w-full mx-auto"></div> */}
       <div>
@@ -67,6 +69,7 @@ const Cleaning = (props: Props) => {
                 <th>O3</th>
                 <th>NO2</th>
                 <th>Location</th>
+                <th>Category</th>
               </tr>
             </thead>
             <tbody>
@@ -81,6 +84,7 @@ const Cleaning = (props: Props) => {
                   <td>{item.o3}</td>
                   <td>{item.no2}</td>
                   <td>{item.location}</td>
+                  <td>{item.category}</td>
                 </tr>
               ))}
             </tbody>

@@ -3,7 +3,7 @@
 import db from '@/helpers/idb'
 import Data from '@/types/data'
 import * as dfd from 'danfojs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type Props = {}
 
@@ -31,8 +31,18 @@ const Normalisasi = (props: Props) => {
     setMinMax(jsonMapped)
   }
 
+  useEffect(() => {
+    (async () => {
+      const data = await db.dataNormalized.toArray()
+      setMinMax(data)
+    })()  
+  }, [])
+  
+
   return (
-    <div className='text-center flex flex-col gap-5 mb-5' id='normalisasidata'>
+    <div className='text-center flex flex-col gap-5 mb-5'
+      id='normalisasidata'
+    >
       <div className="text-center flex flex-col gap-5 mb-5">
         <button onClick={() => handleNormal()}
           className="btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-max self-center"
