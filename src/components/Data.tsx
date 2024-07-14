@@ -65,7 +65,9 @@ const DataSection = (props: Props) => {
   
 
   return (
-    <div className='text-center flex flex-col gap-5 mb-5' id='datamentah'>
+    <div className='text-center flex flex-col gap-5 mb-5'
+      id='datamentah'
+    >
       {/* <div className="skeleton h-[48px] w-[236px] mx-auto sm: sm:join-horizontal"></div> */}
       <div className="join join-vertical sm:join-horizontal mx-auto">
         <button className="btn join-item">Import</button>
@@ -85,6 +87,7 @@ const DataSection = (props: Props) => {
               <th>O3</th>
               <th>NO2</th>
               <th>Location</th>
+              <th>Category</th>
               <th>Extras</th>
             </tr>
           </thead>
@@ -100,6 +103,7 @@ const DataSection = (props: Props) => {
                 <td>{item.o3}</td>
                 <td>{item.no2}</td>
                 <td>{item.location}</td>
+                <td>{item.category}</td>
                 <td><div className="join join-vertical lg:join-horizontal">
                   {/* <ModalUpdate data={data}
                     inputId='updatemodal'
