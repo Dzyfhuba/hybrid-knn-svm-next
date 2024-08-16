@@ -3,12 +3,13 @@ import React from 'react'
 import { BiMenuAltLeft } from 'react-icons/bi'
 import { IoMdClose } from 'react-icons/io'
 import NavLink from './NavLink'
+import SwitchTheme from './SwitchTheme'
 
 type Props = {}
 
 const Sidebar = (props: Props) => {
   return (
-    <div className="drawer sm:hidden flex">
+    <div className="drawer sm:hidden flex ">
       <input id="my-drawer"
         type="checkbox"
         className="drawer-toggle" 
@@ -19,7 +20,7 @@ const Sidebar = (props: Props) => {
           className="btn drawer-button"
         ><BiMenuAltLeft size={24} /></label>
       </div> 
-      <div className="drawer-side">
+      <div className="drawer-side z-50">
         <label htmlFor="my-drawer"
           aria-label="close sidebar"
           className="drawer-overlay"
@@ -61,9 +62,13 @@ const Sidebar = (props: Props) => {
             </details>
           </li>
           <li><NavLink href={'#confusingmatrix'} inputId='my-drawer'>Confusing Matrix</NavLink></li>
+          <li>
+
+          <SwitchTheme />
+          </li>
         </ul>
       </div>
-      
+     
     </div>
   )
 }

@@ -45,9 +45,13 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
       <div
         className='flex flex-col gap-5'
       >
-        <div>
+        <div className='border-b border-b-base-200 flex justify-between items-center pb-4'>
+                  <h1 className='text-xl'>Update Data</h1>
+                  {/* <button className='btn'>✖</button> */}
+                </div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >Date</label>
           <input type="date"
             defaultValue={props.data.date}
@@ -59,9 +63,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >pm10</label>
           <input type="number"
             defaultValue={props.data.pm10}
@@ -72,9 +76,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >pm2.5</label>
           <input type="number"
             defaultValue={props.data.pm2_5}
@@ -85,9 +89,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >SO2</label>
           <input type="number"
             defaultValue={props.data.so2}
@@ -98,9 +102,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >CO</label>
           <input type="number"
             defaultValue={props.data.co}
@@ -111,9 +115,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >O3</label>
           <input type="number"
             defaultValue={props.data.o3}
@@ -124,9 +128,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >NO2</label>
           <input type="number"
             defaultValue={props.data.no2}
@@ -137,9 +141,9 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div>
+        <div className='flex max-sm:flex-col justify-between sm:items-center'>
           <label htmlFor=""
-            className='m-5'
+            className=''
           >Location</label>
           <input type="text"
             defaultValue={props.data.location}
@@ -150,14 +154,14 @@ const ModalUpdate = ({ inputId, ...props }: Props) => {
             required
           />
         </div>
-        <div className='flex flex-row justify-between'>
-          <button type='reset'
-            className='btn w-[100px] self-start'
-          >Reset</button>
-          <button type='submit'
-            className="btn w-[100px] self-end"
-          >Submit</button>
-        </div>
+        <div className='flex flex-row justify-between border-t border-t-base-200 pt-6'>
+                <button type='reset'
+                  className='btn btn-ghost self-start'
+                >Reset</button>
+                <button type='submit'
+                  className="btn btn-warning self-end"
+                >Submit</button>
+              </div>
       </div>
     </form>
   )

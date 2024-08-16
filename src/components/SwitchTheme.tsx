@@ -16,7 +16,7 @@ const SwitchTheme = () => {
         >
           <FaSun />
         </button>
-        <button className={`btn btn-sm join-item !rounded-full btn-ghost ${!theme ? ' bg-base-100':''}`}
+        <button className={`btn btn-sm join-item !rounded-full btn-ghost ${!theme || theme == 'system' ? ' bg-base-100':''}`}
           onClick={() => setTheme('system')}
         >
           <MdOutlineComputer />

@@ -31,7 +31,7 @@ const ScrollToTop = () => {
     isVisible && (
       <button
         onClick={scrollToTop}
-        className='btn rounded-full btn-primary fixed bottom-4 right-4'
+        className='btn rounded-full btn-primary fixed z-30 bottom-20 right-4'
         id='scrolltotop'
       >
         <SlArrowUp size={18} />

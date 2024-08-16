@@ -7,12 +7,13 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import ModalCreate from './ModalCreate'
 import ModalUpdate from './ModalUpdate'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 type Props = {}
 
 const DataSection = (props: Props) => {
   const data = useStoreState((state) => state.data)
+  const loadingData = useStoreState((state) => state.isLoading)
   const { setData, getData } = useStoreActions((actions) => actions )
   const ReactSwal = withReactContent(Swal)
 
@@ -51,7 +52,7 @@ const DataSection = (props: Props) => {
   const handleUpdate = (id :number) => {
     const selected = data.filter(e => e.id === id)[0]
     ReactSwal.fire({
-      title: 'Update Data',
+      // title: 'Update Data',
       showConfirmButton: false,
       html: (
         <ModalUpdate data={selected}  />
@@ -65,18 +66,29 @@ const DataSection = (props: Props) => {
   
 
   return (
-    <div className='text-center flex flex-col gap-5 mb-5'
+    <div className='flex flex-col mb-5 h-full max-h-screen'
       id='datamentah'
     >
       {/* <div className="skeleton h-[48px] w-[236px] mx-auto sm: sm:join-horizontal"></div> */}
-      <div className="join join-vertical sm:join-horizontal mx-auto">
-        <button className="btn join-item">Import</button>
-        <ModalCreate  inputId='createmodal'>Add Data</ModalCreate>
-        <button className="btn join-item">Export</button>
+     
+     <div className='flex justify-between items-center p-4 mb-4 border-b-2 border-base-100'>
+        <b className='text-lg'>Data Kualitas Udara</b>
+        <div>
+        {/* <div className="join sm:join-horizontal"> */}
+          {/* <button className="btn btn-neutral join-item">Import</button> */}
+          <ModalCreate inputId='createmodal'>Add Data</ModalCreate>
+          {/* <button className="btn btn-neutral join-item">Export</button> */}
       </div>
-      <div className='flex flex-col gap-5 overflow-y-auto h-[500px]'>
-        <table id='data'>
-          <thead>
+     </div>
+      <div className='flex flex-col gap-5 overflow-y-auto flex-1 text-center'>
+        {loadingData ? (
+              <div className="h-full w-full flex item-center justify-center">
+                <span className="loading loading-dots loading-lg"></span>
+              </div>
+            ) :(
+
+              <table id='data'>
+          <thead className='sticky top-0 bg-base-200'>
             <tr>
               <th>ID</th>
               <th>Date</th>
@@ -119,6 +131,7 @@ const DataSection = (props: Props) => {
             ))}
           </tbody>
         </table>
+          )}
       </div>
         
       {/* <div className="skeleton h-[50vh] w-full mx-auto"></div> */}

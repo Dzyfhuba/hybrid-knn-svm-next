@@ -8,7 +8,7 @@ type Props = {}
 
 const Navbar = (props: Props) => {
   return (
-    <main className="">
+    <main className="fixed w-full top-0 z-30 border-b border-b-base-200">
       
       <div className="navbar bg-base-100 sm:flex flex-row-reverse sm:flex-row">
         
@@ -28,7 +28,7 @@ const Navbar = (props: Props) => {
               className="btn m-1 btn-ghost"
             >Prepocessing</div>
             <ul tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              className="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-52"
             >
               <li>
                 <Link href={'#cleaning'}>Cleaning Data</Link>
@@ -43,7 +43,7 @@ const Navbar = (props: Props) => {
               className="btn m-1 btn-ghost"
             >Processing</div>
             <ul tabIndex={0}
-              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+              className="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-box w-52"
             >
               <li><Link href={'#svm'}>SVM</Link></li>
               <li><Link href={'#knn'}>KNN</Link></li>

@@ -28,11 +28,10 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <Navbar />
-          <main className='p-3'>
+          <main className=''>
             {children}
           </main>
-          <Footer />
-          <ScrollToTop />
+          {/* <ScrollToTop /> */}
         </ThemeProvider>
       </body>
     </html>

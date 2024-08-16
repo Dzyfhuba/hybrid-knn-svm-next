@@ -27,6 +27,8 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     console.log(formData)
+    if(!formData.location?.length) return
+
     const { data, error } = await supabase
       .from('dimas_data')
       .insert({ 
@@ -45,7 +47,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
 
   return (
     <>
-      <button className="btn join-item"
+      <button 
+      className="btn btn-warning w-max self-center px-6"
+      // className="btn btn-neutral join-item"
         // @ts-expect-error
         onClick={() => document.getElementById(inputId || '')?.showModal()}
       >{props.children}</button>
@@ -53,14 +57,17 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
         className="modal modal-bottom sm:modal-middle"
       >
         <div className="modal-box">
+          <form method='dialog' className='border-b border-b-base-200 flex justify-between items-center pb-2 mb-5'>
+                  <h1 className='text-xl'>Insert Data</h1>
+                  {/* <button className='btn'>✖</button> */}
+                </form>
           <form method="dialog"
             onSubmit={handleSubmit}
           >
-            <h1 className='mb-5'>Insert Data</h1>
             <div className='flex flex-col gap-5'>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >Date</label>
                 <input type="date"
                   defaultValue={today()}
@@ -72,9 +79,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >pm10</label>
                 <input type="number"
                   id='pm10'
@@ -84,9 +91,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >pm2.5</label>
                 <input type="number"
                   id='pm2'
@@ -96,9 +103,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >SO2</label>
                 <input type="number"
                   id='so2'
@@ -108,9 +115,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >CO</label>
                 <input type="number"
                   id='co'
@@ -120,9 +127,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >O3</label>
                 <input type="number"
                   id='o3'
@@ -132,9 +139,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >NO2</label>
                 <input type="number"
                   id='no2'
@@ -144,9 +151,9 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div>
+              <div className='flex max-sm:flex-col justify-between sm:items-center'>
                 <label htmlFor=""
-                  className='m-5'
+                  className=''
                 >Location</label>
                 <input type="text"
                   id='location'
@@ -156,17 +163,20 @@ const ModalCreate = ( { inputId, ...props } : Props) => {
                   required
                 />
               </div>
-              <div className='flex flex-row justify-between'>
+              <div className='flex flex-row justify-between border-t border-t-base-200 pt-6'>
                 <button type='reset'
-                  className='btn w-[80px] self-start'
+                  className='btn btn-ghost self-start'
                 >Reset</button>
                 <button type='submit'
-                  className="btn w-[80px] self-end"
+                  className="btn btn-warning self-end"
                 >Submit</button>
               </div>
             </div>
           </form>
         </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
     </>
   )

@@ -11,9 +11,15 @@ export interface GlobalState {
   deleteData: Thunk<GlobalState, { ids: number[] }>
   storeData: Thunk<GlobalState, Data>
   uploadData: Thunk<GlobalState, Data[]>
-
   isLoading: boolean
   setLoading: Action<GlobalState, boolean>
+
+  activeScrollSection: string
+  setActiveScrollSection : Action<GlobalState, string>
+  isDataCleaned: boolean
+  setIsDataCleaned : Action<GlobalState, boolean>
+  isDataNormalize : boolean
+  setIsDataNormalize : Action<GlobalState, boolean>
 }
 const store = createStore<GlobalState>({
   data: [],
@@ -85,6 +91,18 @@ const store = createStore<GlobalState>({
   setLoading: action((state, payload) => {
     state.isLoading = payload
   }),
+  activeScrollSection: '',
+  setActiveScrollSection: action((state, payload) =>{
+    state.activeScrollSection = payload
+  }),
+  isDataCleaned : false,
+  setIsDataCleaned : action((state, payload) =>{
+    state.isDataCleaned = payload
+  }),
+  isDataNormalize: false,
+  setIsDataNormalize: action((state, payload)=>{
+    state.isDataNormalize = payload
+  })
 })
 
 export default store
