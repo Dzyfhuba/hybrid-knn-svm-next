@@ -12,7 +12,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.4",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "daisyui": "^4.12.2",
     "danfojs": "^1.1.2",
     "datatables.net-buttons-dt": "^3.0.2",
