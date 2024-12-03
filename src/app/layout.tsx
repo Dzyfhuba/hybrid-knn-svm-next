@@ -52,6 +52,10 @@ export default function RootLayout({
               },
               Divider: {
                 colorSplit: 'var(--foreground)',
+              },
+              Anchor: {
+                colorText: 'var(--foreground)',
+                colorLinkActive: '#ff0000',
               }
             },
           }}

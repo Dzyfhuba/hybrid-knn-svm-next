@@ -7,41 +7,41 @@ export type Json =
   | Json[]
 
 export type Database = {
-  public: {
+  svm_knn: {
     Tables: {
-      skills: {
+      raw: {
         Row: {
-          category: string
-          description_cn: string | null
-          description_en: string | null
-          description_id: string | null
-          description_jp: string | null
-          description_sa: string | null
+          co: number | null
+          created_at: string
           id: number
-          image: string | null
-          skill: string
+          kualitas: string | null
+          no2: number | null
+          o3: number | null
+          pm10: number | null
+          pm2_5: number | null
+          so2: number | null
         }
         Insert: {
-          category: string
-          description_cn?: string | null
-          description_en?: string | null
-          description_id?: string | null
-          description_jp?: string | null
-          description_sa?: string | null
+          co?: number | null
+          created_at?: string
           id?: number
-          image?: string | null
-          skill: string
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
         }
         Update: {
-          category?: string
-          description_cn?: string | null
-          description_en?: string | null
-          description_id?: string | null
-          description_jp?: string | null
-          description_sa?: string | null
+          co?: number | null
+          created_at?: string
           id?: number
-          image?: string | null
-          skill?: string
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
         }
         Relationships: []
       }

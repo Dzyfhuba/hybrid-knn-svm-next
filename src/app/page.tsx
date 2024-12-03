@@ -1,21 +1,33 @@
+import ListOfContent from "@/components/contents/list-of-content"
 import { Content } from "antd/es/layout/layout"
 
 export default function Home() {
   return (
     <>
-      <aside
+      {/* <aside
         className="!w-full sm:!w-48 order-first"
       >
-      </aside>
+      </aside> */}
       <Content
         className="order-2 sm:!order-1"
       >
-        content
+        <section id="raw">
+
+        </section>
+        {/* <section id="clean">
+
+        </section> */}
+        <section id="train">
+
+        </section>
+        <section id="test">
+          
+        </section>
       </Content>
       <aside
-        className="order-1 sm:!order-2"
+        className="order-1 sm:!order-2 w-full sm:w-96"
       >
-        aside
+        <ListOfContent />
       </aside>
     </>
   )

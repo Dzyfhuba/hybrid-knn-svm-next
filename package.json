@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type": "dotenv -- supabase gen types typescript --project-id yweomcrqdcosmmgvoqfi > src/types/database.types.ts"
+    "type": "dotenv -- supabase gen types typescript -s svm_knn --project-id yweomcrqdcosmmgvoqfi > src/types/database.types.ts"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
