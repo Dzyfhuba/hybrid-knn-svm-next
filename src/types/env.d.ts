@@ -1,4 +1,4 @@
-export {}
+export { }
 
 declare global {
   namespace NodeJS {
@@ -13,6 +13,9 @@ declare global {
       readonly NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: string
       readonly NEXT_PUBLIC_FIREBASE_APP_ID: string
       readonly NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: string
+
+      readonly SUPABASE_URL: string
+      readonly SUPABASE_KEY: string
     }
   }
 }
