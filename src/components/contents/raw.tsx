@@ -87,18 +87,25 @@ const Raw = () => {
   const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
   console.log(selfUrl)
 
+  const parseParams = (params: TableParams) => ({
+    ...params.pagination,
+    sortField: params.sortField,
+    sortOrder: params.sortOrder,
+    ...params.filters,
+  })
+
   const fetchData = () => {
     setLoading(true)
-    fetch(`${selfUrl}/api/raw?${qs.stringify(tableParams)}`)
+    fetch(`${selfUrl}/api/raw?${qs.stringify(parseParams(tableParams))}`)
       .then((res) => res.json())
-      .then(({ results }) => {
-        setData(results)
+      .then((res) => {
+        setData(res.data)
         setLoading(false)
         setTableParams({
           ...tableParams,
           pagination: {
             ...tableParams.pagination,
-            total: 200,
+            total: res.total,
             // 200 is mock data, you should read it from server
             // total: data.totalCount,
           },

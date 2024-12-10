@@ -5,15 +5,19 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl
   const orderBy = url.searchParams.get("orderBy") || "id"
   const order = url.searchParams.get("order") || "asc"
-  const limit = url.searchParams.get("limit") || 10
-  const offset = url.searchParams.get("offset") || 0
+  const pageSize = parseInt(url.searchParams.get("pageSize") || "10", 10)
+  const current = parseInt(url.searchParams.get("current") || "0", 10)
 
   const data = await supabase.from("raw").select("*")
     .order(orderBy, {ascending: order === "asc"})
-    .range(Number(offset), Number(offset) + Number(limit))
+    .range(current * pageSize, (current + 1) * pageSize - 1)
     
+  const total = await supabase.from("raw").select("id", {count: "exact"})
 
-  return new Response(JSON.stringify(data), {
+  return new Response(JSON.stringify({
+    data: data.data,
+    total: total.count,
+  }), {
     headers: {
       "content-type": "application/json",
     },
