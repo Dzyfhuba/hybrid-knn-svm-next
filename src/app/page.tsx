@@ -1,4 +1,5 @@
 import ListOfContent from "@/components/contents/list-of-content"
+import Raw from "@/components/contents/raw"
 import { Content } from "antd/es/layout/layout"
 
 export default function Home() {
@@ -12,7 +13,7 @@ export default function Home() {
         className="order-2 sm:!order-1"
       >
         <section id="raw">
-
+          <Raw />
         </section>
         {/* <section id="clean">
 

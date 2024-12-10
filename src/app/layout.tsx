@@ -1,6 +1,6 @@
 import ClientWrapper from "@/components/client-wrapper"
 import Footer from "@/components/footer"
-import Analytics from "@/components/libraries/analytics"
+import Analytics from "@/components/analytics"
 import Navigation from "@/components/navigation"
 import { AntdRegistry } from "@ant-design/nextjs-registry"
 import { ConfigProvider, Divider, Layout } from "antd"
