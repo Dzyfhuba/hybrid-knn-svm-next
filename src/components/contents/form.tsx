@@ -28,12 +28,15 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
     try {
       const values = await form.validateFields()
       const newData: DataType = {
-        id: editData?.id ?? Date.now(),
+        id: editData?.id ?? Date.now(), // Gunakan ID untuk update, atau timestamp untuk create
         ...values,
       }
 
-      const response = await fetch(`/api/raw?id=${newData.id}`, {
-        method: 'PUT',
+      const method = editData ? 'PUT' : 'POST'
+      const url = editData ? `/api/raw?id=${editData.id}` : '/api/raw'
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -44,7 +47,7 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
 
       if (response.ok) {
         message.success('Data berhasil disimpan')
-        onCreate(result)
+        onCreate(result)  // Memanggil onCreate dengan data yang baru
       } else {
         message.error(`Error: ${result.error || 'Gagal menyimpan data'}`)
       }
@@ -57,7 +60,7 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
 
   useEffect(() => {
     if (editData) {
-      form.setFieldsValue(editData)
+      form.setFieldsValue(editData)  // Isi form dengan data yang akan diedit
     }
   }, [editData, form])
 
@@ -78,43 +81,43 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
         <Form.Item
           name="pm10"
           label="PM10"
-          rules={[{ required: true, message: 'PM10 tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'PM10 tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
         <Form.Item
           name="pm2_5"
           label="PM2.5"
-          rules={[{ required: true, message: 'PM2.5 tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'PM2.5 tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
         <Form.Item
           name="so2"
           label="SO2"
-          rules={[{ required: true, message: 'SO2 tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'SO2 tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
         <Form.Item
           name="co"
           label="CO"
-          rules={[{ required: true, message: 'CO tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'CO tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
         <Form.Item
           name="o3"
           label="O3"
-          rules={[{ required: true, message: 'O3 tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'O3 tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
         <Form.Item
           name="no2"
           label="NO2"
-          rules={[{ required: true, message: 'NO2 tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'NO2 tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
         <Form.Item
           name="kualitas"
           label="Kualitas"
-          rules={[{ required: true, message: 'Kualitas tidak boleh kosong' }]}>
+          rules={[{ required: true, message: 'Kualitas tidak boleh kosong' }]} >
           <Input />
         </Form.Item>
       </Form>

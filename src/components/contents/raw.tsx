@@ -27,54 +27,6 @@ interface TableParams {
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
 
-const columns: ColumnsType<DataType> = [
-  {
-    title: 'ID',
-    dataIndex: 'id',
-    sorter: true,
-  },
-  {
-    title: 'PM10',
-    dataIndex: 'pm10',
-    sorter: true,
-  },
-  {
-    title: 'PM2.5',
-    dataIndex: 'pm2_5',
-    sorter: true,
-  },
-  {
-    title: 'SO2',
-    dataIndex: 'so2',
-    sorter: true,
-  },
-  {
-    title: 'CO',
-    dataIndex: 'co',
-    sorter: true,
-  },
-  {
-    title: 'O3',
-    dataIndex: 'o3',
-    sorter: true,
-  },
-  {
-    title: 'NO2',
-    dataIndex: 'no2',
-    sorter: true,
-  },
-  {
-    title: 'Kualitas',
-    dataIndex: 'kualitas',
-    sorter: true,
-    filters: [
-      { text: 'BAIK', value: 'BAIK' },
-      { text: 'SEDANG', value: 'SEDANG' },
-      { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-    ]
-  },
-]
-
 const Raw = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
@@ -85,6 +37,7 @@ const Raw = () => {
     },
   })
   const [isModalVisible, setIsModalVisible] = useState(false) 
+  const [editData, setEditData] = useState<DataType | null>(null) // Tetap gunakan null
 
   const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
 
@@ -135,8 +88,8 @@ const Raw = () => {
 
   const handleCreate = async (newData: DataType) => {
     try {
-      const response = await fetch('/api/raw', {
-        method: 'POST',
+      const response = await fetch(editData ? `/api/raw?id=${editData.id}` : '/api/raw', {
+        method: editData ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -144,19 +97,83 @@ const Raw = () => {
       })
 
       if (!response.ok) {
-        throw new Error('Gagal menambah data')
+        throw new Error('Gagal menyimpan data')
       }
-      message.success('Data berhasil ditambahkan')
+
+      message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
       setIsModalVisible(false)
-      fetchData()
+      setEditData(null)  // Reset data edit
+      fetchData()  // Reload data
     } catch (error) {
       if (error instanceof Error) {
         message.error(error.message)
       } else {
-        message.error('Terjadi kesalahan tidak dikenal')
+        message.error('An unknown error occurred')
       }
     }
   }
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      sorter: true,
+    },
+    {
+      title: 'PM10',
+      dataIndex: 'pm10',
+      sorter: true,
+    },
+    {
+      title: 'PM2.5',
+      dataIndex: 'pm2_5',
+      sorter: true,
+    },
+    {
+      title: 'SO2',
+      dataIndex: 'so2',
+      sorter: true,
+    },
+    {
+      title: 'CO',
+      dataIndex: 'co',
+      sorter: true,
+    },
+    {
+      title: 'O3',
+      dataIndex: 'o3',
+      sorter: true,
+    },
+    {
+      title: 'NO2',
+      dataIndex: 'no2',
+      sorter: true,
+    },
+    {
+      title: 'Kualitas',
+      dataIndex: 'kualitas',
+      sorter: true,
+      filters: [
+        { text: 'BAIK', value: 'BAIK' },
+        { text: 'SEDANG', value: 'SEDANG' },
+        { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
+      ]
+    },
+    {
+      title: 'Aksi',
+      render: (_, record) => (
+        <Button 
+          type="link" 
+          onClick={() => {
+            setEditData(record)  // Set data yang akan diedit
+            setIsModalVisible(true)  // Tampilkan modal
+          }}
+        >
+          Edit
+        </Button>
+      ),
+    }
+  ]
 
   return (
     <div>
@@ -183,6 +200,7 @@ const Raw = () => {
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         onCreate={handleCreate}
+        editData={editData || undefined} // Pastikan null diubah menjadi undefined
       />
     </div>
   )

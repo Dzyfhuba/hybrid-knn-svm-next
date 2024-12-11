@@ -9,10 +9,10 @@ export async function GET(request: NextRequest) {
   const current = parseInt(url.searchParams.get("current") || "0", 10)
 
   const data = await supabase.from("raw").select("*")
-    .order(orderBy, {ascending: order === "asc"})
+    .order(orderBy, { ascending: order === "asc" })
     .range(current * pageSize, (current + 1) * pageSize - 1)
     
-  const total = await supabase.from("raw").select("id", {count: "exact"})
+  const total = await supabase.from("raw").select("id", { count: "exact" })
 
   return new Response(JSON.stringify({
     data: data.data,
@@ -26,15 +26,14 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const url = request.nextUrl
-  const id = url.searchParams.get("id")  
-  const body = await request.json()  
-
+  const id = url.searchParams.get("id")
+  const body = await request.json()
 
   if (!id) {
     const { data, error } = await supabase
       .from("raw")
-      .insert([body])  
-      .select() 
+      .insert([body])
+      .select()
 
     if (error) {
       return new Response(
@@ -50,11 +49,9 @@ export async function PUT(request: NextRequest) {
     })
   }
 
-
   const { data, error } = await supabase
     .from("raw")
-    // .upsert([{ id: id, ...body }], { onConflict: "id" })  
-    .upsert([ body ], { onConflict: "id" })  
+    .upsert([{ id, ...body }], { onConflict: "id" })
 
   if (error) {
     return new Response(
