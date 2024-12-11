@@ -4,7 +4,7 @@ import { Button, Divider, GetProp, message, Table, TableProps } from "antd"
 import { SorterResult } from "antd/es/table/interface"
 import { useEffect, useState } from "react"
 import qs from 'qs'
-import ModalCreate from "./form"
+import ModalForm from "./form"
 
 interface DataType {
   id: number
@@ -179,7 +179,7 @@ const Raw = () => {
         onChange={handleTableChange}
       />
 
-      <ModalCreate
+      <ModalForm
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         onCreate={handleCreate}

@@ -21,7 +21,7 @@ interface ModalCreateProps {
   editData?: DataType
 }
 
-const ModalCreate = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) => {
+const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) => {
   const [form] = Form.useForm()
 
   const handleCreate = async () => {
@@ -72,7 +72,7 @@ const ModalCreate = ({ visible, onCancel, onCreate, editData }: ModalCreateProps
     >
       <Form
         form={form}
-        layout="vertical"
+        layout="horizontal"
         initialValues={{ pm10: '', pm2_5: '', so2: '', co: '', o3: '', no2: '', kualitas: '' }}
       >
         <Form.Item
@@ -122,4 +122,4 @@ const ModalCreate = ({ visible, onCancel, onCreate, editData }: ModalCreateProps
   )
 }
 
-export default ModalCreate
+export default ModalForm
