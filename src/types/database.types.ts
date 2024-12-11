@@ -9,6 +9,204 @@ export type Json =
 export type Database = {
   svm_knn: {
     Tables: {
+      data_test: {
+        Row: {
+          co: number | null
+          created_at: string
+          id: number
+          kualitas: string | null
+          no2: number | null
+          o3: number | null
+          pm10: number | null
+          pm2_5: number | null
+          so2: number | null
+        }
+        Insert: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Update: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Relationships: []
+      }
+      data_train: {
+        Row: {
+          co: number | null
+          created_at: string
+          id: number
+          kualitas: string | null
+          no2: number | null
+          o3: number | null
+          pm10: number | null
+          pm2_5: number | null
+          so2: number | null
+        }
+        Insert: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Update: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Relationships: []
+      }
+      model: {
+        Row: {
+          created_at: string
+          id: number
+          model: Json | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          model?: Json | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          model?: Json | null
+        }
+        Relationships: []
+      }
+      normalized: {
+        Row: {
+          co: number | null
+          created_at: string
+          id: number
+          kualitas: string | null
+          no2: number | null
+          o3: number | null
+          pm10: number | null
+          pm2_5: number | null
+          so2: number | null
+        }
+        Insert: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Update: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Relationships: []
+      }
+      prediction_knn: {
+        Row: {
+          co: number | null
+          created_at: string
+          id: number
+          kualitas: string | null
+          no2: number | null
+          o3: number | null
+          pm10: number | null
+          pm2_5: number | null
+          so2: number | null
+        }
+        Insert: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Update: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Relationships: []
+      }
+      prediction_svm: {
+        Row: {
+          co: number | null
+          created_at: string
+          id: number
+          kualitas: string | null
+          no2: number | null
+          o3: number | null
+          pm10: number | null
+          pm2_5: number | null
+          so2: number | null
+        }
+        Insert: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Update: {
+          co?: number | null
+          created_at?: string
+          id?: number
+          kualitas?: string | null
+          no2?: number | null
+          o3?: number | null
+          pm10?: number | null
+          pm2_5?: number | null
+          so2?: number | null
+        }
+        Relationships: []
+      }
       raw: {
         Row: {
           co: number | null

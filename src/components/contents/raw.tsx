@@ -1,9 +1,10 @@
 'use client'
 
-import { Divider, GetProp, Table, TableProps } from "antd"
+import { Button, Divider, GetProp, message, Table, TableProps } from "antd"
 import { SorterResult } from "antd/es/table/interface"
 import { useEffect, useState } from "react"
 import qs from 'qs'
+import ModalCreate from "./form"
 
 interface DataType {
   id: number
@@ -83,24 +84,29 @@ const Raw = () => {
       pageSize: 10,
     },
   })
+  const [isModalVisible, setIsModalVisible] = useState(false) 
 
   const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
-  console.log(selfUrl)
+
+  const parseParams = (params: TableParams) => ({
+    ...params.pagination,
+    sortField: params.sortField,
+    sortOrder: params.sortOrder,
+    ...params.filters,
+  })
 
   const fetchData = () => {
     setLoading(true)
-    fetch(`${selfUrl}/api/raw?${qs.stringify(tableParams)}`)
+    fetch(`${selfUrl}/api/raw?${qs.stringify(parseParams(tableParams))}`)
       .then((res) => res.json())
-      .then(({ results }) => {
-        setData(results)
+      .then((res) => {
+        setData(res.data)
         setLoading(false)
         setTableParams({
           ...tableParams,
           pagination: {
             ...tableParams.pagination,
-            total: 200,
-            // 200 is mock data, you should read it from server
-            // total: data.totalCount,
+            total: res.total,
           },
         })
       })
@@ -122,19 +128,49 @@ const Raw = () => {
       sortField: Array.isArray(sorter) ? undefined : sorter.field,
     })
 
-    // `dataSource` is useless since `pageSize` changed
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([])
+      setData([]) 
     }
   }
 
+  const handleCreate = async (newData: DataType) => {
+    try {
+      const response = await fetch('/api/raw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newData),
+      })
+
+      if (!response.ok) {
+        throw new Error('Gagal menambah data')
+      }
+      message.success('Data berhasil ditambahkan')
+      setIsModalVisible(false) // Menutup modal setelah berhasil menambah data
+      fetchData() // Memanggil ulang data setelah menambah data baru
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error(error.message)
+      } else {
+        message.error('Terjadi kesalahan tidak dikenal')
+      }
+    }
+  }
 
   return (
     <div>
-      <h2 className="text-xl font-bold">
-        Data Mentah
-      </h2>
+      <h2 className="text-xl font-bold">Data Mentah</h2>
       <Divider />
+      <Button
+        type="primary"
+        onClick={() => setIsModalVisible(true)} // Menampilkan modal ketika tombol diklik
+        style={{ marginBottom: 16 }}
+      >
+        Tambah Data
+      </Button>
+
+      {/* Tabel yang menampilkan data */}
       <Table<DataType>
         columns={columns}
         rowKey={(record) => record.id}
@@ -142,6 +178,13 @@ const Raw = () => {
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
+      />
+
+      {/* Modal untuk menambah data */}
+      <ModalCreate
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)} // Menutup modal saat batal
+        onCreate={handleCreate} // Mengirimkan data yang baru dibuat ke API
       />
     </div>
   )
