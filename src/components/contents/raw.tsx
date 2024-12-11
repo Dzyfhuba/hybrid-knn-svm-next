@@ -147,8 +147,8 @@ const Raw = () => {
         throw new Error('Gagal menambah data')
       }
       message.success('Data berhasil ditambahkan')
-      setIsModalVisible(false) // Menutup modal setelah berhasil menambah data
-      fetchData() // Memanggil ulang data setelah menambah data baru
+      setIsModalVisible(false)
+      fetchData()
     } catch (error) {
       if (error instanceof Error) {
         message.error(error.message)
@@ -164,13 +164,12 @@ const Raw = () => {
       <Divider />
       <Button
         type="primary"
-        onClick={() => setIsModalVisible(true)} // Menampilkan modal ketika tombol diklik
+        onClick={() => setIsModalVisible(true)}
         style={{ marginBottom: 16 }}
       >
         Tambah Data
       </Button>
 
-      {/* Tabel yang menampilkan data */}
       <Table<DataType>
         columns={columns}
         rowKey={(record) => record.id}
@@ -180,11 +179,10 @@ const Raw = () => {
         onChange={handleTableChange}
       />
 
-      {/* Modal untuk menambah data */}
       <ModalCreate
         visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)} // Menutup modal saat batal
-        onCreate={handleCreate} // Mengirimkan data yang baru dibuat ke API
+        onCancel={() => setIsModalVisible(false)}
+        onCreate={handleCreate}
       />
     </div>
   )
