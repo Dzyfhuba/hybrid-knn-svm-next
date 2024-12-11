@@ -32,7 +32,7 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
         ...values,
       }
 
-      const method = editData ? 'PUT' : 'POST'
+      const method = editData ? 'PATCH' : 'POST'
       const url = editData ? `/api/raw?id=${editData.id}` : '/api/raw'
 
       const response = await fetch(url, {
@@ -46,7 +46,7 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
       const result = await response.json()
 
       if (response.ok) {
-        message.success('Data berhasil disimpan')
+        message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
         onCreate(result)  // Memanggil onCreate dengan data yang baru
       } else {
         message.error(`Error: ${result.error || 'Gagal menyimpan data'}`)

@@ -36,8 +36,8 @@ const Raw = () => {
       pageSize: 10,
     },
   })
-  const [isModalVisible, setIsModalVisible] = useState(false) 
-  const [editData, setEditData] = useState<DataType | null>(null) // Tetap gunakan null
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [editData, setEditData] = useState<DataType | null>(null)  // Tetap gunakan null untuk edit data
 
   const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
 
@@ -82,14 +82,14 @@ const Raw = () => {
     })
 
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([]) 
+      setData([])  // Clear data when changing pagination
     }
   }
 
   const handleCreate = async (newData: DataType) => {
     try {
       const response = await fetch(editData ? `/api/raw?id=${editData.id}` : '/api/raw', {
-        method: editData ? 'PUT' : 'POST',
+        method: editData ? 'PATCH' : 'POST',  // Ganti PUT menjadi PATCH
         headers: {
           'Content-Type': 'application/json',
         },
@@ -166,7 +166,7 @@ const Raw = () => {
           type="link" 
           onClick={() => {
             setEditData(record)  // Set data yang akan diedit
-            setIsModalVisible(true)  // Tampilkan modal
+            setIsModalVisible(true) // Tampilkan modal
           }}
         >
           Edit
@@ -174,6 +174,7 @@ const Raw = () => {
       ),
     }
   ]
+
 
   return (
     <div>

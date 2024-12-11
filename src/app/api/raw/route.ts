@@ -24,34 +24,43 @@ export async function GET(request: NextRequest) {
   })
 }
 
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
+  const body = await request.json()
+
+  const { data, error } = await supabase
+    .from("raw")
+    .insert([body])
+
+  if (error) {
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 400 }
+    )
+  }
+
+  return new Response(JSON.stringify(data), {
+    headers: {
+      "content-type": "application/json",
+    },
+  })
+}
+
+export async function PATCH(request: NextRequest) {
   const url = request.nextUrl
   const id = url.searchParams.get("id")
   const body = await request.json()
 
   if (!id) {
-    const { data, error } = await supabase
-      .from("raw")
-      .insert([body])
-      .select()
-
-    if (error) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        { status: 400 }
-      )
-    }
-
-    return new Response(JSON.stringify(data), {
-      headers: {
-        "content-type": "application/json",
-      },
-    })
+    return new Response(
+      JSON.stringify({ error: "ID is required for update" }),
+      { status: 400 }
+    )
   }
 
   const { data, error } = await supabase
     .from("raw")
-    .upsert([{ id, ...body }], { onConflict: "id" })
+    .update(body)
+    .match({ id: id })
 
   if (error) {
     return new Response(
