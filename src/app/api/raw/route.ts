@@ -75,3 +75,33 @@ export async function PATCH(request: NextRequest) {
     },
   })
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const url = request.nextUrl
+    const id = url.searchParams.get("id")
+
+    if (!id) {
+      return new Response(JSON.stringify({ error: "ID is required for deletion" }), { status: 400 })
+    }
+
+    console.log("Deleting data with ID:", id)
+
+    const { data, error } = await supabase
+      .from("raw")
+      .delete()
+      .eq("id", id)
+
+    if (error) {
+      console.error("Supabase Error (DELETE):", error.message)
+      return new Response(JSON.stringify({ error: error.message }), { status: 400 })
+    }
+
+    return new Response(JSON.stringify({ message: "Data deleted successfully", data }), {
+      headers: { "content-type": "application/json" },
+    })
+  } catch (err) {
+    console.error("Internal Server Error (DELETE):", err)
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 })
+  }
+}

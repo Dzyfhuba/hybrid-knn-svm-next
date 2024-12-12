@@ -112,7 +112,29 @@ const Raw = () => {
       }
     }
   }
-
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`/api/raw?id=${id}`, {
+        method: "DELETE",
+      })
+  
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Gagal menghapus data: ${errorText}`)
+      }
+  
+      message.success("Data berhasil dihapus")
+      fetchData() // Reload table data after deletion
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error pada handleDelete:", error.message)
+        message.error(error.message)
+      } else {
+        message.error("Terjadi kesalahan")
+      }
+    }
+  }
+  
   const columns: ColumnsType<DataType> = [
     {
       title: 'ID',
@@ -160,19 +182,32 @@ const Raw = () => {
       ]
     },
     {
-      title: 'Aksi',
+      title: "Aksi",
       render: (_, record) => (
-        <Button 
-          type="link" 
-          onClick={() => {
-            setEditData(record)  // Set data yang akan diedit
-            setIsModalopen(true) // Tampilkan modal
-          }}
-        >
-          Edit
-        </Button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button
+            type="primary" 
+            style={{ borderRadius: "4px" }} 
+            onClick={() => {
+              setEditData(record) 
+              setIsModalopen(true) 
+            }}
+          >
+            Edit
+          </Button>
+    
+          <Button
+            type="primary" 
+            danger
+            style={{ borderRadius: "4px" }} 
+            onClick={() => handleDelete(record.id)}
+          >
+            Hapus
+          </Button>
+        </div>
       ),
     }
+    
   ]
 
 
