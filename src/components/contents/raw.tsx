@@ -1,31 +1,31 @@
 'use client'
 
-import { Button, Divider, GetProp, message, Table, TableProps } from 'antd'
+import { Button, Divider, GetProp, message, Modal, Table, TableProps } from 'antd'
 import { SorterResult } from 'antd/es/table/interface'
 import { useEffect, useState } from 'react'
 import qs from 'qs'
 import ModalForm from './form'
 
 interface DataType {
-  id: number
-  pm10: number
-  pm2_5: number
-  so2: number
-  co: number
-  o3: number
-  no2: number
-  kualitas: string
+  id: number;
+  pm10: number;
+  pm2_5: number;
+  so2: number;
+  co: number;
+  o3: number;
+  no2: number;
+  kualitas: string;
 }
 
 interface TableParams {
-  pagination?: TablePaginationConfig
-  sortField?: SorterResult<DataType>['field']
-  sortOrder?: SorterResult<DataType>['order']
-  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1]
+  pagination?: TablePaginationConfig;
+  sortField?: SorterResult<DataType>['field'];
+  sortOrder?: SorterResult<DataType>['order'];
+  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
 }
 
-type ColumnsType<T extends object = object> = TableProps<T>['columns']
-type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
+type ColumnsType<T extends object = object> = TableProps<T>['columns'];
+type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
 
 const Raw = () => {
   const [data, setData] = useState<DataType[]>([])
@@ -68,16 +68,14 @@ const Raw = () => {
       })
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [
+  useEffect(fetchData, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams?.sortOrder,
     tableParams?.sortField,
     JSON.stringify(tableParams.filters),
-    selfUrl,
   ])
+
 
   const handleTableChange: TableProps<DataType>['onChange'] = (
     pagination,
@@ -96,27 +94,35 @@ const Raw = () => {
     }
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await fetch(`/api/raw?id=${id}`, {
-        method: 'DELETE',
-      })
+  const handleDelete = (id: number) => {
+    Modal.confirm({
+      title: 'Konfirmasi Penghapusan',
+      content: 'Apakah Anda yakin ingin menghapus data ini?',
+      okText: 'Ya',
+      cancelText: 'Batal',
+      onOk: async () => {
+        try {
+          const response = await fetch(`/api/raw?id=${id}`, {
+            method: 'DELETE',
+          })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Gagal menghapus data: ${errorText}`)
-      }
+          if (!response.ok) {
+            const errorText = await response.text()
+            throw new Error(`Gagal menghapus data: ${errorText}`)
+          }
 
-      message.success('Data berhasil dihapus')
-      fetchData()
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error pada handleDelete:', error.message)
-        message.error(error.message)
-      } else {
-        message.error('Terjadi kesalahan')
-      }
-    }
+          message.success('Data berhasil dihapus')
+          fetchData()
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error('Error pada handleDelete:', error.message)
+            message.error(error.message)
+          } else {
+            message.error('Terjadi kesalahan')
+          }
+        }
+      },
+    })
   }
 
   const columns: ColumnsType<DataType> = [
