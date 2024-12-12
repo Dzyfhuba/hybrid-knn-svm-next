@@ -37,7 +37,7 @@ const Raw = () => {
     },
   })
   const [isModalopen, setIsModalopen] = useState(false)
-  const [editData, setEditData] = useState<DataType | null>(null)  // Tetap gunakan null untuk edit data
+  const [editData, setEditData] = useState<DataType | null>(null)
 
   const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
 
@@ -82,14 +82,14 @@ const Raw = () => {
     })
 
     if (pagination.pageSize !== tableParams.pagination?.pageSize) {
-      setData([])  // Clear data when changing pagination
+      setData([])
     }
   }
 
   const handleCreate = async (newData: DataType) => {
     try {
       const response = await fetch(editData ? `/api/raw?id=${editData.id}` : '/api/raw', {
-        method: editData ? 'PATCH' : 'POST',  // Ganti PUT menjadi PATCH
+        method: editData ? 'PATCH' : 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -102,8 +102,8 @@ const Raw = () => {
 
       message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
       setIsModalopen(false)
-      setEditData(null)  // Reset data edit
-      fetchData()  // Reload data
+      setEditData(null)
+      fetchData()
     } catch (error) {
       if (error instanceof Error) {
         message.error(error.message)
@@ -124,7 +124,7 @@ const Raw = () => {
       }
   
       message.success("Data berhasil dihapus")
-      fetchData() // Reload table data after deletion
+      fetchData()
     } catch (error) {
       if (error instanceof Error) {
         console.error("Error pada handleDelete:", error.message)
@@ -236,7 +236,7 @@ const Raw = () => {
         open={isModalopen}
         onCancel={() => setIsModalopen(false)}
         onCreate={handleCreate}
-        editData={editData || undefined} // Pastikan null diubah menjadi undefined
+        editData={editData || undefined} 
       />
     </div>
   )
