@@ -6,6 +6,11 @@ const listOfContent = [
     href: "#raw",
     key: "#raw"
   },
+  {
+    title: "Ekspor dan Impor Data", // Tambahkan ini
+    href: "#export-import",
+    key: "#export-import"
+  },
   // {
   //   title: "Data Bersih",
   //   href: "#clean",

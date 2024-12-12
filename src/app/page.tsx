@@ -1,3 +1,4 @@
+import ExportImport from "@/components/contents/export-import"
 import ListOfContent from "@/components/contents/list-of-content"
 import Raw from "@/components/contents/raw"
 import { Content } from "antd/es/layout/layout"
@@ -14,6 +15,9 @@ export default function Home() {
       >
         <section id="raw">
           <Raw />
+        </section>
+        <section id="export-import"> {/* Section untuk Export & Import */}
+          <ExportImport />
         </section>
         {/* <section id="clean">
 
