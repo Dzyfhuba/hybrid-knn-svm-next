@@ -1,7 +1,7 @@
 'use client'
 
 import { Modal, Form, Input, message } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface DataType {
   id: number
@@ -15,20 +15,24 @@ interface DataType {
 }
 
 interface ModalCreateProps {
-  visible: boolean
+  open: boolean
   onCancel: () => void
   onCreate: (data: DataType) => void
   editData?: DataType
 }
 
-const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) => {
+const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => {
   const [form] = Form.useForm()
+  const [loading, setLoading] = useState(false)
 
   const handleCreate = async () => {
+    if (loading) return
+
+    setLoading(true)
     try {
       const values = await form.validateFields()
       const newData: DataType = {
-        id: editData?.id ?? Date.now(), // Gunakan ID untuk update, atau timestamp untuk create
+        id: editData?.id ?? Date.now(),
         ...values,
       }
 
@@ -47,7 +51,7 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
 
       if (response.ok) {
         message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
-        onCreate(result)  // Memanggil onCreate dengan data yang baru
+        onCreate(result)
       } else {
         message.error(`Error: ${result.error || 'Gagal menyimpan data'}`)
       }
@@ -55,28 +59,41 @@ const ModalForm = ({ visible, onCancel, onCreate, editData }: ModalCreateProps) 
       form.resetFields()
     } catch {
       message.error('Gagal membuat data')
+    } finally {
+      setLoading(false) // Kembalikan status loading
     }
   }
 
+
   useEffect(() => {
     if (editData) {
-      form.setFieldsValue(editData)  // Isi form dengan data yang akan diedit
+      form.setFieldsValue(editData)
     }
   }, [editData, form])
 
   return (
     <Modal
       title={editData ? "Edit Data" : "Tambah Data"}
-      visible={visible}
+      open={open}
       onCancel={onCancel}
       onOk={handleCreate}
       okText={editData ? "Simpan Perubahan" : "Tambah"}
       cancelText="Batal"
+      confirmLoading={loading} 
     >
+
       <Form
         form={form}
         layout="horizontal"
-        initialValues={{ pm10: '', pm2_5: '', so2: '', co: '', o3: '', no2: '', kualitas: '' }}
+        initialValues={{
+          pm10: '',
+          pm2_5: '',
+          so2: '',
+          co: '',
+          o3: '',
+          no2: '',
+          kualitas: ''
+        }}
       >
         <Form.Item
           name="pm10"

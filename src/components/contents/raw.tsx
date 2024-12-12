@@ -36,7 +36,7 @@ const Raw = () => {
       pageSize: 10,
     },
   })
-  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isModalopen, setIsModalopen] = useState(false)
   const [editData, setEditData] = useState<DataType | null>(null)  // Tetap gunakan null untuk edit data
 
   const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
@@ -101,7 +101,7 @@ const Raw = () => {
       }
 
       message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
-      setIsModalVisible(false)
+      setIsModalopen(false)
       setEditData(null)  // Reset data edit
       fetchData()  // Reload data
     } catch (error) {
@@ -166,7 +166,7 @@ const Raw = () => {
           type="link" 
           onClick={() => {
             setEditData(record)  // Set data yang akan diedit
-            setIsModalVisible(true) // Tampilkan modal
+            setIsModalopen(true) // Tampilkan modal
           }}
         >
           Edit
@@ -182,7 +182,7 @@ const Raw = () => {
       <Divider />
       <Button
         type="primary"
-        onClick={() => setIsModalVisible(true)}
+        onClick={() => setIsModalopen(true)}
         style={{ marginBottom: 16 }}
       >
         Tambah Data
@@ -198,8 +198,8 @@ const Raw = () => {
       />
 
       <ModalForm
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
+        open={isModalopen}
+        onCancel={() => setIsModalopen(false)}
         onCreate={handleCreate}
         editData={editData || undefined} // Pastikan null diubah menjadi undefined
       />
