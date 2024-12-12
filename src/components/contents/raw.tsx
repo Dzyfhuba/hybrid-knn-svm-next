@@ -1,13 +1,13 @@
 'use client'
 
-import { Button, Divider, GetProp, message, Table, TableProps } from "antd"
-import { SorterResult } from "antd/es/table/interface"
-import { useEffect, useState } from "react"
+import { Button, Divider, GetProp, message, Table, TableProps } from 'antd'
+import { SorterResult } from 'antd/es/table/interface'
+import { useEffect, useState } from 'react'
 import qs from 'qs'
-import ModalForm from "./form"
+import ModalForm from './form'
 
 interface DataType {
-  id: number 
+  id: number
   pm10: number
   pm2_5: number
   so2: number
@@ -18,14 +18,14 @@ interface DataType {
 }
 
 interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: SorterResult<DataType>['field'];
-  sortOrder?: SorterResult<DataType>['order'];
-  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
+  pagination?: TablePaginationConfig
+  sortField?: SorterResult<DataType>['field']
+  sortOrder?: SorterResult<DataType>['order']
+  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1]
 }
 
-type ColumnsType<T extends object = object> = TableProps<T>['columns'];
-type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
+type ColumnsType<T extends object = object> = TableProps<T>['columns']
+type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
   const [data, setData] = useState<DataType[]>([])
@@ -39,7 +39,10 @@ const Raw = () => {
   const [isModalopen, setIsModalopen] = useState(false)
   const [editData, setEditData] = useState<DataType | null>(null)
 
-  const selfUrl = typeof window === 'undefined' ? '' : `${window.location.protocol}//${window.location.host}`
+  const selfUrl =
+    typeof window === 'undefined'
+      ? ''
+      : `${window.location.protocol}//${window.location.host}`
 
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
@@ -65,15 +68,22 @@ const Raw = () => {
       })
   }
 
-  useEffect(fetchData, [
+  useEffect(() => {
+    fetchData()
+  }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams?.sortOrder,
     tableParams?.sortField,
     JSON.stringify(tableParams.filters),
+    selfUrl,
   ])
 
-  const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
+  const handleTableChange: TableProps<DataType>['onChange'] = (
+    pagination,
+    filters,
+    sorter
+  ) => {
     setTableParams({
       pagination,
       filters,
@@ -89,22 +99,22 @@ const Raw = () => {
   const handleDelete = async (id: number) => {
     try {
       const response = await fetch(`/api/raw?id=${id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       })
-  
+
       if (!response.ok) {
         const errorText = await response.text()
         throw new Error(`Gagal menghapus data: ${errorText}`)
       }
-  
-      message.success("Data berhasil dihapus")
+
+      message.success('Data berhasil dihapus')
       fetchData()
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Error pada handleDelete:", error.message)
+        console.error('Error pada handleDelete:', error.message)
         message.error(error.message)
       } else {
-        message.error("Terjadi kesalahan")
+        message.error('Terjadi kesalahan')
       }
     }
   }
@@ -153,34 +163,34 @@ const Raw = () => {
         { text: 'BAIK', value: 'BAIK' },
         { text: 'SEDANG', value: 'SEDANG' },
         { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      ]
+      ],
     },
     {
-      title: "Aksi",
+      title: 'Aksi',
       render: (_, record) => (
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           <Button
-            type="primary" 
-            style={{ borderRadius: "4px" }} 
+            type="primary"
+            style={{ borderRadius: '4px' }}
             onClick={() => {
-              setEditData(record) 
-              setIsModalopen(true) 
+              setEditData(record)
+              setIsModalopen(true)
             }}
           >
             Edit
           </Button>
-    
+
           <Button
-            type="primary" 
+            type="primary"
             danger
-            style={{ borderRadius: "4px" }} 
+            style={{ borderRadius: '4px' }}
             onClick={() => handleDelete(record.id)}
           >
             Hapus
           </Button>
         </div>
       ),
-    }
+    },
   ]
 
   return (
@@ -189,7 +199,10 @@ const Raw = () => {
       <Divider />
       <Button
         type="primary"
-        onClick={() => setIsModalopen(true)}
+        onClick={() => {
+          setEditData(null)
+          setIsModalopen(true)
+        }}
         style={{ marginBottom: 16 }}
       >
         Tambah Data
@@ -206,13 +219,17 @@ const Raw = () => {
 
       <ModalForm
         open={isModalopen}
-        onCancel={() => setIsModalopen(false)}
-        onCreate={(data: DataType) => {
-          console.log("Creating data:", data)
+        onCancel={() => {
           setIsModalopen(false)
+          setEditData(null)
+        }}
+        onCreate={(data: DataType) => {
+          console.log('Creating data:', data)
+          setIsModalopen(false)
+          setEditData(null)
           fetchData()
         }}
-        editData={editData || undefined} 
+        editData={editData || undefined}
       />
     </div>
   )
