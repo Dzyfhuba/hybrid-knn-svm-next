@@ -1,6 +1,6 @@
 'use client'
 
-import { Modal, Form, Input, message } from 'antd'
+import { Modal, Form, Input, message, Select } from 'antd'
 import { useEffect, useState } from 'react'
 
 interface DataType {
@@ -60,7 +60,7 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
     } catch {
       message.error('Gagal membuat data')
     } finally {
-      setLoading(false) // Kembalikan status loading
+      setLoading(false) 
     }
   }
 
@@ -79,65 +79,103 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
       onOk={handleCreate}
       okText={editData ? "Simpan Perubahan" : "Tambah"}
       cancelText="Batal"
-      confirmLoading={loading} 
+      confirmLoading={loading}
     >
 
-      <Form
-        form={form}
-        layout="horizontal"
-        initialValues={{
-          pm10: '',
-          pm2_5: '',
-          so2: '',
-          co: '',
-          o3: '',
-          no2: '',
-          kualitas: ''
-        }}
-      >
-        <Form.Item
-          name="pm10"
-          label="PM10"
-          rules={[{ required: true, message: 'PM10 tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="pm2_5"
-          label="PM2.5"
-          rules={[{ required: true, message: 'PM2.5 tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="so2"
-          label="SO2"
-          rules={[{ required: true, message: 'SO2 tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="co"
-          label="CO"
-          rules={[{ required: true, message: 'CO tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="o3"
-          label="O3"
-          rules={[{ required: true, message: 'O3 tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="no2"
-          label="NO2"
-          rules={[{ required: true, message: 'NO2 tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="kualitas"
-          label="Kualitas"
-          rules={[{ required: true, message: 'Kualitas tidak boleh kosong' }]} >
-          <Input />
-        </Form.Item>
-      </Form>
+<Form
+  form={form}
+  layout="horizontal"
+  initialValues={{
+    pm10: '',
+    pm2_5: '',
+    so2: '',
+    co: '',
+    o3: '',
+    no2: '',
+    kualitas: '',
+  }}
+>
+  {/* PM10 */}
+  <Form.Item
+    name="pm10"
+    label="PM10"
+    rules={[
+      { required: true, message: 'PM10 tidak boleh kosong' },
+    ]}
+  >
+    <Input type="number" placeholder="Masukkan PM10" min={0} />
+  </Form.Item>
+
+  {/* PM2.5 */}
+  <Form.Item
+    name="pm2_5"
+    label="PM2.5"
+    rules={[
+      { required: true, message: 'PM2.5 tidak boleh kosong' },
+    ]}
+  >
+    <Input type="number" placeholder="Masukkan PM2.5" min={0} />
+  </Form.Item>
+
+  {/* SO2 */}
+  <Form.Item
+    name="so2"
+    label="SO2"
+    rules={[
+      { required: true, message: 'SO2 tidak boleh kosong' },
+    ]}
+  >
+    <Input type="number" placeholder="Masukkan SO2" min={0} />
+  </Form.Item>
+
+  {/* CO */}
+  <Form.Item
+    name="co"
+    label="CO"
+    rules={[
+      { required: true, message: 'CO tidak boleh kosong' },
+    ]}
+  >
+    <Input type="number" placeholder="Masukkan CO" min={0} />
+  </Form.Item>
+
+  {/* O3 */}
+  <Form.Item
+    name="o3"
+    label="O3"
+    rules={[
+      { required: true, message: 'O3 tidak boleh kosong' },
+    ]}
+  >
+    <Input type="number" placeholder="Masukkan O3" min={0} />
+  </Form.Item>
+
+  {/* NO2 */}
+  <Form.Item
+    name="no2"
+    label="NO2"
+    rules={[
+      { required: true, message: 'NO2 tidak boleh kosong' },
+    ]}
+  >
+    <Input type="number" placeholder="Masukkan NO2" min={0} />
+  </Form.Item>
+
+  {/* Kualitas */}
+  <Form.Item
+    name="kualitas"
+    label="Kualitas"
+    rules={[{ required: true, message: 'Kualitas tidak boleh kosong' }]}
+  >
+    <Select placeholder="Pilih Kualitas">
+      <Select.Option value="BAIK">BAIK</Select.Option>
+      <Select.Option value="SEDANG">SEDANG</Select.Option>
+      <Select.Option value="TIDAK SEHAT">TIDAK SEHAT</Select.Option>
+    </Select>
+  </Form.Item>
+</Form>
+
+
     </Modal>
   )
 }
