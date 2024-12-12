@@ -83,6 +83,8 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
       confirmLoading={loading}
     >
       <Form
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 14 }}
         form={form}
         layout="horizontal"
         initialValues={{
