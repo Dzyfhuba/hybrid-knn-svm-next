@@ -7,7 +7,7 @@ import qs from 'qs'
 import ModalForm from "./form"
 
 interface DataType {
-  id: number
+  id: number 
   pm10: number
   pm2_5: number
   so2: number
@@ -65,13 +65,13 @@ const Raw = () => {
       })
   }
 
-  useEffect(fetchData, [
-    tableParams.pagination?.current,
-    tableParams.pagination?.pageSize,
-    tableParams?.sortOrder,
-    tableParams?.sortField,
-    JSON.stringify(tableParams.filters),
-  ])
+    useEffect(fetchData, [
+      tableParams.pagination?.current,
+      tableParams.pagination?.pageSize,
+      tableParams?.sortOrder,
+      tableParams?.sortField,
+      JSON.stringify(tableParams.filters),
+    ])
 
   const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
     setTableParams({
@@ -86,32 +86,7 @@ const Raw = () => {
     }
   }
 
-  const handleCreate = async (newData: DataType) => {
-    try {
-      const response = await fetch(editData ? `/api/raw?id=${editData.id}` : '/api/raw', {
-        method: editData ? 'PATCH' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newData),
-      })
 
-      if (!response.ok) {
-        throw new Error('Gagal menyimpan data')
-      }
-
-      message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
-      setIsModalopen(false)
-      setEditData(null)
-      fetchData()
-    } catch (error) {
-      if (error instanceof Error) {
-        message.error(error.message)
-      } else {
-        message.error('An unknown error occurred')
-      }
-    }
-  }
   const handleDelete = async (id: number) => {
     try {
       const response = await fetch(`/api/raw?id=${id}`, {
@@ -235,7 +210,11 @@ const Raw = () => {
       <ModalForm
         open={isModalopen}
         onCancel={() => setIsModalopen(false)}
-        onCreate={handleCreate}
+        onCreate={(data: DataType) => {
+          console.log("Creating data:", data)
+          setIsModalopen(false)
+          fetchData()
+        }}
         editData={editData || undefined} 
       />
     </div>
