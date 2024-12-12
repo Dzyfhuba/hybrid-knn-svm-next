@@ -65,13 +65,13 @@ const Raw = () => {
       })
   }
 
-    useEffect(fetchData, [
-      tableParams.pagination?.current,
-      tableParams.pagination?.pageSize,
-      tableParams?.sortOrder,
-      tableParams?.sortField,
-      JSON.stringify(tableParams.filters),
-    ])
+  useEffect(fetchData, [
+    tableParams.pagination?.current,
+    tableParams.pagination?.pageSize,
+    tableParams?.sortOrder,
+    tableParams?.sortField,
+    JSON.stringify(tableParams.filters),
+  ])
 
   const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
     setTableParams({
@@ -85,7 +85,6 @@ const Raw = () => {
       setData([])
     }
   }
-
 
   const handleDelete = async (id: number) => {
     try {
@@ -109,7 +108,7 @@ const Raw = () => {
       }
     }
   }
-  
+
   const columns: ColumnsType<DataType> = [
     {
       title: 'ID',
@@ -182,9 +181,7 @@ const Raw = () => {
         </div>
       ),
     }
-    
   ]
-
 
   return (
     <div>
