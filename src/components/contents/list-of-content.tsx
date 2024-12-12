@@ -11,6 +11,11 @@ const listOfContent = [
     href: "#export-import",
     key: "#export-import"
   },
+  {
+    title: "Normalisasi",
+    href: "#normalization",
+    key: "#normalization",
+  },
   // {
   //   title: "Data Bersih",
   //   href: "#clean",

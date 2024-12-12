@@ -1,5 +1,6 @@
 import ExportImport from "@/components/contents/export-import"
 import ListOfContent from "@/components/contents/list-of-content"
+import Normalization from "@/components/contents/normalization"
 import Raw from "@/components/contents/raw"
 import { Content } from "antd/es/layout/layout"
 
@@ -16,12 +17,14 @@ export default function Home() {
         <section id="raw">
           <Raw />
         </section>
-        <section id="export-import"> {/* Section untuk Export & Import */}
+        <section id="export-import">
           <ExportImport />
         </section>
-        {/* <section id="clean">
 
-        </section> */}
+        <section id="normalization">
+          <Normalization />
+        </section>
+
         <section id="train">
 
         </section>
