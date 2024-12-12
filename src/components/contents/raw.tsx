@@ -7,25 +7,25 @@ import qs from 'qs'
 import ModalForm from './form'
 
 interface DataType {
-  id: number;
-  pm10: number;
-  pm2_5: number;
-  so2: number;
-  co: number;
-  o3: number;
-  no2: number;
-  kualitas: string;
+  id: number
+  pm10: number
+  pm2_5: number
+  so2: number
+  co: number
+  o3: number
+  no2: number
+  kualitas: string
 }
 
 interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: SorterResult<DataType>['field'];
-  sortOrder?: SorterResult<DataType>['order'];
-  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1];
+  pagination?: TablePaginationConfig
+  sortField?: SorterResult<DataType>['field']
+  sortOrder?: SorterResult<DataType>['order']
+  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1]
 }
 
-type ColumnsType<T extends object = object> = TableProps<T>['columns'];
-type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>;
+type ColumnsType<T extends object = object> = TableProps<T>['columns']
+type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
   const [data, setData] = useState<DataType[]>([])
@@ -75,7 +75,6 @@ const Raw = () => {
     tableParams?.sortField,
     JSON.stringify(tableParams.filters),
   ])
-
 
   const handleTableChange: TableProps<DataType>['onChange'] = (
     pagination,
