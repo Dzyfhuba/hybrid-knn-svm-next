@@ -23,13 +23,13 @@ const listOfContent = [
   // },
   {
     title: "Pelatihan (SVM)",
-    href: "#train",
-    key: "#train"
+    href: "#Pelatihan (SVM)",
+    key: "#Pelatihan (SVM)"
   },
   {
     title: "Pengujian (KNN)",
-    href: "#test",
-    key: "#test"
+    href: "#Pengujian (KNN)",
+    key: "#Pengujian (KNN)"
   },
 ]
 
