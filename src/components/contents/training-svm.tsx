@@ -26,7 +26,7 @@ interface TableParams {
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
 
-const TrainingKNN = () => {
+const TrainingSVM = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false) // Kontrol modal
@@ -152,7 +152,7 @@ const TrainingKNN = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Pelatihan (KNN)</h2>
+      <h2 className="text-xl font-bold">Pelatihan (SVM)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={handleProcessTesting}>
@@ -195,4 +195,4 @@ const TrainingKNN = () => {
   )
 }
 
-export default TrainingKNN
+export default TrainingSVM
