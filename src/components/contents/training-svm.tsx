@@ -65,6 +65,10 @@ const TrainingKNN = () => {
           },
         })
       })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoading(false)
+      })
   }
 
   useEffect(fetchData, [
@@ -76,12 +80,11 @@ const TrainingKNN = () => {
   ])
 
   const handleProcessTesting = async () => {
-    // Tampilkan modal
     setModalVisible(true)
     setModalLoading(true)
 
     try {
-      // Simulasikan proses pengujian (replace with your actual API call)
+      // Simulasikan proses pengujian
       await new Promise((resolve) => setTimeout(resolve, 3000)) // Simulasi loading 3 detik
       Modal.success({
         title: 'Pengujian Selesai',
@@ -149,11 +152,11 @@ const TrainingKNN = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Pelatikan (KNN)</h2>
+      <h2 className="text-xl font-bold">Pelatihan (KNN)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={handleProcessTesting}>
-          Proses Platihan
+          Proses Pelatihan
         </Button>
       </div>
 

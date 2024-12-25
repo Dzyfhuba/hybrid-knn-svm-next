@@ -26,7 +26,7 @@ interface TableParams {
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
 
-const TestingKNN = () => {
+const TrainingKNN = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false) // Kontrol modal
@@ -43,13 +43,15 @@ const TestingKNN = () => {
       ? ''
       : `${window.location.protocol}//${window.location.host}`
 
+  // Parse params to build the query string for the API call
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    sortField: params.sortField,
-    sortOrder: params.sortOrder,
-    ...params.filters,
+    orderBy: params.sortField, // Field to order by
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',  // Ascending or descending order
+    ...params.filters,  // Filters to apply
   })
 
+  // Fetch data from API with pagination, sorting, and filters
   const fetchData = () => {
     setLoading(true)
     fetch(`${selfUrl}/api/raw?${qs.stringify(parseParams(tableParams))}`)
@@ -61,9 +63,13 @@ const TestingKNN = () => {
           ...tableParams,
           pagination: {
             ...tableParams.pagination,
-            total: res.total,
+            total: res.total, // Update the total items for pagination
           },
         })
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoading(false)
       })
   }
 
@@ -75,14 +81,14 @@ const TestingKNN = () => {
     JSON.stringify(tableParams.filters),
   ])
 
+  // Handle process training (simulate with setTimeout for now)
   const handleProcessTesting = async () => {
-    // Tampilkan modal
     setModalVisible(true)
     setModalLoading(true)
 
     try {
-      // Simulasikan proses pengujian (replace with your actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 3000)) // Simulasi loading 3 detik
+      // Simulate the testing process (replace with actual API call)
+      await new Promise((resolve) => setTimeout(resolve, 3000)) // Simulate loading for 3 seconds
       Modal.success({
         title: 'Pengujian Selesai',
         content: 'Proses pengujian dengan KNN berhasil dilakukan.',
@@ -99,6 +105,7 @@ const TestingKNN = () => {
     }
   }
 
+  // Table columns configuration
   const columns: ColumnsType<DataType> = [
     {
       title: 'ID',
@@ -149,11 +156,11 @@ const TestingKNN = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Pengujian (KNN)</h2>
+      <h2 className="text-xl font-bold">Pelatihan (KNN)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={handleProcessTesting}>
-          Proses Pengujian
+          Proses Pelatihan
         </Button>
       </div>
 
@@ -192,4 +199,4 @@ const TestingKNN = () => {
   )
 }
 
-export default TestingKNN
+export default TrainingKNN

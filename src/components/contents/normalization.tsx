@@ -43,8 +43,8 @@ const Normalization = () => {
 
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    sortField: params.sortField,
-    sortOrder: params.sortOrder,
+    orderBy: params.sortField,
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
     ...params.filters,
   })
 
@@ -63,6 +63,10 @@ const Normalization = () => {
           },
         })
       })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoading(false)
+      })
   }
 
   useEffect(fetchData, [
@@ -75,7 +79,6 @@ const Normalization = () => {
 
   const handleNormalize = () => {
     console.log('Normalization process triggered')
-    // Placeholder for normalization functionality
   }
 
   const columns: ColumnsType<DataType> = [

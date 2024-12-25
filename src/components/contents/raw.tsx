@@ -46,8 +46,8 @@ const Raw = () => {
 
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    sortField: params.sortField,
-    sortOrder: params.sortOrder,
+    orderBy: params.sortField,
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
     ...params.filters,
   })
 
@@ -66,6 +66,10 @@ const Raw = () => {
           },
         })
       })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoading(false)
+      })
   }
 
   useEffect(fetchData, [
@@ -76,11 +80,7 @@ const Raw = () => {
     JSON.stringify(tableParams.filters),
   ])
 
-  const handleTableChange: TableProps<DataType>['onChange'] = (
-    pagination,
-    filters,
-    sorter
-  ) => {
+  const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
     setTableParams({
       pagination,
       filters,
@@ -126,12 +126,10 @@ const Raw = () => {
 
   const handleExport = () => {
     console.log('Export data triggered')
-    // Placeholder for export functionality
   }
 
   const handleImport = () => {
     console.log('Import data triggered')
-    // Placeholder for import functionality
   }
 
   const columns: ColumnsType<DataType> = [
@@ -213,18 +211,17 @@ const Raw = () => {
       <h2 className="text-xl font-bold">Data Mentah</h2>
       <Divider />
       <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
-
-      <Button
-        type="primary"
-        onClick={() => {
-          setEditData(null)
-          setIsModalopen(true)
-        }}
-        style={{ marginBottom: 16 }}
-      >
-        Tambah Data
-      </Button>
-      <Button type="primary" onClick={handleExport}>
+        <Button
+          type="primary"
+          onClick={() => {
+            setEditData(null)
+            setIsModalopen(true)
+          }}
+          style={{ marginBottom: 16 }}
+        >
+          Tambah Data
+        </Button>
+        <Button type="primary" onClick={handleExport}>
           Ekspor Data
         </Button>
         <Button type="primary" onClick={handleImport}>
@@ -239,7 +236,6 @@ const Raw = () => {
         loading={loading}
         onChange={handleTableChange}
       />
-
       <ModalForm
         open={isModalopen}
         onCancel={() => {
