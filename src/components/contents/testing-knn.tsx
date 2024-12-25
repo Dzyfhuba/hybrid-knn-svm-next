@@ -29,8 +29,8 @@ type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean
 const PengujianKNN = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
-  const [modalVisible, setModalVisible] = useState(false) // Kontrol modal
-  const [modalLoading, setModalLoading] = useState(false) // Loading dalam modal
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -43,15 +43,13 @@ const PengujianKNN = () => {
       ? ''
       : `${window.location.protocol}//${window.location.host}`
 
-  // Parse params to build the query string for the API call
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    orderBy: params.sortField, // Field to order by
-    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',  // Ascending or descending order
-    ...params.filters,  // Filters to apply
+    orderBy: params.sortField,
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
+    ...params.filters,
   })
 
-  // Fetch data from API with pagination, sorting, and filters
   const fetchData = () => {
     setLoading(true)
     fetch(`${selfUrl}/api/raw?${qs.stringify(parseParams(tableParams))}`)
@@ -63,7 +61,7 @@ const PengujianKNN = () => {
           ...tableParams,
           pagination: {
             ...tableParams.pagination,
-            total: res.total, // Update the total items for pagination
+            total: res.total,
           },
         })
       })
@@ -81,14 +79,12 @@ const PengujianKNN = () => {
     JSON.stringify(tableParams.filters),
   ])
 
-  // Handle process training (simulate with setTimeout for now)
   const handleProcessTesting = async () => {
     setModalVisible(true)
     setModalLoading(true)
 
     try {
-      // Simulate the testing process (replace with actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 3000)) // Simulate loading for 3 seconds
+      await new Promise((resolve) => setTimeout(resolve, 3000))
       Modal.success({
         title: 'Pengujian Selesai',
         content: 'Proses pengujian dengan KNN berhasil dilakukan.',
@@ -105,7 +101,6 @@ const PengujianKNN = () => {
     }
   }
 
-  // Table columns configuration
   const columns: ColumnsType<DataType> = [
     {
       title: 'ID',
