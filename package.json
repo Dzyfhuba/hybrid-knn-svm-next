@@ -12,6 +12,8 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.2",
     "@supabase/supabase-js": "^2.46.2",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-vis": "^1.5.1",
     "antd": "^5.22.2",
     "firebase": "^11.0.2",
     "next": "14.2.20",
