@@ -29,8 +29,8 @@ type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean
 const TrainingSVM = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
-  const [modalVisible, setModalVisible] = useState(false) // Kontrol modal
-  const [modalLoading, setModalLoading] = useState(false) // Loading dalam modal
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -84,17 +84,16 @@ const TrainingSVM = () => {
     setModalLoading(true)
 
     try {
-      // Simulasikan proses pengujian
-      await new Promise((resolve) => setTimeout(resolve, 3000)) // Simulasi loading 3 detik
+      await new Promise((resolve) => setTimeout(resolve, 3000))
       Modal.success({
-        title: 'Pengujian Selesai',
-        content: 'Proses pengujian dengan KNN berhasil dilakukan.',
+        title: 'Pelatihan Selesai',
+        content: 'Proses pelatihan dengan KNN berhasil dilakukan.',
       })
     } catch (error) {
       console.error('Error during testing process:', error)
       Modal.error({
-        title: 'Pengujian Gagal',
-        content: 'Terjadi kesalahan saat melakukan proses pengujian.',
+        title: 'Pelatihan Gagal',
+        content: 'Terjadi kesalahan saat melakukan proses pelatihan.',
       })
     } finally {
       setModalLoading(false)
@@ -178,16 +177,16 @@ const TrainingSVM = () => {
 
       <Modal
         open={modalVisible}
-        title="Proses Pengujian"
+        title="Proses Pelatihan"
         footer={null}
         onCancel={() => setModalVisible(false)}
         closable={!modalLoading}
       >
         <div style={{ textAlign: 'center', padding: '24px 0' }}>
           {modalLoading ? (
-            <Spin size="large" tip="Sedang melakukan pengujian..." />
+            <Spin size="large" tip="Sedang melakukan pelatihan..." />
           ) : (
-            <p>Proses pengujian telah selesai.</p>
+            <p>Proses pelatihan telah selesai.</p>
           )}
         </div>
       </Modal>
