@@ -124,6 +124,16 @@ const Raw = () => {
     })
   }
 
+  const handleExport = () => {
+    console.log('Export data triggered')
+    // Placeholder for export functionality
+  }
+
+  const handleImport = () => {
+    console.log('Import data triggered')
+    // Placeholder for import functionality
+  }
+
   const columns: ColumnsType<DataType> = [
     {
       title: 'ID',
@@ -202,6 +212,8 @@ const Raw = () => {
     <div>
       <h2 className="text-xl font-bold">Data Mentah</h2>
       <Divider />
+      <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
+
       <Button
         type="primary"
         onClick={() => {
@@ -212,7 +224,13 @@ const Raw = () => {
       >
         Tambah Data
       </Button>
-
+      <Button type="primary" onClick={handleExport}>
+          Ekspor Data
+        </Button>
+        <Button type="primary" onClick={handleImport}>
+          Impor Data
+        </Button>
+      </div>
       <Table<DataType>
         columns={columns}
         rowKey={(record) => record.id}

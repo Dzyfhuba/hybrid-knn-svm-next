@@ -1,4 +1,4 @@
-import ExportImport from "@/components/contents/export-import"
+// import ExportImport from "@/components/contents/export-import"
 import ListOfContent from "@/components/contents/list-of-content"
 import Normalization from "@/components/contents/normalization"
 import Raw from "@/components/contents/raw"
@@ -17,9 +17,9 @@ export default function Home() {
         <section id="raw">
           <Raw />
         </section>
-        <section id="export-import">
+        {/* <section id="export-import">
           <ExportImport />
-        </section>
+        </section> */}
 
         <section id="normalization">
           <Normalization />
