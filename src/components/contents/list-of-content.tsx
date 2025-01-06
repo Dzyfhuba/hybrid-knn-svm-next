@@ -6,11 +6,11 @@ const listOfContent = [
     href: "#raw",
     key: "#raw"
   },
-  {
-    title: "Ekspor dan Impor Data", // Tambahkan ini
-    href: "#export-import",
-    key: "#export-import"
-  },
+  // {
+  //   title: "Ekspor dan Impor Data", // Tambahkan ini
+  //   href: "#export-import",
+  //   key: "#export-import"
+  // },
   {
     title: "Normalisasi",
     href: "#normalization",
@@ -23,13 +23,13 @@ const listOfContent = [
   // },
   {
     title: "Pelatihan (SVM)",
-    href: "#train",
-    key: "#train"
+    href: "#Pelatihan (SVM)",
+    key: "#Pelatihan (SVM)"
   },
   {
     title: "Pengujian (KNN)",
-    href: "#test",
-    key: "#test"
+    href: "#Pengujian (KNN)",
+    key: "#Pengujian (KNN)"
   },
 ]
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Divider, Table, TableProps } from 'antd'
+import { Button, Divider, Modal, Table, TableProps, Spin } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useEffect, useState } from 'react'
 import qs from 'qs'
@@ -26,9 +26,11 @@ interface TableParams {
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
 
-const Normalization = () => {
+const PengujianKNN = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -77,8 +79,26 @@ const Normalization = () => {
     JSON.stringify(tableParams.filters),
   ])
 
-  const handleNormalize = () => {
-    console.log('Normalization process triggered')
+  const handleProcessTesting = async () => {
+    setModalVisible(true)
+    setModalLoading(true)
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      Modal.success({
+        title: 'Pengujian Selesai',
+        content: 'Proses pengujian dengan KNN berhasil dilakukan.',
+      })
+    } catch (error) {
+      console.error('Error during testing process:', error)
+      Modal.error({
+        title: 'Pengujian Gagal',
+        content: 'Terjadi kesalahan saat melakukan proses pengujian.',
+      })
+    } finally {
+      setModalLoading(false)
+      setModalVisible(false)
+    }
   }
 
   const columns: ColumnsType<DataType> = [
@@ -131,11 +151,11 @@ const Normalization = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Normalisasi Data</h2>
+      <h2 className="text-xl font-bold">Pengujian (KNN)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={handleNormalize}>
-          Proses Normalisasi
+        <Button type="primary" onClick={handleProcessTesting}>
+          Proses Pengujian
         </Button>
       </div>
 
@@ -154,8 +174,24 @@ const Normalization = () => {
           })
         }}
       />
+
+      <Modal
+        open={modalVisible}
+        title="Proses Pengujian"
+        footer={null}
+        onCancel={() => setModalVisible(false)}
+        closable={!modalLoading}
+      >
+        <div style={{ textAlign: 'center', padding: '24px 0' }}>
+          {modalLoading ? (
+            <Spin size="large" tip="Sedang melakukan pengujian..." />
+          ) : (
+            <p>Proses pengujian telah selesai.</p>
+          )}
+        </div>
+      </Modal>
     </div>
   )
 }
 
-export default Normalization
+export default PengujianKNN

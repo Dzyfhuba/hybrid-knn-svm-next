@@ -46,8 +46,8 @@ const Raw = () => {
 
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    sortField: params.sortField,
-    sortOrder: params.sortOrder,
+    orderBy: params.sortField,
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
     ...params.filters,
   })
 
@@ -66,6 +66,10 @@ const Raw = () => {
           },
         })
       })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoading(false)
+      })
   }
 
   useEffect(fetchData, [
@@ -76,11 +80,7 @@ const Raw = () => {
     JSON.stringify(tableParams.filters),
   ])
 
-  const handleTableChange: TableProps<DataType>['onChange'] = (
-    pagination,
-    filters,
-    sorter
-  ) => {
+  const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
     setTableParams({
       pagination,
       filters,
@@ -122,6 +122,14 @@ const Raw = () => {
         }
       },
     })
+  }
+
+  const handleExport = () => {
+    console.log('Export data triggered')
+  }
+
+  const handleImport = () => {
+    console.log('Import data triggered')
   }
 
   const columns: ColumnsType<DataType> = [
@@ -202,17 +210,24 @@ const Raw = () => {
     <div>
       <h2 className="text-xl font-bold">Data Mentah</h2>
       <Divider />
-      <Button
-        type="primary"
-        onClick={() => {
-          setEditData(null)
-          setIsModalopen(true)
-        }}
-        style={{ marginBottom: 16 }}
-      >
-        Tambah Data
-      </Button>
-
+      <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
+        <Button
+          type="primary"
+          onClick={() => {
+            setEditData(null)
+            setIsModalopen(true)
+          }}
+          style={{ marginBottom: 16 }}
+        >
+          Tambah Data
+        </Button>
+        <Button type="primary" onClick={handleExport}>
+          Ekspor Data
+        </Button>
+        <Button type="primary" onClick={handleImport}>
+          Impor Data
+        </Button>
+      </div>
       <Table<DataType>
         columns={columns}
         rowKey={(record) => record.id}
@@ -221,7 +236,6 @@ const Raw = () => {
         loading={loading}
         onChange={handleTableChange}
       />
-
       <ModalForm
         open={isModalopen}
         onCancel={() => {

@@ -2,34 +2,57 @@ import supabase from "@/libraries/supabase"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
+  // Mengambil parameter dari URL
   const url = request.nextUrl
-  const orderBy = url.searchParams.get("orderBy") || "id"
-  const order = url.searchParams.get("order") || "asc"
-  const pageSize = parseInt(url.searchParams.get("pageSize") || "10", 10)
-  const current = parseInt(url.searchParams.get("current") || "0", 10)
+  const orderBy = url.searchParams.get("orderBy") || "id"  // Default berdasarkan 'id'
+  const order = url.searchParams.get("order") || "asc"     // Default urutan 'asc'
+  const pageSize = parseInt(url.searchParams.get("pageSize") || "10", 10)  // Ukuran halaman
+  const current = parseInt(url.searchParams.get("current") || "1", 10)  // Halaman saat ini (dimulai dari 1)
 
-  const data = await supabase
-    .from("raw")
-    .select("*")
-    .order(orderBy, { ascending: order === "asc" })
-    .range(current * pageSize, (current + 1) * pageSize - 1)
+  try {
+    // Ambil data dengan urutan dan paginasi
+    const { data, error } = await supabase
+      .from("raw")
+      .select("*")
+      .order(orderBy, { ascending: order === "asc" })  
+      .range((current - 1) * pageSize, current * pageSize - 1)  
 
-  const total = await supabase
-    .from("raw")
-    .select("id", { count: "exact" })
+    if (error) throw error
 
-  return new Response(
-    JSON.stringify({
-      data: data.data,
-      total: total.count,
-    }),
-    {
-      headers: {
-        "content-type": "application/json",
-      },
-    }
-  )
+    const { count, error: countError } = await supabase
+      .from("raw")
+      .select("id", { count: "exact" })
+
+    if (countError) throw countError
+
+    return new Response(
+      JSON.stringify({
+        data: data,
+        total: count,
+      }),
+      {
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
+  } catch (error) {
+    // Jika ada error, kembalikan response error
+    console.error(error)
+    return new Response(
+      JSON.stringify({
+        error: "Terjadi kesalahan dalam mengambil data",
+      }),
+      {
+        status: 500,
+        headers: {
+          "content-type": "application/json",
+        },
+      }
+    )
+  }
 }
+
 
 export async function POST(request: NextRequest) {
   try {

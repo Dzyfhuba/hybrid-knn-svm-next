@@ -1,6 +1,6 @@
 'use client'
 
-import { Button, Divider, Table, TableProps } from 'antd'
+import { Button, Divider, Modal, Table, TableProps, Spin } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useEffect, useState } from 'react'
 import qs from 'qs'
@@ -26,9 +26,11 @@ interface TableParams {
 type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
 
-const Normalization = () => {
+const TrainingSVM = () => {
   const [data, setData] = useState<DataType[]>([])
   const [loading, setLoading] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -43,8 +45,8 @@ const Normalization = () => {
 
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    orderBy: params.sortField,
-    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
+    sortField: params.sortField,
+    sortOrder: params.sortOrder,
     ...params.filters,
   })
 
@@ -77,8 +79,26 @@ const Normalization = () => {
     JSON.stringify(tableParams.filters),
   ])
 
-  const handleNormalize = () => {
-    console.log('Normalization process triggered')
+  const handleProcessTesting = async () => {
+    setModalVisible(true)
+    setModalLoading(true)
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      Modal.success({
+        title: 'Pelatihan Selesai',
+        content: 'Proses pelatihan dengan KNN berhasil dilakukan.',
+      })
+    } catch (error) {
+      console.error('Error during testing process:', error)
+      Modal.error({
+        title: 'Pelatihan Gagal',
+        content: 'Terjadi kesalahan saat melakukan proses pelatihan.',
+      })
+    } finally {
+      setModalLoading(false)
+      setModalVisible(false)
+    }
   }
 
   const columns: ColumnsType<DataType> = [
@@ -131,11 +151,11 @@ const Normalization = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Normalisasi Data</h2>
+      <h2 className="text-xl font-bold">Pelatihan (SVM)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={handleNormalize}>
-          Proses Normalisasi
+        <Button type="primary" onClick={handleProcessTesting}>
+          Proses Pelatihan
         </Button>
       </div>
 
@@ -154,8 +174,24 @@ const Normalization = () => {
           })
         }}
       />
+
+      <Modal
+        open={modalVisible}
+        title="Proses Pelatihan"
+        footer={null}
+        onCancel={() => setModalVisible(false)}
+        closable={!modalLoading}
+      >
+        <div style={{ textAlign: 'center', padding: '24px 0' }}>
+          {modalLoading ? (
+            <Spin size="large" tip="Sedang melakukan pelatihan..." />
+          ) : (
+            <p>Proses pelatihan telah selesai.</p>
+          )}
+        </div>
+      </Modal>
     </div>
   )
 }
 
-export default Normalization
+export default TrainingSVM
