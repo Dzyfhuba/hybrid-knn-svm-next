@@ -124,13 +124,13 @@ const Raw = () => {
     })
   }
 
-  const handleExport = () => {
-    console.log('Export data triggered')
-  }
+  // const handleExport = () => {
+  //   console.log('Export data triggered')
+  // }
 
-  const handleImport = () => {
-    console.log('Import data triggered')
-  }
+  // const handleImport = () => {
+  //   console.log('Import data triggered')
+  // }
 
   const columns: ColumnsType<DataType> = [
     {
@@ -221,12 +221,12 @@ const Raw = () => {
         >
           Tambah Data
         </Button>
-        <Button type="primary" onClick={handleExport}>
+        {/* <Button type="primary" onClick={handleExport}>
           Ekspor Data
         </Button>
         <Button type="primary" onClick={handleImport}>
           Impor Data
-        </Button>
+        </Button> */}
       </div>
       <Table<DataType>
         columns={columns}
