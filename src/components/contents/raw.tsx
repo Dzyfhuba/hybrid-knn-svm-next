@@ -134,7 +134,7 @@ const Raw = () => {
 
   const columns: ColumnsType<DataType> = [
     {
-      title: 'ID',
+      title: 'No',
       dataIndex: 'id',
       sorter: true,
     },

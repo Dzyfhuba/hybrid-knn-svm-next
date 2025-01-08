@@ -1,6 +1,6 @@
 'use client'
 
-import { Modal, Form, Input, message, Select } from 'antd'
+import { Form, InputNumber, Modal, notification } from 'antd'
 import { useEffect, useState } from 'react'
 
 interface DataType {
@@ -23,6 +23,7 @@ interface ModalCreateProps {
 
 const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => {
   const [form] = Form.useForm()
+  const [notify, notificationContext] = notification.useNotification()
   const [loading, setLoading] = useState(false)
 
   const handleCreate = async () => {
@@ -32,7 +33,7 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
     try {
       const values = await form.validateFields()
       const newData: DataType = {
-        id: editData?.id ?? Date.now(),
+        id: editData?.id,
         ...values,
       }
 
@@ -50,52 +51,50 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
       const result = await response.json()
 
       if (response.ok) {
-        message.success(editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan')
+        notify.success({ message: editData ? 'Data berhasil diperbarui' : 'Data berhasil ditambahkan' })
         onCreate(result)
+        form.resetFields()
       } else {
-        message.error(`Error: ${result.error || 'Gagal menyimpan data'}`)
+        notify.error({ message: `Error: ${result.error || 'Gagal menyimpan data'}` })
       }
 
-      form.resetFields()
     } catch {
-      message.error('Gagal membuat data')
+      notify.error({ message: 'Gagal membuat data' })
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (editData) {
-      form.setFieldsValue(editData)
-    } else {
-      form.resetFields()
+    if (form && open) {
+      if (editData) {
+        form.setFieldsValue(editData)
+      }
     }
   }, [editData, form, open])
 
   return (
-    <Modal
-      title={editData ? `Edit Data ID: ${editData.id}` : 'Tambah Data'}
-      open={open}
-      onCancel={onCancel}
-      onOk={handleCreate}
-      okText={editData ? 'Simpan Perubahan' : 'Tambah'}
-      cancelText="Batal"
-      confirmLoading={loading}
-    >
-      <Form
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 14 }}
-        form={form}
-        layout="horizontal"
-        initialValues={{
-          pm10: '',
-          pm2_5: '',
-          so2: '',
-          co: '',
-          o3: '',
-          no2: '',
-          kualitas: '',
-        }}
+    <>{notificationContext}
+      <Modal
+        title={editData ? `Edit Data ID: ${editData.id}` : 'Tambah Data'}
+        open={open}
+        onCancel={onCancel}
+        onOk={handleCreate}
+        okButtonProps={{ htmlType: 'submit' }}
+        cancelButtonProps={{ htmlType: 'reset' }}
+        okText={editData ? 'Simpan Perubahan' : 'Tambah'}
+        cancelText="Batal"
+        confirmLoading={loading}
+        modalRender={(modal) => (
+          <Form
+            form={form}
+            labelCol={{ span: 4 }}
+            wrapperCol={{ span: 14 }}
+            layout="horizontal"
+          >
+            {modal}
+          </Form>
+        )}
       >
         {['pm10', 'pm2_5', 'so2', 'co', 'o3', 'no2'].map((field) => (
           <Form.Item
@@ -107,23 +106,27 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
               { pattern: /^\d+$/, message: `${field.toUpperCase()} harus berupa angka` },
             ]}
           >
-            <Input placeholder={`Masukkan ${field.toUpperCase()}`} />
+            <InputNumber placeholder={`Masukkan ${field.toUpperCase()}`} />
           </Form.Item>
         ))}
 
-        <Form.Item
+        {/* <Form.Item
           name="kualitas"
           label="Kualitas"
           rules={[{ required: true, message: 'Kualitas tidak boleh kosong' }]}
         >
-          <Select placeholder="Pilih Kualitas">
-            <Select.Option value="BAIK">BAIK</Select.Option>
-            <Select.Option value="SEDANG">SEDANG</Select.Option>
-            <Select.Option value="TIDAK SEHAT">TIDAK SEHAT</Select.Option>
-          </Select>
-        </Form.Item>
-      </Form>
-    </Modal>
+          <Select
+            placeholder="Pilih Kualitas"
+            optionFilterProp='label'
+            showSearch
+            options={['BAIK', 'SEDANG', 'TIDAK SEHAT'].map((kualitas) => ({
+              label: kualitas,
+              value: kualitas,
+            }))}
+          />
+        </Form.Item> */}
+      </Modal>
+    </>
   )
 }
 
