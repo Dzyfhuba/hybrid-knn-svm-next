@@ -1,10 +1,9 @@
 // import ExportImport from "@/components/contents/export-import"
-import ListOfContent from "@/components/contents/list-of-content"
-import Normalization from "@/components/contents/normalization"
-import Raw from "@/components/contents/raw"
-import TestingKNN from "@/components/contents/testing-knn"
-import TrainingSVM from "@/components/contents/training-svm"
-import { Content } from "antd/es/layout/layout"
+import ListOfContent from '@/components/contents/list-of-content'
+import Raw from '@/components/contents/raw'
+import TestingKNN from '@/components/contents/testing-knn'
+import TrainingSVM from '@/components/contents/training-svm'
+import { Content } from 'antd/es/layout/layout'
 
 export default function Home() {
   return (
@@ -19,17 +18,16 @@ export default function Home() {
           <ExportImport />
         </section> */}
 
-        <section id="normalization">
+        {/* <section id="normalization">
           <Normalization />
-        </section>
+        </section> */}
 
         <section id="Pelatihan (SVM)">
           <TrainingSVM />
         </section>
 
-
         <section id="Pengujian (KNN)">
-        <TestingKNN />
+          <TestingKNN />
         </section>
 
       </Content>
