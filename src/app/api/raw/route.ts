@@ -1,27 +1,29 @@
-import supabase from "@/libraries/supabase"
-import { NextRequest } from "next/server"
+import supabase from '@/libraries/supabase'
+import ISPU from '@/models/ispu'
+import { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
   // Mengambil parameter dari URL
   const url = request.nextUrl
-  const orderBy = url.searchParams.get("orderBy") || "id"  // Default berdasarkan 'id'
-  const order = url.searchParams.get("order") || "asc"     // Default urutan 'asc'
-  const pageSize = parseInt(url.searchParams.get("pageSize") || "10", 10)  // Ukuran halaman
-  const current = parseInt(url.searchParams.get("current") || "1", 10)  // Halaman saat ini (dimulai dari 1)
+  const orderBy = url.searchParams.get('orderBy') || 'id'  // Default berdasarkan 'id'
+  const order = url.searchParams.get('order') || 'asc'     // Default urutan 'asc'
+  const pageSize = parseInt(url.searchParams.get('pageSize') || '10', 10)  // Ukuran halaman
+  const current = parseInt(url.searchParams.get('current') || '1', 10)  // Halaman saat ini (dimulai dari 1)
 
   try {
     // Ambil data dengan urutan dan paginasi
     const { data, error } = await supabase
-      .from("raw")
-      .select("*")
-      .order(orderBy, { ascending: order === "asc" })  
-      .range((current - 1) * pageSize, current * pageSize - 1)  
+      .from('raw')
+      .select('*')
+      .order(orderBy, { ascending: order === 'asc' })  
+      .range((current - 1) * pageSize, current * pageSize - 1)
 
     if (error) throw error
+    console.log('Data:', data)
 
     const { count, error: countError } = await supabase
-      .from("raw")
-      .select("id", { count: "exact" })
+      .from('raw')
+      .select('id', { count: 'exact' })
 
     if (countError) throw countError
 
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
       }),
       {
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
       }
     )
@@ -41,12 +43,12 @@ export async function GET(request: NextRequest) {
     console.error(error)
     return new Response(
       JSON.stringify({
-        error: "Terjadi kesalahan dalam mengambil data",
+        error: 'Terjadi kesalahan dalam mengambil data',
       }),
       {
         status: 500,
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
       }
     )
@@ -60,16 +62,19 @@ export async function POST(request: NextRequest) {
 
     if (
       !body.pm10 || !body.pm2_5 || !body.so2 || !body.co ||
-      !body.o3 || !body.no2 || !body.kualitas
+      !body.o3 || !body.no2
     ) {
       return new Response(
-        JSON.stringify({ error: "Semua field wajib diisi" }),
+        JSON.stringify({ error: 'Semua field wajib diisi' }),
         { status: 400 }
       )
     }
 
+    console.log('Inserting data:', ISPU.calculateSummaryWithLabel(body))
+    body['kualitas'] = ISPU.calculateSummaryWithLabel(body)
+
     const { data, error } = await supabase
-      .from("raw")
+      .from('raw')
       .insert([body])
 
     if (error) {
@@ -83,14 +88,14 @@ export async function POST(request: NextRequest) {
       JSON.stringify(data),
       {
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
       }
     )
   } catch (err) {
-    console.error("Internal Server Error (POST):", err)
+    console.error('Internal Server Error (POST):', err)
     return new Response(
-      JSON.stringify({ error: "Internal Server Error" }),
+      JSON.stringify({ error: 'Internal Server Error' }),
       { status: 500 }
     )
   }
@@ -98,12 +103,12 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const url = request.nextUrl
-  const id = url.searchParams.get("id")
+  const id = url.searchParams.get('id')
   const body = await request.json()
 
   if (!id) {
     return new Response(
-      JSON.stringify({ error: "ID is required for update" }),
+      JSON.stringify({ error: 'ID is required for update' }),
       { status: 400 }
     )
   }
@@ -113,15 +118,15 @@ export async function PATCH(request: NextRequest) {
     !body.o3 || !body.no2 || !body.kualitas
   ) {
     return new Response(
-      JSON.stringify({ error: "Semua field wajib diisi" }),
+      JSON.stringify({ error: 'Semua field wajib diisi' }),
       { status: 400 }
     )
   }
 
   const { data, error } = await supabase
-    .from("raw")
+    .from('raw')
     .update(body)
-    .eq("id", id)
+    .eq('id', id)
 
   if (error) {
     return new Response(
@@ -134,7 +139,7 @@ export async function PATCH(request: NextRequest) {
     JSON.stringify(data),
     {
       headers: {
-        "content-type": "application/json",
+        'content-type': 'application/json',
       },
     }
   )
@@ -143,24 +148,24 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const url = request.nextUrl
-    const id = url.searchParams.get("id")
+    const id = url.searchParams.get('id')
 
     if (!id) {
       return new Response(
-        JSON.stringify({ error: "ID is required for deletion" }),
+        JSON.stringify({ error: 'ID is required for deletion' }),
         { status: 400 }
       )
     }
 
-    console.log("Deleting data with ID:", id)
+    console.log('Deleting data with ID:', id)
 
     const { data, error } = await supabase
-      .from("raw")
+      .from('raw')
       .delete()
-      .eq("id", id)
+      .eq('id', id)
 
     if (error) {
-      console.error("Supabase Error (DELETE):", error.message)
+      console.error('Supabase Error (DELETE):', error.message)
       return new Response(
         JSON.stringify({ error: error.message }),
         { status: 400 }
@@ -168,15 +173,15 @@ export async function DELETE(request: NextRequest) {
     }
 
     return new Response(
-      JSON.stringify({ message: "Data deleted successfully", data }),
+      JSON.stringify({ message: 'Data deleted successfully', data }),
       {
-        headers: { "content-type": "application/json" },
+        headers: { 'content-type': 'application/json' },
       }
     )
   } catch (err) {
-    console.error("Internal Server Error (DELETE):", err)
+    console.error('Internal Server Error (DELETE):', err)
     return new Response(
-      JSON.stringify({ error: "Internal Server Error" }),
+      JSON.stringify({ error: 'Internal Server Error' }),
       { status: 500 }
     )
   }
