@@ -1,4 +1,4 @@
-import { Footer as FooterBase } from "antd/es/layout/layout"
+import { Footer as FooterBase } from 'antd/es/layout/layout'
 
 const Footer = () => {
   return (
