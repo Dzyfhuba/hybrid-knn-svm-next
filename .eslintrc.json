@@ -1,8 +1,10 @@
 {
   "extends": ["next/core-web-vitals", "next/typescript"],
+  "ignorePatterns": ["src/types/database.types.ts"],
   "rules": {
     "semi": ["error", "never"],
     "quotes": ["error", "single"],
-    "indent": ["warn", 2]
+    "indent": ["warn", 2],
+    "react-hooks/exhaustive-deps": "off"
   }
 }
