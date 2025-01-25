@@ -56,6 +56,10 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
         form.resetFields()
       } else {
         notify.error({ message: `Error: ${result.error || 'Gagal menyimpan data'}` })
+        form.setFields(Object.entries(result.errors).map(([key, value]) => ({
+          name: key,
+          errors: Array.isArray(value) ? value : [String(value)],
+        })))
       }
 
     } catch {
@@ -85,6 +89,9 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
         okText={editData ? 'Simpan Perubahan' : 'Tambah'}
         cancelText="Batal"
         confirmLoading={loading}
+        afterClose={() => {
+          form.resetFields()
+        }}
         modalRender={(modal) => (
           <Form
             form={form}
@@ -96,17 +103,41 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
           </Form>
         )}
       >
-        {['pm10', 'pm2_5', 'so2', 'co', 'o3', 'no2'].map((field) => (
+        {[{
+          key: 'pm10',
+          label: 'PM10',
+          unit: 'µg/m³',
+        }, {
+          key: 'pm2_5',
+          label: 'PM2.5',
+          unit: 'µg/m³',
+        }, {
+          key: 'so2',
+          label: 'SO2',
+          unit: 'µg/m³',
+        }, {
+          key: 'co',
+          label: 'CO',
+          unit: 'mg/m³',
+        }, {
+          key: 'o3',
+          label: 'O3',
+          unit: 'µg/m³',
+        }, {
+          key: 'no2',
+          label: 'NO2',
+          unit: 'µg/m³',
+        }].map((field) => (
           <Form.Item
-            key={field}
-            name={field}
-            label={field.toUpperCase()}
+            key={field.key}
+            name={field.key}
+            label={field.label.toUpperCase()}
             rules={[
-              { required: true, message: `${field.toUpperCase()} tidak boleh kosong` },
-              { pattern: /^\d+$/, message: `${field.toUpperCase()} harus berupa angka` },
+              { required: true, message: `${field.label.toUpperCase()} tidak boleh kosong` },
+              { pattern: /^\d+$/, message: `${field.label.toUpperCase()} harus berupa angka` },
             ]}
           >
-            <InputNumber placeholder={`Masukkan ${field.toUpperCase()}`} />
+            <InputNumber placeholder={`Masukkan ${field.label.toUpperCase()}`} addonAfter={field.unit} />
           </Form.Item>
         ))}
 

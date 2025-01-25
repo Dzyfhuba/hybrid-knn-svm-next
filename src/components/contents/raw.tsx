@@ -139,32 +139,32 @@ const Raw = () => {
       sorter: true,
     },
     {
-      title: 'PM10',
+      title: 'PM10 (µg/m³)',
       dataIndex: 'pm10',
       sorter: true,
     },
     {
-      title: 'PM2.5',
+      title: 'PM2.5 (µg/m³)',
       dataIndex: 'pm2_5',
       sorter: true,
     },
     {
-      title: 'SO2',
+      title: 'SO2 (µg/m³)',
       dataIndex: 'so2',
       sorter: true,
     },
     {
-      title: 'CO',
+      title: 'CO (mg/m³)',
       dataIndex: 'co',
       sorter: true,
     },
     {
-      title: 'O3',
+      title: 'O3 (µg/m³)',
       dataIndex: 'o3',
       sorter: true,
     },
     {
-      title: 'NO2',
+      title: 'NO2 (µg/m³)',
       dataIndex: 'no2',
       sorter: true,
     },
