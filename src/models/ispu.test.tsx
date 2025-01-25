@@ -5,7 +5,7 @@ describe('ISPU', () => {
   describe('calculate', () => {
     it('should calculate ISPU for pm10 correctly', () => {
       const result = ISPU.calculate(100, 'pm10')
-      expect(result).toBeCloseTo(75.2525)
+      expect(result).toBeCloseTo(75)
     })
 
     it('should throw an error for negative concentration', () => {
@@ -14,12 +14,12 @@ describe('ISPU', () => {
 
     it('should calculate ISPU for so2 correctly', () => {
       const result = ISPU.calculate(500, 'so2')
-      expect(result).toBeCloseTo(69.2981)
+      expect(result).toBeCloseTo(225)
     })
 
     it('should calculate ISPU for co correctly', () => {
       const result = ISPU.calculate(10, 'co')
-      expect(result).toBeCloseTo(100)
+      expect(result).toBeCloseTo(70)
     })
   })
 
@@ -51,41 +51,69 @@ describe('ISPU', () => {
   })
 
   describe('calculateSummaryWithLabel', () => {
-    it('should calculate summary ISPU correctly for given data', () => {
+    it('should calculate summary ISPU correctly for given data set 1', () => {
       const data = {
-        pm10: 94,
-        pm2_5: 135,
-        so2: 46,
-        co: 29,
-        o3: 74,
+        pm10: 72,
+        pm2_5: 119,
+        so2: 58,
+        co: 44,
+        o3: 53,
         no2: 44,
       }
       const summary = ISPU.calculateSummaryWithLabel(data)
-      expect(summary).toBe('TIDAK SEHAT')
+      expect(summary).toBe('SANGAT TIDAK SEHAT')
+    })
 
+    it('should calculate summary ISPU correctly for given data set 2', () => {
       const data2 = {
-        pm10: 54,
-        pm2_5: 73,
-        so2: 56,
-        co: 24,
-        o3: 23,
-        no2: 24,
+        pm10: 57,
+        pm2_5: 85,
+        so2: 48,
+        co: 13,
+        o3: 34,
+        no2: 18,
       }
-
       const summary2 = ISPU.calculateSummaryWithLabel(data2)
-      expect(summary2).toBe('SEDANG')
+      expect(summary2).toBe('TIDAK SEHAT')
+    })
 
+    it('should calculate summary ISPU correctly for given data set 3', () => {
       const data3 = {
         pm10: 27,
         pm2_5: 50,
         so2: 44,
         co: 11,
         o3: 17,
-        no2: 12,
+        no2: 17,
       }
-
       const summary3 = ISPU.calculateSummaryWithLabel(data3)
-      expect(summary3).toBe('BAIK')
+      expect(summary3).toBe('SEDANG')
+    })
+
+    it('should calculate summary ISPU correctly for given data set 4', () => {
+      const data4 = {
+        pm10: 17,
+        pm2_5: 30,
+        so2: 33,
+        co: 8,
+        o3: 13,
+        no2: 13,
+      }
+      const summary4 = ISPU.calculateSummaryWithLabel(data4)
+      expect(summary4).toBe('SEDANG')
+    })
+
+    it('should calculate summary ISPU correctly for given data set 5', () => {
+      const data5 = {
+        pm10: 7,
+        pm2_5: 10,
+        so2: 1,
+        co: 5,
+        o3: 7,
+        no2: 7,
+      }
+      const summary5 = ISPU.calculateSummaryWithLabel(data5)
+      expect(summary5).toBe('BAIK')
     })
   })
 })
