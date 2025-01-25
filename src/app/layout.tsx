@@ -1,9 +1,10 @@
+import Analytics from '@/components/analytics'
+import AntProvider from '@/components/ant-provider'
 import ClientWrapper from '@/components/client-wrapper'
 import Footer from '@/components/footer'
-import Analytics from '@/components/analytics'
 import Navigation from '@/components/navigation'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { ConfigProvider, Divider, Layout } from 'antd'
+import { Divider, Layout } from 'antd'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
@@ -35,36 +36,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: '#ee6d12',
-            },
-            components: {
-              Layout: {
-                headerBg: 'var(--background)',
-                headerColor: 'var(--foreground)',
-                siderBg: 'var(--background)',
-                footerBg: 'var(--background)',
-                colorBgBase: 'var(--background)',
-                colorBgLayout: 'var(--background)',
-                colorText: 'var(--foreground)',
-              },
-              Divider: {
-                colorSplit: 'var(--foreground)',
-              },
-              Anchor: {
-                colorText: 'var(--foreground)',
-                colorLinkActive: '#ff0000',
-              },
-            },
-          }}
-        >
-          <ClientWrapper>
-            <Analytics />
-          </ClientWrapper>
+        <ClientWrapper>
+          <Analytics />
+        </ClientWrapper>
 
-          <AntdRegistry>
+        <AntdRegistry>
+          <AntProvider>
             <Layout>
               <Navigation />
               <div
@@ -79,8 +56,8 @@ export default function RootLayout({
                 <Footer />
               </div>
             </Layout>
-          </AntdRegistry>
-        </ConfigProvider>
+          </AntProvider>
+        </AntdRegistry>
       </body>
     </html>
   )
