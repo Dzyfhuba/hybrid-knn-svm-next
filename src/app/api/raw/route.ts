@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       JSON.stringify({
         data: data,
         total: count,
-      }),
+      }, null, 0),
       {
         headers: {
           'content-type': 'application/json',
