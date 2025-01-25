@@ -1,6 +1,7 @@
 import supabase from '@/libraries/supabase'
 import ISPU from '@/models/ispu'
 import { NextRequest } from 'next/server'
+import { z } from 'zod'
 
 export async function GET(request: NextRequest) {
   // Mengambil parameter dari URL
@@ -59,19 +60,25 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    
+    const payload = z.object({
+      pm10: z.number().positive(),
+      pm2_5: z.number().positive(),
+      so2: z.number().positive(),
+      co: z.number().positive(),
+      o3: z.number().positive(),
+      no2: z.number().positive(),
+    }).safeParse(body)
 
-    if (
-      !body.pm10 || !body.pm2_5 || !body.so2 || !body.co ||
-      !body.o3 || !body.no2
-    ) {
+    if (!payload.success) {
       return new Response(
-        JSON.stringify({ error: 'Semua field wajib diisi' }),
+        JSON.stringify({ errors: payload.error.formErrors.fieldErrors }),
         { status: 400 }
       )
     }
 
-    console.log('Inserting data:', ISPU.calculateSummaryWithLabel(body))
-    body['kualitas'] = ISPU.calculateSummaryWithLabel(body)
+    console.log('Inserting data:', ISPU.calculateSummaryWithLabel(payload.data))
+    body['kualitas'] = ISPU.calculateSummaryWithLabel(payload.data)
 
     const { data, error } = await supabase
       .from('raw')
@@ -112,13 +119,19 @@ export async function PATCH(request: NextRequest) {
       { status: 400 }
     )
   }
+  
+  const payload = z.object({
+    pm10: z.number().positive(),
+    pm2_5: z.number().positive(),
+    so2: z.number().positive(),
+    co: z.number().positive(),
+    o3: z.number().positive(),
+    no2: z.number().positive(),
+  }).safeParse(body)
 
-  if (
-    !body.pm10 || !body.pm2_5 || !body.so2 || !body.co ||
-    !body.o3 || !body.no2 || !body.kualitas
-  ) {
+  if (!payload.success) {
     return new Response(
-      JSON.stringify({ error: 'Semua field wajib diisi' }),
+      JSON.stringify({ errors: payload.error.formErrors.fieldErrors }),
       { status: 400 }
     )
   }
