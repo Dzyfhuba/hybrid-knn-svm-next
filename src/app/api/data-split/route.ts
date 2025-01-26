@@ -53,6 +53,10 @@ export async function PUT(request: NextRequest) {
   if (train_delete.error) {
     return response.internalServerError({message: train_delete.error.message})
   }
+  const test_delete = await supabase.from('data_test').delete().eq('model_id', model.id)
+  if (test_delete.error) {
+    return response.internalServerError({message: test_delete.error.message})
+  }
   
   // insert data into data_train and data_test
   const train_insert = await supabase.from('data_train').insert(train).select('*')
