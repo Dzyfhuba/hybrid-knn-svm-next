@@ -1,4 +1,5 @@
 'use client'
+import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
 import { Button, Form, GetProp, InputNumber, Modal, Table } from 'antd'
 import { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
@@ -19,6 +20,8 @@ const DataSplit = () => {
   const [modal, modalContext] = Modal.useModal()
   const [form] = Form.useForm()
   const [training, setTraining] = useState(80)
+  const { model } = useStoreState(state => state)
+  const actions = useStoreActions(actions => actions)
 
   const columns: ColumnsType<Database['svm_knn']['Tables']['data_train']['Row']> = [
     {
@@ -86,23 +89,31 @@ const DataSplit = () => {
             reference
           }
 
+          actions.setModel((prev) => ({
+            ...prev,
+            train_percentage: training,
+          }))
+
           return await axios.put('/api/data-split', payload)
             .then(res => {
               setDataTrain(res.data.extra.data_train)
               setTotalTrain(res.data.extra.data_train.length)
               setDataTest(res.data.extra.data_test)
               setTotalTest(res.data.extra.data_test.length)
-              
+
+              console.log(res.data)
+
               modal.success({
                 title: 'Data Berhasil Dibagi',
                 content: `Data berhasil dibagi dengan rasio ${training}:${testing}.`,
+                autoFocusButton: 'ok',
               })
             })
         }
       })
     }
   }
-  
+
   const [dataTrain, setDataTrain] = useState<Database['svm_knn']['Tables']['data_train']['Row'][]>([])
   const [totalTrain, setTotalTrain] = useState(0)
   const [dataTest, setDataTest] = useState<Database['svm_knn']['Tables']['data_test']['Row'][]>([])
@@ -129,7 +140,7 @@ const DataSplit = () => {
     ...params.filters,
     reference: window.localStorage.getItem('reference')
   })
-  
+
   const fetchDataTrain = () => {
     setLoadingTrain(true)
     fetch(`/api/data-train?${QueryString.stringify(parseParams(tableParamsTrain))}`)
@@ -172,7 +183,7 @@ const DataSplit = () => {
         setLoadingTest(false)
       })
   }
-  
+
   useEffect(fetchDataTrain, [
     tableParamsTrain.pagination?.current,
     tableParamsTrain.pagination?.pageSize,
@@ -195,7 +206,7 @@ const DataSplit = () => {
       sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
       sortField: Array.isArray(sorter) ? undefined : sorter.field,
     })
-  
+
     if (pagination.pageSize !== tableParamsTrain.pagination?.pageSize) {
       setDataTrain([])
     }
@@ -207,12 +218,24 @@ const DataSplit = () => {
       sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
       sortField: Array.isArray(sorter) ? undefined : sorter.field,
     })
-  
+
     if (pagination.pageSize !== tableParamsTest.pagination?.pageSize) {
       setDataTest([])
     }
   }
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    console.log(model.train_percentage)
+    if (form) {
+      form.setFieldsValue({
+        training: model.train_percentage || 80,
+        testing: 100 - (model.train_percentage || 80)
+      })
+    }
+  }, [model.train_percentage, form])
+  
   return (
     <div>
       {modalContext}
@@ -223,10 +246,10 @@ const DataSplit = () => {
         form={form}
         layout='horizontal'
         labelCol={{ span: 8 }}
-        initialValues={{
-          training: 80,
-          testing: 20
-        }}
+        // initialValues={{
+        //   training: model.train_percentage || 80,
+        //   testing: 20
+        // }}
         className='w-full sm:w-max'
         onFinish={handleSubmit}
       >

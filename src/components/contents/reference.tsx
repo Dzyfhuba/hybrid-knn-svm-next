@@ -28,10 +28,9 @@ const Reference = () => {
     if (typeof window === 'undefined') return
 
     if (open && form) {
-      fetchModel()
-      // const reference = window.localStorage.getItem('reference')
+      const reference = window.localStorage.getItem('reference')
 
-      // getReference(reference)
+      getReference(reference)
     }
   }, [open])
 
@@ -42,6 +41,8 @@ const Reference = () => {
       const reference = window.localStorage.getItem('reference')
       
       getReference(reference)
+
+      fetchModel()
     }
   }, [])
 
