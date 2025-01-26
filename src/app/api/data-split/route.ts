@@ -41,6 +41,7 @@ export async function PUT(request: NextRequest) {
       co: item.co,
       o3: item.o3,
       no2: item.no2,
+      kualitas: item.kualitas,
     })
   })
 
@@ -67,11 +68,27 @@ export async function PUT(request: NextRequest) {
   if (test_insert.error) {
     return response.internalServerError({message: test_insert.error.message})
   }
+  console.log('train_length', payload.data.train_length)
+  // save train length
+  const model_update = await supabase.from('model')
+    .update({
+      train_percentage: payload.data.train_length,
+    })
+    .eq('id', model.id)
+  if (model_update.error) {
+    return response.internalServerError({message: model_update.error.message})
+  }
+
+  const modelItem = await supabase.from('model').select('*').eq('id', model.id).single()
+  if (modelItem.error) {
+    return response.internalServerError({message: modelItem.error.message})
+  }
 
   return response.created({
     extra: {
       data_train: train_insert.data,
       data_test: test_insert.data,
+      model: modelItem.data,
     },
     message: 'Data berhasil di-split',
   })
