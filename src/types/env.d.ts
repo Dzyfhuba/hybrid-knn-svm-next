@@ -16,6 +16,8 @@ declare global {
 
       readonly SUPABASE_URL: string
       readonly SUPABASE_KEY: string
+
+      readonly NEXT_PUBLIC_ENABLE_ISPU_PREVIEW: string
     }
   }
 }
