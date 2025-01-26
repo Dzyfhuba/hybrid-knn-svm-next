@@ -88,7 +88,9 @@ const DataSplit = () => {
           return await axios.put('/api/data-split', payload)
             .then(res => {
               setDataTrain(res.data.extra.data_train)
+              setTotalTrain(res.data.extra.data_train.length)
               setDataTest(res.data.extra.data_test)
+              setTotalTest(res.data.extra.data_test.length)
               
               modal.success({
                 title: 'Data Berhasil Dibagi',
@@ -303,7 +305,7 @@ const DataSplit = () => {
           loading={loadingTrain}
           onChange={handleTableChangeTrain}
           scroll={{ x: 1000 }}
-          caption={dataTrain.length > 0 ? `Total Data: ${totalTrain}` : undefined}
+          caption={totalTrain > 0 ? `Total Data: ${totalTrain}` : undefined}
         />
       </div>
 
@@ -318,7 +320,7 @@ const DataSplit = () => {
           loading={loadingTest}
           onChange={handleTableChangeTest}
           scroll={{ x: 1000 }}
-          caption={dataTest.length > 0 ? `Total Data: ${totalTest}` : undefined}
+          caption={totalTest > 0 ? `Total Data: ${totalTest}` : undefined}
         />
       </div>
     </div>
