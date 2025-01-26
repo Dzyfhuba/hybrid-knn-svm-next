@@ -20,7 +20,7 @@ const DataSplit = () => {
   const [message, messageContext] = Message.useMessage()
   const [form] = Form.useForm()
   const [training, setTraining] = useState(() => {
-    const trainingValue = window.localStorage.getItem('training')
+    const trainingValue = typeof window !== 'undefined' ? window.localStorage.getItem('training') : null
     return trainingValue ? parseInt(trainingValue) : 80
   })
   const { model } = useStoreState(state => state)
