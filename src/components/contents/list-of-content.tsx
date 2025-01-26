@@ -9,21 +9,11 @@ const listOfContent = [
     href: '#raw',
     key: '#raw'
   },
-  // {
-  //   title: "Ekspor dan Impor Data", // Tambahkan ini
-  //   href: "#export-import",
-  //   key: "#export-import"
-  // },
-  // {
-  //   title: 'Normalisasi',
-  //   href: '#normalization',
-  //   key: '#normalization',
-  // },
-  // {
-  //   title: "Data Bersih",
-  //   href: "#clean",
-  //   key: "#clean"
-  // },
+  {
+    title: 'Data Split',
+    href: '#data-split',
+    key: '#data-split'
+  },
   {
     title: 'Pelatihan (SVM)',
     href: '#train',

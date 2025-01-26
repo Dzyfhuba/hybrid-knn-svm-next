@@ -6,7 +6,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { IoReload } from 'react-icons/io5'
 
-const SplitData = () => {
+const DataSplit = () => {
   const [modal, modalContext] = Modal.useModal()
   const [form] = Form.useForm()
   const [training, setTraining] = useState(80)
@@ -209,4 +209,4 @@ const SplitData = () => {
   )
 }
 
-export default SplitData
+export default DataSplit

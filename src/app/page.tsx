@@ -2,7 +2,7 @@
 import ListOfContent, { DrawerListOfContent } from '@/components/contents/list-of-content'
 import Raw from '@/components/contents/raw'
 import Reference from '@/components/contents/reference'
-import SplitData from '@/components/contents/split-data'
+import DataSplit from '@/components/contents/data-split'
 import TestingKNN from '@/components/contents/testing-knn'
 import TrainingSVM from '@/components/contents/training-svm'
 import { Content } from 'antd/es/layout/layout'
@@ -29,8 +29,8 @@ export default function Home() {
           <Normalization />
         </section> */}
 
-        <section id="split-data">
-          <SplitData />
+        <section id="data-split">
+          <DataSplit />
         </section>
 
         <section id="train">
