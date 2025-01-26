@@ -40,6 +40,7 @@ const ListOfContent = () => {
   return (
     <>
       <Anchor
+        className='sticky top-14'
         affix={false}
         items={listOfContent}
       />
@@ -77,7 +78,7 @@ const DrawerListOfContent = () => {
           right: 0,
           zIndex: 100
         }}
-        className='!rounded-r-none rounded-br'
+        className='!rounded-r-none rounded-br sm:!hidden'
       />
     </>
   )
