@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const url = request.nextUrl
-  const id = url.searchParams.get('id')
+  const id = parseInt(url.searchParams.get('id') || '0')
   const body = await request.json()
 
   if (!id) {
@@ -160,7 +160,7 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const url = request.nextUrl
-    const id = url.searchParams.get('id')
+    const id = parseInt(url.searchParams.get('id') || '0')
 
     if (!id) {
       return new Response(
