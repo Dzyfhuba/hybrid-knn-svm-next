@@ -19,7 +19,10 @@ interface TableParams {
 const DataSplit = () => {
   const [modal, modalContext] = Modal.useModal()
   const [form] = Form.useForm()
-  const [training, setTraining] = useState(80)
+  const [training, setTraining] = useState(() => {
+    const trainingValue = window.localStorage.getItem('training');
+    return trainingValue ? parseInt(trainingValue) : 80;
+  })
   const { model } = useStoreState(state => state)
   const actions = useStoreActions(actions => actions)
 
@@ -94,21 +97,25 @@ const DataSplit = () => {
             train_percentage: training,
           }))
 
-          return await axios.put('/api/data-split', payload)
-            .then(res => {
-              setDataTrain(res.data.extra.data_train)
-              setTotalTrain(res.data.extra.data_train.length)
-              setDataTest(res.data.extra.data_test)
-              setTotalTest(res.data.extra.data_test.length)
+          // refetch data
+          fetchDataTrain()
+          fetchDataTest()
 
-              console.log(res.data)
+          // return await axios.put('/api/data-split', payload)
+          //   .then(res => {
+          //     setDataTrain(res.data.extra.data_train)
+          //     setTotalTrain(res.data.extra.data_train.length)
+          //     setDataTest(res.data.extra.data_test)
+          //     setTotalTest(res.data.extra.data_test.length)
 
-              modal.success({
-                title: 'Data Berhasil Dibagi',
-                content: `Data berhasil dibagi dengan rasio ${training}:${testing}.`,
-                autoFocusButton: 'ok',
-              })
-            })
+          //     console.log(res.data)
+
+          modal.success({
+            title: 'Data Berhasil Dibagi',
+            content: `Data berhasil dibagi dengan rasio ${training}:${testing}.`,
+            autoFocusButton: 'ok',
+          })
+          //   })
         }
       })
     }
@@ -227,7 +234,7 @@ const DataSplit = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    console.log(model.train_percentage)
+    console.log(model.train_percentage, training)
     if (form) {
       form.setFieldsValue({
         training: model.train_percentage || 80,
@@ -235,7 +242,7 @@ const DataSplit = () => {
       })
     }
   }, [model.train_percentage, form])
-  
+
   return (
     <div>
       {modalContext}
@@ -277,6 +284,7 @@ const DataSplit = () => {
             onKeyUp={(e) => {
               const value = e.currentTarget.valueAsNumber || 0
               const testing = 100 - value
+              setTraining(value)
               form.setFieldsValue({ testing })
             }}
           />
@@ -300,21 +308,13 @@ const DataSplit = () => {
         </Form.Item>
 
         <Form.Item>
-          <div className='flex items-center gap-1'>
-            <Button
-              type="primary"
-              danger
-              htmlType="reset"
-              icon={<IoReload />}
-              disabled={training === 80}
-            />
-            <Button
-              type="primary"
-              htmlType="submit"
-            >
-              Split Data
-            </Button>
-          </div>
+          <Button
+            type="primary"
+            htmlType="submit"
+            disabled={training === model.train_percentage}
+          >
+            Split Data
+          </Button>
         </Form.Item>
       </Form>
 
