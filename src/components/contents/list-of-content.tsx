@@ -67,8 +67,9 @@ const DrawerListOfContent = () => {
       </Drawer>
 
       <Button
-        icon={<HiMenuAlt3 />}
+        icon={<HiMenuAlt3 size={28} />}
         type='primary'
+        size='large'
         onClick={() => setOpen(true)}
         style={{
           position: 'fixed',
