@@ -1,6 +1,6 @@
 {
   "extends": ["next/core-web-vitals", "next/typescript"],
-  "ignorePatterns": ["src/types/database.types.ts"],
+  "ignorePatterns": ["src/types/database.d.ts"],
   "rules": {
     "semi": ["error", "never"],
     "quotes": ["error", "single"],
