@@ -26,6 +26,8 @@ interface ModalCreateProps {
   editData?: DataType;
 }
 
+const ENABLE_IPSU_PREVIEW = parseInt(process.env.NEXT_PUBLIC_ENABLE_ISPU_PREVIEW || '0') === 1
+
 const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => {
   const [form] = Form.useForm()
   const [notify, notificationContext] = notification.useNotification()
@@ -112,17 +114,18 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
       if (editData) {
         form.setFieldsValue(editData)
         
-        const formula = (element: Criterion, value:number) => {
-          const {
-            indexLower,
-            indexUpper,
-            concentrationLower,
-            concentrationUpper,
-          } = ISPU.getStandard(value, element)
+        if (ENABLE_IPSU_PREVIEW) {
+          const formula = (element: Criterion, value:number) => {
+            const {
+              indexLower,
+              indexUpper,
+              concentrationLower,
+              concentrationUpper,
+            } = ISPU.getStandard(value, element)
 
-          const result = ISPU.calculate(value, element)
+            const result = ISPU.calculate(value, element)
 
-          const formula = `
+            const formula = `
                   \\text{ISPU} = \\frac{(\\text{${indexUpper}} - \\text{${indexLower}})}{(\\text{${concentrationUpper}} - \\text{${concentrationLower}})}
                   \\times (\\text{${value}} - \\text{${concentrationLower}}) + \\text{${indexLower}}
                   \\\\
@@ -131,50 +134,51 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
                   \\text{Kualitas} = \\text{${ISPU.getLabel(result)}}
                 `
 
-          return katex.renderToString(formula, {throwOnError: false})
+            return katex.renderToString(formula, {throwOnError: false})
+          }
+
+          setIspu({
+            pm10: {
+              value: editData.pm10,
+              label: ISPU.getLabel(editData.pm10),
+              formula: formula('pm10', editData.pm10),
+            },
+            pm2_5: {
+              value: editData.pm2_5,
+              label: ISPU.getLabel(editData.pm2_5),
+              formula: formula('pm2_5', editData.pm2_5),
+            },
+            so2: {
+              value: editData.so2,
+              label: ISPU.getLabel(editData.so2),
+              formula: formula('so2', editData.so2),
+            },
+            co: {
+              value: editData.co,
+              label: ISPU.getLabel(editData.co),
+              formula: formula('co', editData.co),
+            },
+            o3: {
+              value: editData.o3,
+              label: ISPU.getLabel(editData.o3),
+              formula: formula('o3', editData.o3),
+            },
+            no2: {
+              value: editData.no2,
+              label: ISPU.getLabel(editData.no2),
+              formula: formula('no2', editData.no2),
+            },
+          })
+
+          setKualitasRecomendation(ISPU.calculateSummaryWithLabel({
+            pm10: form.getFieldValue('pm10') ?? 0,
+            pm2_5: form.getFieldValue('pm2_5') ?? 0,
+            so2: form.getFieldValue('so2') ?? 0,
+            co: form.getFieldValue('co') ?? 0,
+            o3: form.getFieldValue('o3') ?? 0,
+            no2: form.getFieldValue('no2') ?? 0,
+          }))
         }
-
-        setIspu({
-          pm10: {
-            value: editData.pm10,
-            label: ISPU.getLabel(editData.pm10),
-            formula: formula('pm10', editData.pm10),
-          },
-          pm2_5: {
-            value: editData.pm2_5,
-            label: ISPU.getLabel(editData.pm2_5),
-            formula: formula('pm2_5', editData.pm2_5),
-          },
-          so2: {
-            value: editData.so2,
-            label: ISPU.getLabel(editData.so2),
-            formula: formula('so2', editData.so2),
-          },
-          co: {
-            value: editData.co,
-            label: ISPU.getLabel(editData.co),
-            formula: formula('co', editData.co),
-          },
-          o3: {
-            value: editData.o3,
-            label: ISPU.getLabel(editData.o3),
-            formula: formula('o3', editData.o3),
-          },
-          no2: {
-            value: editData.no2,
-            label: ISPU.getLabel(editData.no2),
-            formula: formula('no2', editData.no2),
-          },
-        })
-
-        setKualitasRecomendation(ISPU.calculateSummaryWithLabel({
-          pm10: form.getFieldValue('pm10') ?? 0,
-          pm2_5: form.getFieldValue('pm2_5') ?? 0,
-          so2: form.getFieldValue('so2') ?? 0,
-          co: form.getFieldValue('co') ?? 0,
-          o3: form.getFieldValue('o3') ?? 0,
-          no2: form.getFieldValue('no2') ?? 0,
-        }))
       }
     }
   }, [editData, form, open])
@@ -238,8 +242,8 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
                 } = ISPU.getStandard(value, field.key)
 
                 const result = ISPU.calculate(value, field.key)
-
-                const formula = `
+                if (ENABLE_IPSU_PREVIEW){
+                  const formula = `
                   \\text{ISPU} = \\frac{(\\text{${indexUpper}} - \\text{${indexLower}})}{(\\text{${concentrationUpper}} - \\text{${concentrationLower}})}
                   \\times (\\text{${value}} - \\text{${concentrationLower}}) + \\text{${indexLower}}
                   \\\\
@@ -247,25 +251,26 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
                   \\\\
                   \\text{Kualitas} = \\text{${ISPU.getLabel(result)}}
                 `
-                const renderedFormula = katex.renderToString(formula, {throwOnError: false})
+                  const renderedFormula = katex.renderToString(formula, {throwOnError: false})
 
-                setIspu((prev) => ({
-                  ...prev,
-                  [field.key]: {
-                    value: value,
-                    label: ISPU.getLabel(value),
-                    formula: renderedFormula,
-                  },
-                }))
+                  setIspu((prev) => ({
+                    ...prev,
+                    [field.key]: {
+                      value: value,
+                      label: ISPU.getLabel(value),
+                      formula: renderedFormula,
+                    },
+                  }))
 
-                setKualitasRecomendation(ISPU.calculateSummaryWithLabel({
-                  pm10: form.getFieldValue('pm10') ?? 0,
-                  pm2_5: form.getFieldValue('pm2_5') ?? 0,
-                  so2: form.getFieldValue('so2') ?? 0,
-                  co: form.getFieldValue('co') ?? 0,
-                  o3: form.getFieldValue('o3') ?? 0,
-                  no2: form.getFieldValue('no2') ?? 0,
-                }))
+                  setKualitasRecomendation(ISPU.calculateSummaryWithLabel({
+                    pm10: form.getFieldValue('pm10') ?? 0,
+                    pm2_5: form.getFieldValue('pm2_5') ?? 0,
+                    so2: form.getFieldValue('so2') ?? 0,
+                    co: form.getFieldValue('co') ?? 0,
+                    o3: form.getFieldValue('o3') ?? 0,
+                    no2: form.getFieldValue('no2') ?? 0,
+                  }))
+                }
               }}
             />
           </Form.Item>
