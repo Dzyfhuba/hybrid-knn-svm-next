@@ -1,13 +1,12 @@
 'use client'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
-import { Button, Form, GetProp, InputNumber, Modal, Table } from 'antd'
+import { Button, Form, GetProp, InputNumber, Modal, Table, message as Message } from 'antd'
 import { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
 import { SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import QueryString from 'qs'
 import { useEffect, useState } from 'react'
-import { IoReload } from 'react-icons/io5'
 
 interface TableParams {
   pagination?: TablePaginationConfig
@@ -18,10 +17,11 @@ interface TableParams {
 
 const DataSplit = () => {
   const [modal, modalContext] = Modal.useModal()
+  const [message, messageContext] = Message.useMessage()
   const [form] = Form.useForm()
   const [training, setTraining] = useState(() => {
-    const trainingValue = window.localStorage.getItem('training');
-    return trainingValue ? parseInt(trainingValue) : 80;
+    const trainingValue = window.localStorage.getItem('training')
+    return trainingValue ? parseInt(trainingValue) : 80
   })
   const { model } = useStoreState(state => state)
   const actions = useStoreActions(actions => actions)
@@ -98,24 +98,32 @@ const DataSplit = () => {
           }))
 
           // refetch data
-          fetchDataTrain()
-          fetchDataTest()
+          // fetchDataTrain()
+          // fetchDataTest()
 
-          // return await axios.put('/api/data-split', payload)
-          //   .then(res => {
-          //     setDataTrain(res.data.extra.data_train)
-          //     setTotalTrain(res.data.extra.data_train.length)
-          //     setDataTest(res.data.extra.data_test)
-          //     setTotalTest(res.data.extra.data_test.length)
+          return await axios.put('/api/data-split', payload)
+            .then(res => {
+              setDataTrain(res.data.extra.data_train)
+              setTableParamsTrain({
+                pagination: {
+                  current: 1,
+                  pageSize: 10,
+                },
+              })
+              setTotalTrain(res.data.extra.data_train.length)
+              setDataTest(res.data.extra.data_test)
+              setTableParamsTest({
+                pagination: {
+                  current: 1,
+                  pageSize: 10,
+                },
+              })
+              setTotalTest(res.data.extra.data_test.length)
 
-          //     console.log(res.data)
+              console.log(res.data)
 
-          modal.success({
-            title: 'Data Berhasil Dibagi',
-            content: `Data berhasil dibagi dengan rasio ${training}:${testing}.`,
-            autoFocusButton: 'ok',
-          })
-          //   })
+              message.success('Data berhasil dipisahkan dengan rasio ' + training + ':' + testing)          
+            })
         }
       })
     }
@@ -154,6 +162,7 @@ const DataSplit = () => {
       .then((res) => res.json())
       .then((res) => {
         setDataTrain(res.data)
+        console.log(res.total)
         setTotalTrain(res.total)
         setLoadingTrain(false)
         setTableParamsTrain({
@@ -246,6 +255,7 @@ const DataSplit = () => {
   return (
     <div>
       {modalContext}
+      {messageContext}
 
       <h2 className="text-xl font-bold">Data Split</h2>
 
