@@ -29,6 +29,7 @@ type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
   const [data, setData] = useState<DataType[]>([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
@@ -58,6 +59,7 @@ const Raw = () => {
       .then((res) => {
         setData(res.data)
         setLoading(false)
+        setTotal(res.total)
         setTableParams({
           ...tableParams,
           pagination: {
@@ -236,6 +238,7 @@ const Raw = () => {
         loading={loading}
         onChange={handleTableChange}
         scroll={{ x: 1000 }}
+        caption={data.length > 0 ? `Total Data: ${total}` : undefined}
       />
       <ModalForm
         open={isModalopen}

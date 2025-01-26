@@ -1,17 +1,24 @@
 'use client'
 import { Database } from '@/types/database'
-import { Button, Form, InputNumber, Modal, Table } from 'antd'
-import { ColumnsType } from 'antd/es/table'
+import { Button, Form, GetProp, InputNumber, Modal, Table } from 'antd'
+import { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
+import { SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
+import QueryString from 'qs'
 import { useEffect, useState } from 'react'
 import { IoReload } from 'react-icons/io5'
+
+interface TableParams {
+  pagination?: TablePaginationConfig
+  sortField?: SorterResult<Database['svm_knn']['Tables']['data_train']['Row']>['field']
+  sortOrder?: SorterResult<Database['svm_knn']['Tables']['data_train']['Row']>['order']
+  filters?: Parameters<GetProp<TableProps, 'onChange'>>[1]
+}
 
 const DataSplit = () => {
   const [modal, modalContext] = Modal.useModal()
   const [form] = Form.useForm()
   const [training, setTraining] = useState(80)
-  const [dataTrain, setDataTrain] = useState<Database['svm_knn']['Tables']['data_train']['Row'][]>([])
-  const [dataTest, setDataTest] = useState<Database['svm_knn']['Tables']['data_test']['Row'][]>([])
 
   const columns: ColumnsType<Database['svm_knn']['Tables']['data_train']['Row']> = [
     {
@@ -67,47 +74,148 @@ const DataSplit = () => {
       modal.confirm({
         title: 'Split Data',
         content: `Apakah anda yakin untuk membagi data dengan rasio ${training}:${testing}?`,
-        onOk: () => {
+        autoFocusButton: 'ok',
+        onOk: async () => {
           setTraining(training)
+          const reference = window.localStorage.getItem('reference')
 
-          modal.success({
-            title: 'Data Berhasil Dibagi',
-            content: `Data berhasil dibagi dengan rasio ${training}:${testing}.`,
-          })
+          const payload = {
+            train_length: training,
+            test_length: testing,
+            reference
+          }
+
+          return await axios.put('/api/data-split', payload)
+            .then(res => {
+              setDataTrain(res.data.extra.data_train)
+              setDataTest(res.data.extra.data_test)
+              
+              modal.success({
+                title: 'Data Berhasil Dibagi',
+                content: `Data berhasil dibagi dengan rasio ${training}:${testing}.`,
+              })
+            })
         }
       })
     }
   }
+  
+  const [dataTrain, setDataTrain] = useState<Database['svm_knn']['Tables']['data_train']['Row'][]>([])
+  const [totalTrain, setTotalTrain] = useState(0)
+  const [dataTest, setDataTest] = useState<Database['svm_knn']['Tables']['data_test']['Row'][]>([])
+  const [loadingTrain, setLoadingTrain] = useState(false)
+  const [tableParamsTrain, setTableParamsTrain] = useState<TableParams>({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+  })
+  const [totalTest, setTotalTest] = useState(0)
+  const [loadingTest, setLoadingTest] = useState(false)
+  const [tableParamsTest, setTableParamsTest] = useState<TableParams>({
+    pagination: {
+      current: 1,
+      pageSize: 10,
+    },
+  })
 
-  const fetchDataTrain = async (reference: string | null) => {
-    const data: Database['svm_knn']['Tables']['data_train']['Row'][] = await axios.get('/api/data-train' + (reference ? `?reference=${reference}` : ''))
-      .then(response => response.data.data)
-    
-    setDataTrain(data)
+  const parseParams = (params: TableParams) => ({
+    ...params.pagination,
+    orderBy: params.sortField,
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
+    ...params.filters,
+    reference: window.localStorage.getItem('reference')
+  })
+  
+  const fetchDataTrain = () => {
+    setLoadingTrain(true)
+    fetch(`/api/data-train?${QueryString.stringify(parseParams(tableParamsTrain))}`)
+      .then((res) => res.json())
+      .then((res) => {
+        setDataTrain(res.data)
+        setTotalTrain(res.total)
+        setLoadingTrain(false)
+        setTableParamsTrain({
+          ...tableParamsTrain,
+          pagination: {
+            ...tableParamsTrain.pagination,
+            total: res.total,
+          },
+        })
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoadingTrain(false)
+      })
   }
-
-  const fetchDataTest = async (reference: string | null) => {
-    const data: Database['svm_knn']['Tables']['data_test']['Row'][] = await axios.get('/api/data-test' + (reference ? `?reference=${reference}` : ''))
-      .then(response => response.data.data)
-    
-    setDataTest(data)
+  const fetchDataTest = () => {
+    setLoadingTest(true)
+    fetch(`/api/data-test?${QueryString.stringify(parseParams(tableParamsTest))}`)
+      .then((res) => res.json())
+      .then((res) => {
+        setDataTest(res.data)
+        setTotalTest(res.total)
+        setLoadingTest(false)
+        setTableParamsTest({
+          ...tableParamsTest,
+          pagination: {
+            ...tableParamsTest.pagination,
+            total: res.total,
+          },
+        })
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error)
+        setLoadingTest(false)
+      })
   }
+  
+  useEffect(fetchDataTrain, [
+    tableParamsTrain.pagination?.current,
+    tableParamsTrain.pagination?.pageSize,
+    tableParamsTrain?.sortOrder,
+    tableParamsTrain?.sortField,
+    JSON.stringify(tableParamsTrain.filters),
+  ])
+  useEffect(fetchDataTest, [
+    tableParamsTest.pagination?.current,
+    tableParamsTest.pagination?.pageSize,
+    tableParamsTest?.sortOrder,
+    tableParamsTest?.sortField,
+    JSON.stringify(tableParamsTest.filters),
+  ])
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const reference = window.localStorage.getItem('reference')
-
-      fetchDataTrain(reference)
-      fetchDataTest(reference)
+  const handleTableChangeTrain: TableProps<Database['svm_knn']['Tables']['data_train']['Row']>['onChange'] = (pagination, filters, sorter) => {
+    setTableParamsTrain({
+      pagination,
+      filters,
+      sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
+      sortField: Array.isArray(sorter) ? undefined : sorter.field,
+    })
+  
+    if (pagination.pageSize !== tableParamsTrain.pagination?.pageSize) {
+      setDataTrain([])
     }
-  }, [])
+  }
+  const handleTableChangeTest: TableProps<Database['svm_knn']['Tables']['data_test']['Row']>['onChange'] = (pagination, filters, sorter) => {
+    setTableParamsTest({
+      pagination,
+      filters,
+      sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
+      sortField: Array.isArray(sorter) ? undefined : sorter.field,
+    })
+  
+    if (pagination.pageSize !== tableParamsTest.pagination?.pageSize) {
+      setDataTest([])
+    }
+  }
 
   return (
     <div>
       {modalContext}
 
       <h2 className="text-xl font-bold">Data Split</h2>
-      
+
       <Form
         form={form}
         layout='horizontal'
@@ -191,7 +299,11 @@ const DataSplit = () => {
           columns={columns}
           rowKey={(record) => record.id}
           dataSource={dataTrain}
+          pagination={tableParamsTrain.pagination}
+          loading={loadingTrain}
+          onChange={handleTableChangeTrain}
           scroll={{ x: 1000 }}
+          caption={dataTrain.length > 0 ? `Total Data: ${totalTrain}` : undefined}
         />
       </div>
 
@@ -202,7 +314,11 @@ const DataSplit = () => {
           columns={columns}
           rowKey={(record) => record.id}
           dataSource={dataTest}
+          pagination={tableParamsTest.pagination}
+          loading={loadingTest}
+          onChange={handleTableChangeTest}
           scroll={{ x: 1000 }}
+          caption={dataTest.length > 0 ? `Total Data: ${totalTest}` : undefined}
         />
       </div>
     </div>
