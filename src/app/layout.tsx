@@ -44,17 +44,12 @@ export default function RootLayout({
           <AntProvider>
             <Layout>
               <Navigation />
-              <div
-                className="container mx-auto p-3"
+              <Layout
               >
-                <Layout
-                  className="flex !flex-col sm:!flex-row"
-                >
-                  {children}
-                </Layout>
-                <Divider />
-                <Footer />
-              </div>
+                {children}
+              </Layout>
+              <Divider />
+              <Footer />
             </Layout>
           </AntProvider>
         </AntdRegistry>

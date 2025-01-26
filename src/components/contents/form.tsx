@@ -1,7 +1,7 @@
 'use client'
 
 import { Form, InputNumber, Modal, notification } from 'antd'
-import { useEffect, useState } from 'react'
+import { createRef, useEffect, useState } from 'react'
 import DebounceSelect from '../debounce-select'
 import ISPU from '@/models/ispu'
 import { Criterion } from '@/types/criterion'
@@ -109,8 +109,11 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
     }
   }
 
+  const autoFocusRef = createRef<HTMLInputElement>()
+
   useEffect(() => {
     if (form && open) {
+      autoFocusRef.current?.focus()
       if (editData) {
         form.setFieldsValue(editData)
         
@@ -211,7 +214,7 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
           </Form>
         )}
       >
-        {criterion.map((field) => (
+        {criterion.map((field, idx) => (
           <Form.Item
             key={field.key}
             name={field.key}
@@ -232,6 +235,7 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
               type='number'
               addonAfter={field.unit}
               style={{ width: '100%' }}
+              ref={idx === 0 ? autoFocusRef : undefined}
               onKeyUp={(e) => {
                 const value = Number(e.currentTarget.value ?? 0)
                 const {

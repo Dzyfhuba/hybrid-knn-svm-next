@@ -235,6 +235,7 @@ const Raw = () => {
         pagination={tableParams.pagination}
         loading={loading}
         onChange={handleTableChange}
+        scroll={{ x: 1000 }}
       />
       <ModalForm
         open={isModalopen}

@@ -173,6 +173,7 @@ const PengujianKNN = () => {
             sortField: Array.isArray(sorter) ? undefined : sorter.field,
           })
         }}
+        scroll={{ x: 1000 }}
       />
 
       <Modal

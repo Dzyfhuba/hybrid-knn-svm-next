@@ -94,7 +94,7 @@ export default function DebounceSelect<
 
   return (
     <Select
-      labelInValue
+      // labelInValue
       filterOption={false}
       onSearch={debounceFetcher}
       showSearch

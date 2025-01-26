@@ -15,6 +15,7 @@ export type Database = {
           created_at: string
           id: number
           kualitas: string | null
+          model_id: number | null
           no2: number | null
           o3: number | null
           pm10: number | null
@@ -26,6 +27,7 @@ export type Database = {
           created_at?: string
           id?: number
           kualitas?: string | null
+          model_id?: number | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
@@ -37,13 +39,22 @@ export type Database = {
           created_at?: string
           id?: number
           kualitas?: string | null
+          model_id?: number | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
           so2?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "data_test_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "model"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       data_train: {
         Row: {
@@ -51,6 +62,7 @@ export type Database = {
           created_at: string
           id: number
           kualitas: string | null
+          model_id: number | null
           no2: number | null
           o3: number | null
           pm10: number | null
@@ -62,6 +74,7 @@ export type Database = {
           created_at?: string
           id?: number
           kualitas?: string | null
+          model_id?: number | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
@@ -73,29 +86,41 @@ export type Database = {
           created_at?: string
           id?: number
           kualitas?: string | null
+          model_id?: number | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
           so2?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "data_train_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "model"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       model: {
         Row: {
           created_at: string
           id: number
           model: Json | null
+          reference: string | null
         }
         Insert: {
           created_at?: string
           id?: number
           model?: Json | null
+          reference?: string | null
         }
         Update: {
           created_at?: string
           id?: number
           model?: Json | null
+          reference?: string | null
         }
         Relationships: []
       }
@@ -211,35 +236,44 @@ export type Database = {
         Row: {
           co: number | null
           created_at: string
+          deleted_at: string | null
           id: number
           kualitas: string | null
           no2: number | null
           o3: number | null
           pm10: number | null
           pm2_5: number | null
+          reference: string | null
           so2: number | null
+          updated_at: string | null
         }
         Insert: {
           co?: number | null
           created_at?: string
+          deleted_at?: string | null
           id?: number
           kualitas?: string | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
+          reference?: string | null
           so2?: number | null
+          updated_at?: string | null
         }
         Update: {
           co?: number | null
           created_at?: string
+          deleted_at?: string | null
           id?: number
           kualitas?: string | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
+          reference?: string | null
           so2?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }

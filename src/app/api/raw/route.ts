@@ -20,7 +20,6 @@ export async function GET(request: NextRequest) {
       .range((current - 1) * pageSize, current * pageSize - 1)
 
     if (error) throw error
-    console.log('Data:', data)
 
     const { count, error: countError } = await supabase
       .from('raw')

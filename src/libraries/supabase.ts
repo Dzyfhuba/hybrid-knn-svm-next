@@ -1,4 +1,4 @@
-import { Database } from '@/types/database.types'
+import { Database } from '@/types/database'
 import { createClient } from '@supabase/supabase-js'
 
 type Schema = 'svm_knn'
