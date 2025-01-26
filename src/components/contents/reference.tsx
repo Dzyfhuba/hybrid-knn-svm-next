@@ -1,5 +1,5 @@
 'use client'
-import { Database } from '@/types/database'
+import { useStoreActions } from '@/state/hooks'
 import { Button, Form, Input, Modal, Space } from 'antd'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
@@ -8,15 +8,16 @@ const Reference = () => {
   const [form] = Form.useForm()
   const [isLoading, setLoading] = useState(true)
   const [open, setOpen] = useState(false)
+  const { fetchModel } = useStoreActions((actions) => actions)
 
   const getReference = async (reference: string | null) => {
     setLoading(true)
-    axios.get<Database['svm_knn']['Tables']['model']['Row']>('/api/model' + (reference ? `?reference=${reference}` : ''))
+    axios.get('/api/model' + (reference ? `?reference=${reference}` : ''))
       .then((response) => {
-        if (response.data.reference) {
-          window.localStorage.setItem('reference', response.data.reference)
+        if (response.data.item.reference) {
+          window.localStorage.setItem('reference', response.data.item.reference)
           form.setFieldsValue({
-            reference: response.data.reference
+            reference: response.data.item.reference
           })
         }
       })
@@ -27,9 +28,10 @@ const Reference = () => {
     if (typeof window === 'undefined') return
 
     if (open && form) {
-      const reference = window.localStorage.getItem('reference')
+      fetchModel()
+      // const reference = window.localStorage.getItem('reference')
 
-      getReference(reference)
+      // getReference(reference)
     }
   }, [open])
 

@@ -78,6 +78,7 @@ const DataSplit = () => {
         onOk: async () => {
           setTraining(training)
           const reference = window.localStorage.getItem('reference')
+          window.localStorage.setItem('training', training.toString())
 
           const payload = {
             train_length: training,

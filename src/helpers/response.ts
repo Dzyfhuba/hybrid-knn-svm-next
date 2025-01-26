@@ -50,6 +50,18 @@ const response = {
       }
     )
   },
+  // 404
+  notFound: <T extends object>(params: Params<T>) => {
+    return new Response(
+      JSON.stringify(params, null, 0),
+      {
+        status: 404,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  },
   internalServerError: <T extends object>(params: Params<T>) => {
     return new Response(
       JSON.stringify(params, null, 0),

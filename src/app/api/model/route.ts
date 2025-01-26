@@ -1,6 +1,8 @@
+import response from '@/helpers/response'
 import supabase from '@/libraries/supabase'
 import { nanoid } from 'nanoid'
 import { NextRequest } from 'next/server'
+import { z } from 'zod'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -11,13 +13,46 @@ export async function GET(request: NextRequest) {
     modelReference = nanoid()
   }
 
-  const { data, error } = await supabase.from('model').select().eq('reference', modelReference)
-  if (error || data.length === 0) {
+  const { data, error } = await supabase.from('model').select().eq('reference', modelReference).maybeSingle()
+  if (error) {
+    return response.internalServerError({ message: error.message })
+  }
+
+  if (!data) {
     const { error: insertError } = await supabase.from('model').insert({ reference: modelReference })
     if (insertError) {
-      return new Response(JSON.stringify({ error: insertError.message }), { status: 500 })
+      return response.internalServerError({ message: insertError.message })
     }
   }
 
-  return new Response(JSON.stringify({ reference: modelReference }), { status: 200 })
+  return response.ok({
+    item: {
+      reference: modelReference,
+      train_percentage: data?.train_percentage || 80
+    }
+  })
+}
+
+export async function PUT(request: NextRequest) {
+  const payload = z.object({
+    train_percentage: z.number(),
+    reference: z.string()
+  }).safeParse({
+    ...await request.json(),
+    ...(new URL(request.url).searchParams)
+  })
+
+  if (!payload.success) {
+    return new Response(JSON.stringify({ error: payload.error }), { status: 400 })
+  }
+
+  // put train_percentage to model
+  const { error: modelError } = await supabase.from('model')
+    .update({ train_percentage: payload.data.train_percentage })
+    .eq('reference', payload.data.reference)
+  if (modelError) {
+    return new Response(JSON.stringify({ error: modelError.message }), { status: 500 })
+  }
+
+  return response.ok({ message: 'Data berhasil disimpan' })
 }

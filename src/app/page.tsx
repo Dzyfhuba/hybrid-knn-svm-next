@@ -7,10 +7,11 @@ import TestingKNN from '@/components/contents/testing-knn'
 import TrainingSVM from '@/components/contents/training-svm'
 import { Content } from 'antd/es/layout/layout'
 import Sider from 'antd/es/layout/Sider'
+import ClientWrapper from '@/components/client-wrapper'
 
 export default function Home() {
   return (
-    <>
+    <ClientWrapper>
       <Content
         className="order-2 sm:!order-1 p-3 sm:max-w-screen-lg sm:mx-auto"
       >
@@ -47,7 +48,7 @@ export default function Home() {
       </Sider>
 
       <DrawerListOfContent />
-    </>
+    </ClientWrapper>
   )
 }
 

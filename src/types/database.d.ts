@@ -109,18 +109,21 @@ export type Database = {
           id: number
           model: Json | null
           reference: string | null
+          train_percentage: number | null
         }
         Insert: {
           created_at?: string
           id?: number
           model?: Json | null
           reference?: string | null
+          train_percentage?: number | null
         }
         Update: {
           created_at?: string
           id?: number
           model?: Json | null
           reference?: string | null
+          train_percentage?: number | null
         }
         Relationships: []
       }

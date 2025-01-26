@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest) {
   }
 
   // get all data
-  const raw = await supabase.from('raw').select('pm10, pm2_5, so2, co, o3, no2')
+  const raw = await supabase.from('raw').select('pm10, pm2_5, so2, co, o3, no2, kualitas')
   if (raw.error) {
     return response.internalServerError({message: raw.error.message})
   }
