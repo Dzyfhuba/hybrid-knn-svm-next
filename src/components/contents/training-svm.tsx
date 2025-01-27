@@ -3,7 +3,7 @@
 import SVM from '@/models/svm'
 import { useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
-import { Button, Divider, Modal, Table, TableProps } from 'antd'
+import { Button, Divider, Modal, Skeleton, Table, TableProps } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import qs from 'qs'
@@ -142,22 +142,45 @@ const TrainingSVM = () => {
       .then((res) => res.data.data as Database['svm_knn']['Tables']['data_train']['Row'][])
 
     console.log('SVM Construction...')
-    const svm = new SVM.Linear({
-      epochs: 10000,
-      learningRate: 0.001,
-      regularization: 1,
-      checkpointInterval: 1000,
+    const svm = new SVM.MultiClass({
+      learningRate: 0.00001,
+      regularization: 1.0,
+      epochs: 100000,
+      checkpointInterval: 10000,
     })
 
-    const X = train.map((d) => [d.pm10, d.pm2_5, d.so2, d.co, d.o3, d.no2].filter(value => value !== null))
-    console.log('X:', X)
-    const y = train.map((d) => (d.kualitas === 'BAIK' ? 1 : -1))
+    const X = train.map((item) => [
+      item.pm10,
+      item.pm2_5,
+      item.so2,
+      item.co,
+      item.o3,
+      item.no2,
+    ]).filter((item) => item.every((i) => i !== null))
+    const y = train.map((item) => {
+      switch (item.kualitas) {
+      case 'BAIK':
+        return 1
+      case 'SEDANG':
+        return 2
+      case 'TIDAK SEHAT':
+        return 3
+      case 'SANGAT TIDAK SEHAT':
+        return 4
+      case 'BERBAHAYA':
+        return 5
+      default:
+        return 0
+      }
+    })
 
     console.log('Training SVM...')
     svm.fit(X, y)
+    console.log('Training done')
 
-    console.log('Training Done!')
-    console.log('History:', svm.getHistory())
+    const prediction = svm.predict(X)
+    console.log('Prediction:', prediction)
+
     setLoadingTraining(false)
   }
 
@@ -204,9 +227,12 @@ const TrainingSVM = () => {
             handleTrain()
             // setModalVisible(false)
           }}
+          loading={LoadingTraining}
         >
           Latih Sekarang!
         </Button>
+
+        <Skeleton active loading={LoadingTraining}  />
       </Modal>
     </div>
   )
