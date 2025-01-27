@@ -8,7 +8,7 @@ class Linear {
 
   private weightsHistory: number[][] = []
   private biasHistory: number[] = []
-  private lostHistory: number[] = []
+  private lossHistory: number[] = []
 
   private checkpointInterval: number = 10
 
@@ -49,14 +49,14 @@ class Linear {
         // Simpan loss
         // console.log(X, y, this.weights, this.bias)
       }
-      const loss = this.loss(X, y, this.weights, this.bias)
+      const loss = this.loss(X, y)
       if (epoch % this.checkpointInterval === 0) {
         console.log(`Epoch ${epoch}, loss: ${loss}`)
         // Simpan bobot dan bias
         this.weightsHistory.push([...this.weights])
         this.biasHistory.push(this.bias)
 
-        this.lostHistory.push(loss)
+        this.lossHistory.push(loss)
       }
     }
   }
@@ -65,7 +65,7 @@ class Linear {
     return {
       weights: this.weightsHistory,
       bias: this.biasHistory,
-      lost: this.lostHistory,
+      lost: this.lossHistory,
     }
   }
 
@@ -77,9 +77,19 @@ class Linear {
     return y * (this.dot(X, weights) + bias)
   }
 
-  loss(X: number[][], y: number[], weights: number[], bias: number) {
-    return 0.5 * this.dot(weights, weights) + this.regularization * X.reduce((acc, X_i, i) => acc + Math.max(0, 1 - y[i] * this.hyperplane(X_i, y[i], weights, bias)), 0)
+  loss(X: number[][], y: number[]): number {
+    // Regularization term
+    const regTerm = 0.5 * this.regularization * this.dot(this.weights, this.weights)
+
+    // Hinge loss
+    const hingeLoss = X.reduce((acc, X_i, i) => {
+      const margin = y[i] * (this.dot(X_i, this.weights) + this.bias)
+      return acc + Math.max(0, 1 - margin)
+    }, 0)
+
+    return regTerm + hingeLoss
   }
+
 }
 
 const SVM = {
