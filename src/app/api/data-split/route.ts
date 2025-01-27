@@ -6,8 +6,8 @@ import { z } from 'zod'
 
 export async function PUT(request: NextRequest) {
   const payload = z.object({
-    train_length: z.number(),
-    test_length: z.number(),
+    train_length: z.number().int(),
+    test_length: z.number().int(),
     reference: z.string()
   }).safeParse(await request.json())
 
