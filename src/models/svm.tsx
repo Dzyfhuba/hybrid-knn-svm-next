@@ -40,15 +40,20 @@ class Linear {
         const X_i = X[i]
         const y_i = y[i]
 
+        // Menghitung hyperplane
         if (this.hyperplane(X_i, y_i, this.weights, this.bias) >= 1) {
+          // Jika hyperplane >= 1, update bobot, tidak ada hinge loss (hinge loss adalah kerugian yang terjadi ketika hyperplane < 1)
+          // Sehingga hanya perlu mengupdate bobot dengan regularisasi
           this.weights = this.weights.map((w) => w - this.learningRate * (2 * this.regularization * w))
         } else {
+          // Jika hyperplane < 1, update bobot dan bias, karena ada hinge loss
+          // Sehingga perlu mengupdate bobot dan bias dengan regularisasi
           this.weights = this.weights.map((w, j) => w - this.learningRate * (2 * this.regularization * w - X_i[j] * y_i))
           this.bias -= this.learningRate * y_i * this.regularization
         }
-        // Simpan loss
-        // console.log(X, y, this.weights, this.bias)
       }
+
+      // Menghitung loss setiap epoch (loss adalah gabungan antara regularisasi dan hinge loss)
       const loss = this.loss(X, y)
       if (epoch % this.checkpointInterval === 0) {
         console.log(`Epoch ${epoch}, loss: ${loss}`)
@@ -56,6 +61,7 @@ class Linear {
         this.weightsHistory.push([...this.weights])
         this.biasHistory.push(this.bias)
 
+        // Simpan loss
         this.lossHistory.push(loss)
       }
     }
