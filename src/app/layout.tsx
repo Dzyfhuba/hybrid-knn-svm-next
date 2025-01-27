@@ -8,6 +8,7 @@ import { Divider, Layout } from 'antd'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
+import '@ant-design/v5-patch-for-react-19'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
