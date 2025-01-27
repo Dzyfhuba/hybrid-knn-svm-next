@@ -37,13 +37,13 @@ const Reference = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    if (form) {
-      const reference = window.localStorage.getItem('reference')
+    // if (form.__INTERNAL__.name) {
+    //   const reference = window.localStorage.getItem('reference')
       
-      getReference(reference)
+    //   getReference(reference)
 
-      fetchModel()
-    }
+    fetchModel()
+    // }
   }, [])
 
   return (
@@ -52,6 +52,7 @@ const Reference = () => {
         open={open}
         footer={null}
         maskClosable
+        // forceRender
         onCancel={() => {
           setOpen(false)
 
