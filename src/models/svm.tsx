@@ -67,6 +67,14 @@ class Linear {
     }
   }
 
+  predict(X: number[][]) {
+    return this.decisionFunction(X).map((decision) => decision >= 0 ? 1 : -1)
+  }
+
+  decisionFunction(X: number[][]) {
+    return X.map((X_i) => this.dot(X_i, this.weights) + this.bias)
+  }
+
   getHistory() {
     return {
       weights: this.weightsHistory,
@@ -95,11 +103,65 @@ class Linear {
 
     return regTerm + hingeLoss
   }
+}
 
+class MultiClass {
+  private learningRate: number
+  private regularization: number
+  private epochs: number
+  private models: Linear[] = []
+  private classes: number[] = []
+
+  private checkpointInterval: number = 10
+
+  constructor({
+    learningRate = 0.001,
+    regularization = 1.0,
+    epochs = 1000,
+    checkpointInterval = 10,
+  }) {
+    this.learningRate = learningRate
+    this.regularization = regularization
+    this.epochs = epochs
+    this.checkpointInterval = checkpointInterval
+  }
+
+  fit(X: number[][], y: number[]) {
+    this.classes = Array.from(new Set(y))
+    for (const cls of this.classes) {
+      const yBinary = y.map((label) => (label === cls ? 1 : -1))
+      console.log(`Training class ${cls} vs all`)
+      const model = new Linear({
+        learningRate: this.learningRate,
+        regularization: this.regularization,
+        epochs: this.epochs,
+        checkpointInterval: this.checkpointInterval,
+      })
+      model.fit(X, yBinary)
+      this.models.push(model)
+    }
+  }
+
+  predict(X: number[][]) {
+    const decisionValues = this.models.map((model) => model.decisionFunction(X))
+    return decisionValues[0].map((_, i) => {
+      const decisions = decisionValues.map((values) => values[i])
+      return this.classes[decisions.indexOf(Math.max(...decisions))]
+    })
+  }
+
+  printWeightsAndBiases() {
+    this.models.forEach((model, i) => {
+      console.log(`Class ${this.classes[i]}:`)
+      console.log(`  Weights: ${model['weights']}`)
+      console.log(`  Bias: ${model['bias']}`)
+    })
+  }
 }
 
 const SVM = {
   Linear,
+  MultiClass,
 }
 
 export default SVM
