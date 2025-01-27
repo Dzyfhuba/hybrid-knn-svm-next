@@ -1,9 +1,13 @@
 'use client'
 
-import { Button, Divider, Modal, Table, TableProps, Spin } from 'antd'
+import SVM from '@/models/svm'
+import { useStoreState } from '@/state/hooks'
+import { Database } from '@/types/database'
+import { Button, Divider, Modal, Table, TableProps } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
-import { useEffect, useState } from 'react'
+import axios from 'axios'
 import qs from 'qs'
+import { useEffect, useState } from 'react'
 
 interface DataType {
   id: number;
@@ -28,9 +32,11 @@ type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean
 
 const TrainingSVM = () => {
   const [data, setData] = useState<DataType[]>([])
+  const model = useStoreState((state) => state.model)
+
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
-  const [modalLoading, setModalLoading] = useState(false)
+  const [LoadingTraining, setLoadingTraining] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -78,28 +84,6 @@ const TrainingSVM = () => {
     tableParams.sortField,
     JSON.stringify(tableParams.filters),
   ])
-
-  const handleProcessTesting = async () => {
-    setModalVisible(true)
-    setModalLoading(true)
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-      Modal.success({
-        title: 'Pelatihan Selesai',
-        content: 'Proses pelatihan dengan KNN berhasil dilakukan.',
-      })
-    } catch (error) {
-      console.error('Error during testing process:', error)
-      Modal.error({
-        title: 'Pelatihan Gagal',
-        content: 'Terjadi kesalahan saat melakukan proses pelatihan.',
-      })
-    } finally {
-      setModalLoading(false)
-      setModalVisible(false)
-    }
-  }
 
   const columns: ColumnsType<DataType> = [
     {
@@ -149,12 +133,40 @@ const TrainingSVM = () => {
     },
   ]
 
+  const handleTrain = async () => {
+    setLoadingTraining(true)
+
+    const reference = model.reference
+    // load data
+    const train = await axios.get(`/api/data-train/all${reference ? `?reference=${reference}` : ''}`)
+      .then((res) => res.data.data as Database['svm_knn']['Tables']['data_train']['Row'][])
+
+    console.log('SVM Construction...')
+    const svm = new SVM.Linear({
+      epochs: 10000,
+      learningRate: 0.001,
+      regularization: 1,
+      checkpointInterval: 1000,
+    })
+
+    const X = train.map((d) => [d.pm10, d.pm2_5, d.so2, d.co, d.o3, d.no2].filter(value => value !== null))
+    console.log('X:', X)
+    const y = train.map((d) => (d.kualitas === 'BAIK' ? 1 : -1))
+
+    console.log('Training SVM...')
+    svm.fit(X, y)
+
+    console.log('Training Done!')
+    console.log('History:', svm.getHistory())
+    setLoadingTraining(false)
+  }
+
   return (
     <div>
       <h2 className="text-xl font-bold">Pelatihan (SVM)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={handleProcessTesting}>
+        <Button type="primary" onClick={() => setModalVisible(true)}>
           Proses Pelatihan
         </Button>
       </div>
@@ -181,15 +193,20 @@ const TrainingSVM = () => {
         title="Proses Pelatihan"
         footer={null}
         onCancel={() => setModalVisible(false)}
-        closable={!modalLoading}
       >
-        <div style={{ textAlign: 'center', padding: '24px 0' }}>
-          {modalLoading ? (
-            <Spin size="large" tip="Sedang melakukan pelatihan..." />
-          ) : (
-            <p>Proses pelatihan telah selesai.</p>
-          )}
-        </div>
+        <Button
+          type="primary"
+          htmlType='button'
+          onClick={(e) => {
+            console.log('SVM Construction...', e.target)
+
+            console.log('Training SVM...')
+            handleTrain()
+            // setModalVisible(false)
+          }}
+        >
+          Latih Sekarang!
+        </Button>
       </Modal>
     </div>
   )
