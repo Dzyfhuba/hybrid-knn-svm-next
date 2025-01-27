@@ -6,7 +6,7 @@ export interface GlobalState {
   model: Database['svm_knn']['Tables']['model']['Insert']
   putModel: Action<GlobalState, Database['svm_knn']['Tables']['model']['Row']>
   setModel: Action<GlobalState, ((model: GlobalState['model']) => GlobalState['model']) | GlobalState['model']>
-  fetchModel: Thunk<GlobalState, void>
+  fetchModel: Thunk<GlobalState>
 }
 
 const store = createStore<GlobalState>({
