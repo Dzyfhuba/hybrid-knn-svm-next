@@ -50,8 +50,8 @@ const DrawerListOfContent = () => {
         open={open}
         width={200}
         classNames={{
-          wrapper: 'h-max !top-[10vh]',
-          content: '!rounded-l'
+          wrapper: 'h-max top-[10vh]!',
+          content: 'rounded-l!'
         }}
       >
         <ListOfContent />
@@ -68,7 +68,7 @@ const DrawerListOfContent = () => {
           right: 0,
           zIndex: 100
         }}
-        className='!rounded-r-none rounded-br sm:!hidden'
+        className='rounded-r-none! rounded-br sm:hidden!'
       />
     </>
   )

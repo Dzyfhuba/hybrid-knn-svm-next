@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <ClientWrapper>
       <Content
-        className="order-2 sm:!order-1 p-3 sm:max-w-screen-lg sm:mx-auto"
+        className="order-2 sm:order-1! p-3 sm:max-w-(--breakpoint-lg) sm:mx-auto"
       >
         <section id="reference">
           <Reference />
@@ -43,7 +43,7 @@ export default function Home() {
         </section>
 
       </Content>
-      <Sider className="order-1 sm:!order-2 w-auto hidden sm:block">
+      <Sider className="order-1 sm:order-2! w-auto hidden sm:block">
         <ListOfContent />
       </Sider>
 
