@@ -1,5 +1,6 @@
 'use client'
 
+import ClassificationReport from '@/models/classification-report'
 import SVM from '@/models/svm'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
@@ -194,6 +195,13 @@ const TrainingSVM = () => {
 
     const prediction = svm.predict(X)
     console.log('Prediction:', prediction)
+
+    const report = new ClassificationReport.MultiClass({
+      predictions: prediction,
+      actuals: y,
+    })
+
+    report.print()
 
     setLoadingTraining(false)
   }
