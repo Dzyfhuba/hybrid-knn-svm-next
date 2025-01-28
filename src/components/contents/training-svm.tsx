@@ -9,6 +9,7 @@ import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import qs from 'qs'
 import { useEffect, useState } from 'react'
+import TextPrimary from '../text-primary'
 
 interface DataType {
   id: number;
@@ -232,7 +233,7 @@ const TrainingSVM = () => {
 
       <Modal
         open={modalVisible}
-        title="Proses Pelatihan"
+        title="Proses Pelatihan (SVM)"
         footer={null}
         onCancel={() => setModalVisible(false)}
         afterOpenChange={(open) => {
@@ -241,6 +242,14 @@ const TrainingSVM = () => {
           }
         }}
       >
+        <article>
+          <p>
+            Proses pelatihan metode Hybrid SVM-KNN memerlukan proses pelatihan SVM terhadap <TextPrimary>data latih</TextPrimary>.
+            Kemudian model yang dihasilkan akan digunakan untuk memprediksi <TextPrimary>data latih baru</TextPrimary>.
+            <TextPrimary> Data latih baru</TextPrimary> tersebut akan digunakan sebagai <TextPrimary>data latih</TextPrimary> KNN.
+          </p>
+        </article>
+        
         <Form
           labelCol={{ span: 8 }}
           onFinish={handleTrain}
