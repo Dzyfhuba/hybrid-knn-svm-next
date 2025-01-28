@@ -2,8 +2,8 @@ class Linear {
   private learningRate: number
   private regularization: number
   private epochs: number
-  private weights: number[] | null = null
-  private bias: number | null = null
+  private weights: number[]
+  private bias: number
   private lossHistory: number[] = []
   private checkpointInterval: number
 
@@ -17,6 +17,9 @@ class Linear {
     this.regularization = regularization
     this.epochs = epochs
     this.checkpointInterval = checkpointInterval
+
+    this.weights = []
+    this.bias = 0
   }
 
   fit(X: number[][], y: number[]) {
@@ -31,7 +34,7 @@ class Linear {
       for (let i = 0; i < nSamples; i++) {
         const condition = y_[i] * (this.dot(X[i], this.weights) + this.bias) >= 1
         if (condition) {
-          this.weights = this.weights.map((w, j) => w - this.learningRate * (2 * w / nSamples))
+          this.weights = this.weights.map((w) => w - this.learningRate * (2 * w / nSamples))
         } else {
           this.weights = this.weights.map((w, j) => w - this.learningRate * (2 * w / nSamples - X[i][j] * y_[i] * this.regularization))
           this.bias += this.learningRate * y_[i] * this.regularization
