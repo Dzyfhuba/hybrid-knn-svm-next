@@ -196,12 +196,9 @@ const TrainingSVM = () => {
     const prediction = svm.predict(X)
     console.log('Prediction:', prediction)
 
-    const report = new ClassificationReport.MultiClass({
-      predictions: prediction,
-      actuals: y,
-    })
+    const report = new ClassificationReport(y, prediction)
 
-    report.print()
+    console.log(report.printReport())
 
     setLoadingTraining(false)
   }
@@ -404,6 +401,7 @@ const TrainingSVM = () => {
           <Button
             type="primary"
             htmlType='submit'
+            loading={LoadingTraining}
           >
           Latih Sekarang!
           </Button>
