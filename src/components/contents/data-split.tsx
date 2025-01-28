@@ -321,7 +321,7 @@ const DataSplit = () => {
           <Button
             type="primary"
             htmlType="submit"
-            disabled={training === model.train_percentage}
+            disabled={training === model.train_percentage && dataTrain.length > 0}
           >
             Split Data
           </Button>
