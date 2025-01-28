@@ -242,7 +242,9 @@ const TrainingSVM = () => {
           }
         }}
       >
-        <article>
+        <article
+          className='text-justify'
+        >
           <p>
             Proses pelatihan metode Hybrid SVM-KNN memerlukan proses pelatihan SVM terhadap <TextPrimary>data latih</TextPrimary>.
             Kemudian model yang dihasilkan akan digunakan untuk memprediksi <TextPrimary>data latih baru</TextPrimary>.
