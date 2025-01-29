@@ -109,6 +109,7 @@ export type Database = {
           id: number
           model: Json | null
           reference: string | null
+          svm_report: Json | null
           train_percentage: number | null
         }
         Insert: {
@@ -116,6 +117,7 @@ export type Database = {
           id?: number
           model?: Json | null
           reference?: string | null
+          svm_report?: Json | null
           train_percentage?: number | null
         }
         Update: {
@@ -123,6 +125,7 @@ export type Database = {
           id?: number
           model?: Json | null
           reference?: string | null
+          svm_report?: Json | null
           train_percentage?: number | null
         }
         Relationships: []
@@ -201,36 +204,39 @@ export type Database = {
       }
       prediction_svm: {
         Row: {
+          actual: string | null
           co: number | null
           created_at: string
           id: number
-          kualitas: string | null
           no2: number | null
           o3: number | null
           pm10: number | null
           pm2_5: number | null
+          prediction: string | null
           so2: number | null
         }
         Insert: {
+          actual?: string | null
           co?: number | null
           created_at?: string
           id?: number
-          kualitas?: string | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
+          prediction?: string | null
           so2?: number | null
         }
         Update: {
+          actual?: string | null
           co?: number | null
           created_at?: string
           id?: number
-          kualitas?: string | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
+          prediction?: string | null
           so2?: number | null
         }
         Relationships: []
@@ -246,7 +252,6 @@ export type Database = {
           o3: number | null
           pm10: number | null
           pm2_5: number | null
-          reference: string | null
           so2: number | null
           updated_at: string | null
         }
@@ -260,7 +265,6 @@ export type Database = {
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
-          reference?: string | null
           so2?: number | null
           updated_at?: string | null
         }
@@ -274,7 +278,6 @@ export type Database = {
           o3?: number | null
           pm10?: number | null
           pm2_5?: number | null
-          reference?: string | null
           so2?: number | null
           updated_at?: string | null
         }
