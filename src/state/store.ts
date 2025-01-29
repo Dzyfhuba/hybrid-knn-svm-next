@@ -4,7 +4,7 @@ import { action, Action, createStore, thunk, Thunk } from 'easy-peasy'
 
 export interface GlobalState {
   model: Database['svm_knn']['Tables']['model']['Insert']
-  putModel: Action<GlobalState, Database['svm_knn']['Tables']['model']['Row']>
+  putModel: Action<GlobalState, Database['svm_knn']['Tables']['model']['Insert']>
   setModel: Action<GlobalState, ((model: GlobalState['model']) => GlobalState['model']) | GlobalState['model']>
   fetchModel: Thunk<GlobalState>
 }
