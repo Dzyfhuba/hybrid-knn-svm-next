@@ -40,6 +40,7 @@ const TrainingSVM = () => {
   const [report, setReport] = useState<{ label: string; precision: string; recall: string; f1: string; support: string; }[]>()
   const model = useStoreState((state) => state.model)
   const fetchModel = useStoreActions((actions) => actions.fetchModel)
+  const putModel = useStoreActions((actions) => actions.putModel)
   const [form] = Form.useForm()
 
   const [loading, setLoading] = useState(false)
@@ -191,6 +192,13 @@ const TrainingSVM = () => {
     console.log(report.printReport())
     setReport(report.report().map(item => ({...item, label: !isNaN(parseInt(item.label)) ? kualitas.detransform(parseInt(item.label)) : item.label})))
 
+    console.log('Saving model...')
+    putModel({
+      ...model,
+      svm_report: report.report(),
+      model: svm.getTrainedResults(),
+    })
+
     setDataActual(train.map(item => item.kualitas!))
     setDataPrediction(prediction.map((item) => kualitas.detransform(item)))
 
@@ -227,8 +235,10 @@ const TrainingSVM = () => {
       <Modal
         open={modalVisible}
         title="Proses Pelatihan (SVM)"
-        footer={null}
         onCancel={() => setModalVisible(false)}
+        onOk={() => {
+          console.log()
+        }}
         afterOpenChange={(open) => {
           if (open) {
             fetchModel()
