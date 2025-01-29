@@ -36,7 +36,9 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const payload = z.object({
     train_percentage: z.number(),
-    reference: z.string()
+    reference: z.string(),
+    svm_report: z.any().optional(),
+    model: z.any().optional()
   }).safeParse({
     ...await request.json(),
     ...(new URL(request.url).searchParams)
@@ -48,7 +50,11 @@ export async function PUT(request: NextRequest) {
 
   // put train_percentage to model
   const { error: modelError } = await supabase.from('model')
-    .update({ train_percentage: payload.data.train_percentage })
+    .update({
+      train_percentage: payload.data.train_percentage,
+      svm_report: payload.data.svm_report,
+      model: payload.data.model
+    })
     .eq('reference', payload.data.reference)
   if (modelError) {
     return new Response(JSON.stringify({ error: modelError.message }), { status: 500 })
