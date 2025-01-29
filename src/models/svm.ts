@@ -67,9 +67,12 @@ class Linear {
   private dot(X: number[], weights: number[]): number {
     return X.reduce((acc, x, i) => acc + x * weights[i], 0)
   }
-
-  plotLossHistory() {
-    // Implement plotting logic if needed
+  
+  getTrainedResults() {
+    return {
+      weights: this.weights,
+      bias: this.bias,
+    }
   }
 }
 
@@ -125,8 +128,11 @@ class MultiClass {
     })
   }
 
-  plotLossHistory() {
-    // Implement plotting logic if needed
+  getTrainedResults() {
+    return {
+      models: this.models.map(model => model.getTrainedResults()),
+      classes: this.classes,
+    }
   }
 }
 
