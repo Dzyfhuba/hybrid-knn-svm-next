@@ -196,7 +196,9 @@ const TrainingSVM = () => {
     putModel({
       ...model,
       svm_report: report.report(),
-      model: svm.getTrainedResults(),
+      model: {
+        svm: svm.getTrainedResults(),
+      },
     })
 
     setDataActual(train.map(item => item.kualitas!))
