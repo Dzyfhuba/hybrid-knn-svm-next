@@ -47,3 +47,7 @@ body {
 .ant-input-number {
   width: 100% !important;
 }
+
+.subtitle {
+  @apply font-bold;
+}
