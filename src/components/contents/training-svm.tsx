@@ -1,10 +1,11 @@
 'use client'
 
+import kualitas from '@/helpers/kualitas'
 import ClassificationReport from '@/models/classification-report'
 import SVM from '@/models/svm'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
-import { Button, Divider, Form, InputNumber, Modal, Skeleton, Table, TableProps } from 'antd'
+import { Button, Divider, Form, InputNumber, Modal, Table, TableProps } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import qs from 'qs'
@@ -34,6 +35,9 @@ type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean
 
 const TrainingSVM = () => {
   const [data, setData] = useState<DataType[]>([])
+  const [dataActual, setDataActual] = useState<string[]>()
+  const [dataPrediction, setDataPrediction] = useState<string[]>()
+  const [report, setReport] = useState<{ label: string; precision: string; recall: string; f1: string; support: string; }[]>()
   const model = useStoreState((state) => state.model)
   const fetchModel = useStoreActions((actions) => actions.fetchModel)
   const [form] = Form.useForm()
@@ -173,22 +177,7 @@ const TrainingSVM = () => {
       item.o3,
       item.no2,
     ]).filter((item) => item.every((i) => i !== null))
-    const y = train.map((item) => {
-      switch (item.kualitas) {
-      case 'BAIK':
-        return 1
-      case 'SEDANG':
-        return 2
-      case 'TIDAK SEHAT':
-        return 3
-      case 'SANGAT TIDAK SEHAT':
-        return 4
-      case 'BERBAHAYA':
-        return 5
-      default:
-        return 0
-      }
-    })
+    const y = train.map((item) => kualitas.transform(item.kualitas!))
 
     console.log('Training SVM...')
     svm.fit(X, y)
@@ -200,6 +189,10 @@ const TrainingSVM = () => {
     const report = new ClassificationReport(y, prediction)
 
     console.log(report.printReport())
+    setReport(report.report().map(item => ({...item, label: !isNaN(parseInt(item.label)) ? kualitas.detransform(parseInt(item.label)) : item.label})))
+
+    setDataActual(train.map(item => item.kualitas!))
+    setDataPrediction(prediction.map((item) => kualitas.detransform(item)))
 
     setLoadingTraining(false)
   }
@@ -251,7 +244,7 @@ const TrainingSVM = () => {
             <TextPrimary> Data latih baru</TextPrimary> tersebut akan digunakan sebagai <TextPrimary>data latih</TextPrimary> KNN.
           </p>
         </article>
-        
+
         <Form
           labelCol={{ span: 8 }}
           onFinish={handleTrain}
@@ -356,7 +349,7 @@ const TrainingSVM = () => {
                   if (value === null) {
                     return Promise.resolve()
                   }
-                  
+
                   if (value < 1) {
                     return Promise.reject('Harus lebih besar dari 1')
                   }
@@ -386,7 +379,7 @@ const TrainingSVM = () => {
                   if (value === null) {
                     return Promise.resolve()
                   }
-                  
+
                   if (value < form.getFieldValue('epochs') / 10) {
                     return Promise.reject('Tidak boleh kurang dari 10% jumlah epochs')
                   }
@@ -409,16 +402,61 @@ const TrainingSVM = () => {
               placeholder={`Default = ${Math.round(defaultParams.epochs / 10)}`}
             />
           </Form.Item>
-          <Button
-            type="primary"
-            htmlType='submit'
-            loading={LoadingTraining}
+          <Form.Item
+            className='text-center'
           >
-          Latih Sekarang!
-          </Button>
+            <Button
+              type="primary"
+              htmlType='submit'
+              loading={LoadingTraining}
+            >
+              Latih Sekarang!
+            </Button>
+          </Form.Item>
         </Form>
 
-        <Skeleton active loading={LoadingTraining}  />
+        {dataActual && dataPrediction ? (
+          <>
+            <h1
+              className='subtitle'
+            >
+              Laporan Klasifikasi
+            </h1>
+            <Table
+              dataSource={report}
+              rowKey={(record) => record.label}
+              columns={[
+                {
+                  title: '',
+                  dataIndex: 'label',
+                  key: 'label',
+                  render: (value) => !value.includes('avg') ? <span className='font-black'>{value}</span> : value
+                },
+                {
+                  title: 'Presisi',
+                  dataIndex: 'precision',
+                  key: 'precision',
+                },
+                {
+                  title: 'Recall',
+                  dataIndex: 'recall',
+                  key: 'recall',
+                },
+                {
+                  title: 'F1 Score',
+                  dataIndex: 'f1',
+                  key: 'f1',
+                },
+                {
+                  title: '',
+                  dataIndex: 'support',
+                  key: 'support',
+                }
+              ]}
+              pagination={false}
+            />
+          </>
+        ) : <></>}
       </Modal>
     </div>
   )
