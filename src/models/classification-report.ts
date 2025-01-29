@@ -5,6 +5,7 @@ class ClassificationReport {
   private classes: (string | number)[]
   private labelMap: Map<(string | number), number>
   private support: number[]
+  private predictionClasses: (string | number)[]
 
   constructor(private trueLabels: (string | number)[], private predictedLabels: (string | number)[]) {
     if (trueLabels.length !== predictedLabels.length) {
@@ -14,18 +15,20 @@ class ClassificationReport {
       throw new Error('Input labels cannot be empty')
     }
 
-    this.classes = this.getUniqueSortedLabels()
+    this.classes = this.getUniqueSortedLabels([...trueLabels, ...predictedLabels])
     if (this.classes.length === 0) {
       throw new Error('No classes found in input labels')
     }
+
+    this.predictionClasses = this.getUniqueSortedLabels(predictedLabels)
 
     this.labelMap = new Map(this.classes.map((cls, idx) => [cls, idx]))
     this.confusionMatrix = this.createConfusionMatrix()
     this.support = this.calculateSupport()
   }
 
-  private getUniqueSortedLabels(): (string | number)[] {
-    const allLabels = [...new Set([...this.trueLabels, ...this.predictedLabels])]
+  private getUniqueSortedLabels(labels: (string|number)[]): (string | number)[] {
+    const allLabels = [...new Set(labels)]
     return allLabels.sort()
   }
 
@@ -123,7 +126,7 @@ class ClassificationReport {
     const headers = ['', 'Precision', 'Recall', 'F1-Score', 'Support']
     
     // Convert all values to strings explicitly
-    const rows = this.classes.map((cls, idx) => {
+    const rows = this.predictionClasses.map((cls, idx) => {
       const metrics = this.getClassMetrics(cls)
       return [
         cls.toString(),  // Convert class label to string
@@ -171,6 +174,38 @@ class ClassificationReport {
     ].join('\n')
 
     return `\n${report}\n\nAccuracy: ${this.getAccuracy().toFixed(digits)}\n`
+  }
+
+  report(digits: number = 2) {
+    // return as array of objects
+    const data = this.predictionClasses.map((cls, idx) => {
+      const metrics = this.getClassMetrics(cls)
+      return {
+        label: cls.toString(),
+        precision: metrics.precision.toFixed(digits),
+        recall: metrics.recall.toFixed(digits),
+        f1: metrics.f1.toFixed(digits),
+        support: this.support[idx].toString()
+      }
+    })
+    const macros = [
+      { label: 'macro avg', method: 'macro' },
+      { label: 'weighted avg', method: 'weighted' },
+      { label: 'micro avg', method: 'micro' }
+    ]
+    
+    macros.forEach(({ label, method }) => {
+      const metrics = this.getAverageMetrics(method as AverageMethod)
+      data.push({
+        label,
+        precision: metrics.precision.toFixed(digits),
+        recall: metrics.recall.toFixed(digits),
+        f1: metrics.f1.toFixed(digits),
+        support: this.support.reduce((a, b) => a + b, 0).toString()
+      })
+    })
+
+    return data
   }
 }
 
