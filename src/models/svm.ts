@@ -130,6 +130,10 @@ class MultiClass {
 
   getTrainedResults() {
     return {
+      learningRate: this.learningRate,
+      regularization: this.regularization,
+      epochs: this.epochs,
+      checkpointInterval: this.checkpointInterval,
       models: this.models.map(model => model.getTrainedResults()),
       classes: this.classes,
     }
