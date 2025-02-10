@@ -171,7 +171,8 @@ export type Database = {
           co: number | null
           created_at: string
           id: number
-          kualitas: string | null
+          actual: string | null
+          prediction: string | null
           no2: number | null
           o3: number | null
           pm10: number | null
@@ -182,7 +183,8 @@ export type Database = {
           co?: number | null
           created_at?: string
           id?: number
-          kualitas?: string | null
+          actual?: string | null
+          prediction?: string | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null
@@ -193,7 +195,8 @@ export type Database = {
           co?: number | null
           created_at?: string
           id?: number
-          kualitas?: string | null
+          actual?: string | null
+          prediction?: string | null
           no2?: number | null
           o3?: number | null
           pm10?: number | null

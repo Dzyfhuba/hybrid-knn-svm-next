@@ -21,6 +21,8 @@ interface DataType {
   o3: number;
   no2: number;
   kualitas: string;
+  actual?: string;
+  prediction?: string;
 }
 
 interface TableParams {
@@ -41,6 +43,8 @@ const TrainingSVM = () => {
   const model = useStoreState((state) => state.model)
   const fetchModel = useStoreActions((actions) => actions.fetchModel)
   const putModel = useStoreActions((actions) => actions.putModel)
+  const reference = model.reference
+  const setPredictionKnn = useStoreActions((actions) => actions.setPredictionKnn)
   const [form] = Form.useForm()
 
   const [loading, setLoading] = useState(false)
@@ -60,38 +64,45 @@ const TrainingSVM = () => {
 
   const parseParams = (params: TableParams) => ({
     ...params.pagination,
-    sortField: params.sortField,
-    sortOrder: params.sortOrder,
+    orderBy: params.sortField,
+    order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
     ...params.filters,
   })
 
-  const fetchData = () => {
+  const fetchData = async () => {
+    if(!reference) return
     setLoading(true)
-    fetch(`${selfUrl}/api/raw?${qs.stringify(parseParams(tableParams))}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setData(res.data)
-        setLoading(false)
-        setTableParams({
-          ...tableParams,
-          pagination: {
-            ...tableParams.pagination,
-            total: res.total,
-          },
-        })
+
+    try {
+      let res = await fetch(`${selfUrl}/api/data-prediction-svm?${qs.stringify({...parseParams(tableParams), reference})}`).then((res) => res.json())
+      
+      if(!(res.total)){
+        res = await fetch(`${selfUrl}/api/data-train?${qs.stringify({...parseParams(tableParams), reference})}`).then((res) => res.json())
+      }
+
+      setData(res.data)
+      setLoading(false)
+      setTableParams({
+        ...tableParams,
+        pagination: {
+          ...tableParams.pagination,
+          total: res.total,
+        },
       })
-      .catch((error) => {
-        console.error('Error fetching data:', error)
-        setLoading(false)
-      })
+      
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setLoading(false)
+    }
   }
 
-  useEffect(fetchData, [
+  useEffect(()=>{fetchData()}, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams.sortOrder,
     tableParams.sortField,
     JSON.stringify(tableParams.filters),
+    model.reference
   ])
 
   const columns: ColumnsType<DataType> = [
@@ -132,13 +143,23 @@ const TrainingSVM = () => {
     },
     {
       title: 'Kualitas',
-      dataIndex: 'kualitas',
+      dataIndex: data?.[0]?.actual ? 'actual' : 'kualitas',
       sorter: true,
       filters: [
         { text: 'BAIK', value: 'BAIK' },
         { text: 'SEDANG', value: 'SEDANG' },
         { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
       ],
+    },
+    {
+      title: 'Prediksi',
+      dataIndex: 'prediction',
+      // sorter: true,
+      // filters: [
+      //   { text: 'BAIK', value: 'BAIK' },
+      //   { text: 'SEDANG', value: 'SEDANG' },
+      //   { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
+      // ],
     },
   ]
 
@@ -152,7 +173,6 @@ const TrainingSVM = () => {
   const handleTrain = async () => {
     setLoadingTraining(true)
 
-    const reference = model.reference
     // load data
     const train = await axios.get(`/api/data-train/all${reference ? `?reference=${reference}` : ''}`)
       .then((res) => res.data.data as Database['svm_knn']['Tables']['data_train']['Row'][])
@@ -201,10 +221,29 @@ const TrainingSVM = () => {
       },
     })
 
-    setDataActual(train.map(item => item.kualitas!))
-    setDataPrediction(prediction.map((item) => kualitas.detransform(item)))
+    const dataWithPrediction = train.map((item, index) => ({...item, actual: item.kualitas, prediction: kualitas.detransform(prediction[index])}))
 
-    setLoadingTraining(false)
+    try {
+      await axios.put('/api/data-prediction-svm', JSON.stringify({data : dataWithPrediction, reference}))
+     
+      Modal.success({
+        title: 'Pengujian Selesai',
+        content: 'Proses pengujian dengan KNN berhasil dilakukan.',
+      })
+    } catch (error) {
+      console.error('Error during testing process:', error)
+      Modal.error({
+        title: 'Pengujian Gagal',
+        content: 'Terjadi kesalahan saat melakukan proses pengujian.',
+      })
+    } finally {
+      setDataActual(train.map(item => item.kualitas!))
+      setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
+      setPredictionKnn(dataWithPrediction)
+      setData(dataWithPrediction.reverse() as DataType[])
+  
+      setLoadingTraining(false)
+    }
   }
 
   return (

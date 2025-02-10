@@ -161,7 +161,7 @@ const DataSplit = () => {
     fetch(`/api/data-train?${QueryString.stringify(parseParams(tableParamsTrain))}`)
       .then((res) => res.json())
       .then((res) => {
-        setDataTrain(res.data)
+        setDataTrain(res.data ?? [])
         console.log(res.total)
         setTotalTrain(res.total)
         setLoadingTrain(false)

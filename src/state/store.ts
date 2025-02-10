@@ -7,6 +7,8 @@ export interface GlobalState {
   putModel: Action<GlobalState, Database['svm_knn']['Tables']['model']['Insert']>
   setModel: Action<GlobalState, ((model: GlobalState['model']) => GlobalState['model']) | GlobalState['model']>
   fetchModel: Thunk<GlobalState>
+  predictionKnn : Database['svm_knn']['Tables']['prediction_knn']['Row'][]
+  setPredictionKnn : Action<GlobalState, ((model: GlobalState['predictionKnn']) => GlobalState['predictionKnn']) | GlobalState['predictionKnn']>
 }
 
 const store = createStore<GlobalState>({
@@ -23,7 +25,11 @@ const store = createStore<GlobalState>({
   fetchModel: thunk(async (actions) => {
     const { data } = await axios.get('/api/model' + (typeof window !== 'undefined' ? `?reference=${window.localStorage.getItem('reference')}` : ''))
     actions.setModel(data.item)
-  })
+  }),
+  predictionKnn : [],
+  setPredictionKnn : action((state, payload) => {
+    state.predictionKnn = typeof payload === 'function' ? payload(state.predictionKnn) : payload
+  }),
 })
 
 export default store
