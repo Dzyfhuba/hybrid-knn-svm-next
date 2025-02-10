@@ -110,6 +110,7 @@ export type Database = {
           model: Json | null
           reference: string | null
           svm_report: Json | null
+          knn_report: Json | null
           train_percentage: number | null
         }
         Insert: {
@@ -118,6 +119,7 @@ export type Database = {
           model?: Json | null
           reference?: string | null
           svm_report?: Json | null
+          knn_report?: Json | null
           train_percentage?: number | null
         }
         Update: {
@@ -126,6 +128,7 @@ export type Database = {
           model?: Json | null
           reference?: string | null
           svm_report?: Json | null
+          knn_report?: Json | null
           train_percentage?: number | null
         }
         Relationships: []

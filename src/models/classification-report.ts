@@ -205,6 +205,8 @@ class ClassificationReport {
       })
     })
 
+    // data.push({label: 'accuracy', precision: '', recall: '', f1: '', support: this.getAccuracy().toFixed(digits)})
+    
     return data
   }
 }

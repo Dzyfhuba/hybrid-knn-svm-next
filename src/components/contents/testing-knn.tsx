@@ -1,15 +1,16 @@
 'use client'
 
-import { Button, Divider, Modal, Table, TableProps, Spin, Form, InputNumber } from 'antd'
+import { Button, Divider, Modal, Table, TableProps, Form, InputNumber } from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useEffect, useState } from 'react'
 import qs from 'qs'
-import { useStoreState } from '@/state/hooks'
+import { useStoreActions, useStoreState } from '@/state/hooks'
 import KNN from '@/models/knn'
 import kualitas from '@/helpers/kualitas'
 import axios from 'axios'
 import { Database } from '@/types/database'
 import TextPrimary from '../text-primary'
+import ClassificationReport from '@/models/classification-report'
 
 interface DataType {
   id: number;
@@ -35,12 +36,15 @@ type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
 
 const PengujianKNN = () => {
+  const [modal, modalContext] = Modal.useModal()
   const model = useStoreState((state) => state.model)
+  const putModel = useStoreActions((actions) => actions.putModel)
   const predictionKnn = useStoreState((state) => state.predictionKnn)
   const reference = model.reference
   const [form] = Form.useForm()
 
   const [data, setData] = useState<DataType[]>([])
+  const [report, setReport] = useState<{ label: string; precision: string; recall: string; f1: string; support: string; }[]>()
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -64,8 +68,8 @@ const PengujianKNN = () => {
   })
 
   const fetchData = async () => {
-    setLoading(true)
     if(!reference) return
+    setLoading(true)
 
     try {
       let res = await fetch(`${selfUrl}/api/data-prediction-knn?${qs.stringify({...parseParams(tableParams), reference})}`)
@@ -101,7 +105,15 @@ const PengujianKNN = () => {
     model.reference
   ])
 
+  useEffect(()=>{
+    if(model?.knn_report && Array.isArray(model?.knn_report)){
+      //@ts-ignore
+      setReport(model.knn_report)
+    }
+  },[model])
+
   const handleProcessTesting = async () => {
+    if(!reference) return
     let dataTrain = predictionKnn;
     setModalLoading(true)
 
@@ -111,9 +123,9 @@ const PengujianKNN = () => {
     }
 
     if(!dataTrain.length) {
-      Modal.error({
+      modal.error({
         title: 'Pengujian Gagal',
-        content: 'Data latih tidak tersedia, lakukan pelatihan (SVM) terlebih dahulu!.',
+        content: 'Data latih baru tidak tersedia, lakukan pelatihan (SVM) terlebih dahulu!',
       })
 
       setModalLoading(false)
@@ -150,6 +162,7 @@ const PengujianKNN = () => {
       item.o3,
       item.no2,
     ])
+    const yTest = cleanTest.map((item) => kualitas.transform(item.kualitas!))
 
     const prediction = knn.predict(XTest)
     console.log('Prediction:', prediction)
@@ -159,18 +172,34 @@ const PengujianKNN = () => {
     // console.log('K Nearest : ', knn.getKNearestLabelsRecords())
     // console.log('Records : ', knn.getMostCommonRecords())
 
+    const report = new ClassificationReport(yTest, prediction)
+    
+    console.log(report.printReport())
+    setReport(report.report().map(item => ({...item, label: !isNaN(parseInt(item.label)) ? kualitas.detransform(parseInt(item.label)) : item.label})))
+
+    console.log('Saving model...')
+    putModel({
+      ...model,
+      knn_report: report.report(),
+      model: {
+        //@ts-expect-error
+        ...model?.model,
+        knn: {distance : knn.getDistanceRecords()}
+      },
+    })
+
     const dataWithPrediction = cleanTest.map((item, index)=> ({...item, actual: item.kualitas, prediction: kualitas.detransform(prediction[index])}))
 
     try {
       await axios.put('/api/data-prediction-knn', JSON.stringify({data : dataWithPrediction, reference}))
      
-      Modal.success({
+      modal.success({
         title: 'Pengujian Selesai',
         content: 'Proses pengujian dengan KNN berhasil dilakukan.',
       })
     } catch (error) {
       console.error('Error during testing process:', error)
-      Modal.error({
+      modal.error({
         title: 'Pengujian Gagal',
         content: 'Terjadi kesalahan saat melakukan proses pengujian.',
       })
@@ -235,6 +264,7 @@ const PengujianKNN = () => {
 
   return (
     <div>
+      {modalContext}
       <h2 className="text-xl font-bold">Pengujian (KNN)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
@@ -311,6 +341,48 @@ const PengujianKNN = () => {
             </Button>
           </Form.Item>
         </Form>
+        {report?.length ? (
+          <>
+            <h1
+              className='subtitle'
+            >
+              Laporan Klasifikasi
+            </h1>
+            <Table
+              dataSource={report}
+              rowKey={(record) => record.label}
+              columns={[
+                {
+                  title: '',
+                  dataIndex: 'label',
+                  key: 'label',
+                  render: (value) => !value.includes('avg') ? <span className='font-black'>{isNaN(value) ? value : kualitas.detransform(parseInt(value))}</span> : value
+                },
+                {
+                  title: 'Presisi',
+                  dataIndex: 'precision',
+                  key: 'precision',
+                },
+                {
+                  title: 'Recall',
+                  dataIndex: 'recall',
+                  key: 'recall',
+                },
+                {
+                  title: 'F1 Score',
+                  dataIndex: 'f1',
+                  key: 'f1',
+                },
+                {
+                  title: '',
+                  dataIndex: 'support',
+                  key: 'support',
+                }
+              ]}
+              pagination={false}
+            />
+          </>
+        ) : <></>}
       </Modal>
     </div>
   )

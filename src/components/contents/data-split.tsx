@@ -16,6 +16,7 @@ interface TableParams {
 }
 
 const DataSplit = () => {
+  const [isClient, setIsClient] = useState(false)
   const [modal, modalContext] = Modal.useModal()
   const [message, messageContext] = Message.useMessage()
   const [form] = Form.useForm()
@@ -75,6 +76,15 @@ const DataSplit = () => {
   ]
 
   const handleSubmit = async () => {
+    const reference = typeof window !== 'undefined' ? window.localStorage.getItem('reference') : null
+    if(!reference){
+      modal.error({
+        title: 'Referensi tidak ada',
+        content: 'Buat referensi terlebih dahulu!',
+      })
+      return
+    }
+
     if (await form.validateFields()) {
       const { training, testing } = form.getFieldsValue()
       modal.confirm({
@@ -252,82 +262,87 @@ const DataSplit = () => {
     }
   }, [model.train_percentage, form])
 
+  useEffect(()=>{
+    //To prevent hydration error in next js when initial view contains input html
+    setIsClient(true)
+  },[])
+
   return (
     <div>
       {modalContext}
       {messageContext}
 
       <h2 className="text-xl font-bold">Data Split</h2>
-
-      <Form
-        form={form}
-        layout='horizontal'
-        labelCol={{ span: 8 }}
-        // initialValues={{
-        //   training: model.train_percentage || 80,
-        //   testing: 20
-        // }}
-        className='w-full sm:w-max'
-        onFinish={handleSubmit}
-      >
-        <Form.Item
-          name="training"
-          label="Data Training"
-          rules={[
-            {
-              required: true,
-              message: 'Data Training harus diisi',
-            },
-            {
-              type: 'number',
-              min: 0,
-              max: 100,
-              message: 'Data Training harus diisi dengan angka 0-100'
-            }
-          ]}
+      {isClient ?        
+        <Form
+          form={form}
+          layout='horizontal'
+          labelCol={{ span: 8 }}
+          // initialValues={{
+          //   training: model.train_percentage || 80,
+          //   testing: 20
+          // }}
+          className='w-full sm:w-max'
+          onFinish={handleSubmit}
         >
-          <InputNumber
-            type='number'
-            placeholder='Data Training (%)'
-            addonAfter="%"
-            className='w-full sm:w-max'
-            onKeyUp={(e) => {
-              const value = e.currentTarget.valueAsNumber || 0
-              const testing = 100 - value
-              setTraining(value)
-              form.setFieldsValue({ testing })
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          name="testing"
-          label="Data Testing"
-          rules={[
-            {
-              required: true,
-              message: 'Data Testing harus diisi',
-            },
-          ]}
-        >
-          <InputNumber
-            placeholder='Data Testing (%)'
-            addonAfter="%"
-            className='w-full sm:w-max'
-            readOnly
-          />
-        </Form.Item>
-
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            disabled={training === model.train_percentage && dataTrain.length > 0}
+          <Form.Item 
+            name="training"
+            label="Data Training"
+            rules={[
+              {
+                required: true,
+                message: 'Data Training harus diisi',
+              },
+              {
+                type: 'number',
+                min: 0,
+                max: 100,
+                message: 'Data Training harus diisi dengan angka 0-100'
+              }
+            ]}
           >
-            Split Data
-          </Button>
-        </Form.Item>
-      </Form>
+            <InputNumber
+              type='number'
+              placeholder='Data Training (%)'
+              addonAfter="%"
+              className='w-full sm:w-max'
+              onKeyUp={(e) => {
+                const value = e.currentTarget.valueAsNumber || 0
+                const testing = 100 - value
+                setTraining(value)
+                form.setFieldsValue({ testing })
+              }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="testing"
+            label="Data Testing"
+            rules={[
+              {
+                required: true,
+                message: 'Data Testing harus diisi',
+              },
+            ]}
+          >
+            <InputNumber
+              placeholder='Data Testing (%)'
+              addonAfter="%"
+              className='w-full sm:w-max'
+              readOnly
+            />
+          </Form.Item>
 
+          <Form.Item>
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={training === model.train_percentage && dataTrain.length > 0}
+            >
+              Split Data
+            </Button>
+          </Form.Item>
+        </Form>
+      : <></>}
       <div>
         <h3 className="text-lg font-bold">Data Latih</h3>
 

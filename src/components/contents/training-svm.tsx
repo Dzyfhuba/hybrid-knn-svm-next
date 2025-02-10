@@ -36,6 +36,7 @@ type ColumnsType<T extends object = object> = TableProps<T>['columns'];
 type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
 
 const TrainingSVM = () => {
+  const [modal, modalContext] = Modal.useModal()
   const [data, setData] = useState<DataType[]>([])
   const [dataActual, setDataActual] = useState<string[]>()
   const [dataPrediction, setDataPrediction] = useState<string[]>()
@@ -105,6 +106,13 @@ const TrainingSVM = () => {
     model.reference
   ])
 
+  useEffect(()=>{
+    if(model?.svm_report && Array.isArray(model?.svm_report)){
+      //@ts-ignore
+      setReport(model.svm_report)
+    }
+  },[model])
+
   const columns: ColumnsType<DataType> = [
     {
       title: 'ID',
@@ -171,11 +179,21 @@ const TrainingSVM = () => {
   }
 
   const handleTrain = async () => {
+    if(!reference) return
     setLoadingTraining(true)
 
     // load data
     const train = await axios.get(`/api/data-train/all${reference ? `?reference=${reference}` : ''}`)
       .then((res) => res.data.data as Database['svm_knn']['Tables']['data_train']['Row'][])
+
+    if(!train.length) {
+      modal.error({
+        title: 'Pengujian Gagal',
+        content: 'Data latih tidak tersedia, lakukan pembagian data terlebih dahulu!',
+      })
+      setLoadingTraining(false)
+      return
+    }
 
     const learningRate = form.getFieldValue('learning_rate') as number || defaultParams.learningRate
     const regularization = form.getFieldValue('regularization') as number || defaultParams.regularization
@@ -226,15 +244,15 @@ const TrainingSVM = () => {
     try {
       await axios.put('/api/data-prediction-svm', JSON.stringify({data : dataWithPrediction, reference}))
      
-      Modal.success({
-        title: 'Pengujian Selesai',
-        content: 'Proses pengujian dengan KNN berhasil dilakukan.',
+      modal.success({
+        title: 'Pelatihan Selesai',
+        content: 'Proses pelatihan dengan SVM berhasil dilakukan.',
       })
     } catch (error) {
-      console.error('Error during testing process:', error)
-      Modal.error({
-        title: 'Pengujian Gagal',
-        content: 'Terjadi kesalahan saat melakukan proses pengujian.',
+      console.error('Error during training process:', error)
+      modal.error({
+        title: 'Pelatihan Gagal',
+        content: 'Terjadi kesalahan saat melakukan proses pelatihan.',
       })
     } finally {
       setDataActual(train.map(item => item.kualitas!))
@@ -248,6 +266,7 @@ const TrainingSVM = () => {
 
   return (
     <div>
+      {modalContext}
       <h2 className="text-xl font-bold">Pelatihan (SVM)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
@@ -466,7 +485,7 @@ const TrainingSVM = () => {
           </Form.Item>
         </Form>
 
-        {dataActual && dataPrediction ? (
+        {report?.length ? (
           <>
             <h1
               className='subtitle'
@@ -481,7 +500,7 @@ const TrainingSVM = () => {
                   title: '',
                   dataIndex: 'label',
                   key: 'label',
-                  render: (value) => !value.includes('avg') ? <span className='font-black'>{value}</span> : value
+                  render: (value) => !value.includes('avg') ? <span className='font-black'>{isNaN(value) ? value : kualitas.detransform(parseInt(value))}</span> : value
                 },
                 {
                   title: 'Presisi',

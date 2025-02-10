@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
   let modelReference = searchParams.get('reference')
 
-  if (!modelReference) {
+  if (!modelReference || modelReference == 'null') {
     modelReference = nanoid()
   }
 
@@ -25,10 +25,15 @@ export async function GET(request: NextRequest) {
     }
   }
 
+
   return response.ok({
+    // item: {
+    //   reference: modelReference,
+    //   train_percentage: data?.train_percentage || 80
+    // }
     item: {
+      ...data,
       reference: modelReference,
-      train_percentage: data?.train_percentage || 80
     }
   })
 }
@@ -38,6 +43,7 @@ export async function PUT(request: NextRequest) {
     train_percentage: z.number(),
     reference: z.string(),
     svm_report: z.any().optional(),
+    knn_report: z.any().optional(),
     model: z.any().optional()
   }).safeParse({
     ...await request.json(),
@@ -53,6 +59,7 @@ export async function PUT(request: NextRequest) {
     .update({
       train_percentage: payload.data.train_percentage,
       svm_report: payload.data.svm_report,
+      knn_report: payload.data.knn_report,
       model: payload.data.model
     })
     .eq('reference', payload.data.reference)
