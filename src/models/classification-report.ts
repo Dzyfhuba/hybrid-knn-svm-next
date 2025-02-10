@@ -128,7 +128,7 @@ class ClassificationReport {
     const headers = ['', 'Precision', 'Recall', 'F1-Score', 'Support']
 
     // Convert all values to strings explicitly
-    const rows = this.predictionClasses.map((cls, idx) => {
+    const rows = this.classes.map((cls, idx) => {
       const metrics = this.getClassMetrics(cls)
       return [
         cls.toString(),  // Convert class label to string
@@ -180,7 +180,7 @@ class ClassificationReport {
 
   report(digits: number = 2) {
     // return as array of objects
-    const data = this.predictionClasses.map((cls, idx) => {
+    const data = this.classes.map((cls, idx) => {
       const metrics = this.getClassMetrics(cls)
       return {
         label: cls.toString(),
