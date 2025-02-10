@@ -5,7 +5,6 @@ class ClassificationReport {
   private classes: (string | number)[]
   private labelMap: Map<(string | number), number>
   private support: number[]
-  private predictionClasses: (string | number)[]
 
   constructor(private trueLabels: (string | number)[], private predictedLabels: (string | number)[]) {
     if (trueLabels.length !== predictedLabels.length) {
@@ -19,8 +18,6 @@ class ClassificationReport {
     if (this.classes.length === 0) {
       throw new Error('No classes found in input labels')
     }
-
-    this.predictionClasses = this.getUniqueSortedLabels(predictedLabels)
 
     this.labelMap = new Map(this.classes.map((cls, idx) => [cls, idx]))
     this.confusionMatrix = this.createConfusionMatrix(trueLabels, predictedLabels)
