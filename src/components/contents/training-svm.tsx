@@ -264,7 +264,7 @@ const TrainingSVM = () => {
     } finally {
       // setDataActual(train.map(item => item.kualitas!))
       // setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
-      setPredictionKnn(dataWithPrediction)
+      setPredictionKnn([])
       setData(dataWithPrediction.reverse() as DataType[])
   
       setLoadingTraining(false)
