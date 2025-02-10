@@ -29,7 +29,7 @@ export async function PUT(request: NextRequest) {
 
   // count train length and test length
   const total = raw.data.length
-  const train_length = Math.round(total * payload.data.train_length / 100)
+  const train_length = Math.floor(total * payload.data.train_length / 100)
 
   const rawNew:Database['svm_knn']['Tables']['data_train']['Insert'][] = []
   raw.data.forEach((item) => {
