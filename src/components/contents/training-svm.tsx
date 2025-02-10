@@ -38,8 +38,8 @@ type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean
 const TrainingSVM = () => {
   const [modal, modalContext] = Modal.useModal()
   const [data, setData] = useState<DataType[]>([])
-  const [dataActual, setDataActual] = useState<string[]>()
-  const [dataPrediction, setDataPrediction] = useState<string[]>()
+  // const [dataActual, setDataActual] = useState<string[]>()
+  // const [dataPrediction, setDataPrediction] = useState<string[]>()
   const [report, setReport] = useState<{ label: string; precision: string; recall: string; f1: string; support: string; }[]>()
   const model = useStoreState((state) => state.model)
   const fetchModel = useStoreActions((actions) => actions.fetchModel)
@@ -108,7 +108,7 @@ const TrainingSVM = () => {
 
   useEffect(()=>{
     if(model?.svm_report && Array.isArray(model?.svm_report)){
-      //@ts-ignore
+      //@ts-expect-error difference type
       setReport(model.svm_report)
     }
   },[model])
@@ -255,8 +255,8 @@ const TrainingSVM = () => {
         content: 'Terjadi kesalahan saat melakukan proses pelatihan.',
       })
     } finally {
-      setDataActual(train.map(item => item.kualitas!))
-      setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
+      // setDataActual(train.map(item => item.kualitas!))
+      // setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
       setPredictionKnn(dataWithPrediction)
       setData(dataWithPrediction.reverse() as DataType[])
   

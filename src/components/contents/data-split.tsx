@@ -1,7 +1,15 @@
 'use client'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
-import { Button, Form, GetProp, InputNumber, Modal, Table, message as Message } from 'antd'
+import {
+  Button,
+  Form,
+  GetProp,
+  InputNumber,
+  Modal,
+  Table,
+  message as Message,
+} from 'antd'
 import { ColumnsType, TablePaginationConfig, TableProps } from 'antd/es/table'
 import { SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
@@ -10,8 +18,12 @@ import { useEffect, useState } from 'react'
 
 interface TableParams {
   pagination?: TablePaginationConfig
-  sortField?: SorterResult<Database['svm_knn']['Tables']['data_train']['Row']>['field']
-  sortOrder?: SorterResult<Database['svm_knn']['Tables']['data_train']['Row']>['order']
+  sortField?: SorterResult<
+    Database['svm_knn']['Tables']['data_train']['Row']
+  >['field']
+  sortOrder?: SorterResult<
+    Database['svm_knn']['Tables']['data_train']['Row']
+  >['order']
   filters?: Parameters<GetProp<TableProps, 'onChange'>>[1]
 }
 
@@ -21,13 +33,18 @@ const DataSplit = () => {
   const [message, messageContext] = Message.useMessage()
   const [form] = Form.useForm()
   const [training, setTraining] = useState(() => {
-    const trainingValue = typeof window !== 'undefined' ? window.localStorage.getItem('training') : null
+    const trainingValue =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('training')
+        : null
     return trainingValue ? parseInt(trainingValue) : 80
   })
-  const { model } = useStoreState(state => state)
-  const actions = useStoreActions(actions => actions)
+  const { model } = useStoreState((state) => state)
+  const actions = useStoreActions((actions) => actions)
 
-  const columns: ColumnsType<Database['svm_knn']['Tables']['data_train']['Row']> = [
+  const columns: ColumnsType<
+    Database['svm_knn']['Tables']['data_train']['Row']
+  > = [
     {
       title: 'No',
       dataIndex: 'id',
@@ -76,8 +93,11 @@ const DataSplit = () => {
   ]
 
   const handleSubmit = async () => {
-    const reference = typeof window !== 'undefined' ? window.localStorage.getItem('reference') : null
-    if(!reference){
+    const reference =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('reference')
+        : null
+    if (!reference) {
       modal.error({
         title: 'Referensi tidak ada',
         content: 'Buat referensi terlebih dahulu!',
@@ -99,7 +119,7 @@ const DataSplit = () => {
           const payload = {
             train_length: training,
             test_length: testing,
-            reference
+            reference,
           }
 
           actions.setModel((prev) => ({
@@ -111,37 +131,45 @@ const DataSplit = () => {
           // fetchDataTrain()
           // fetchDataTest()
 
-          return await axios.put('/api/data-split', payload)
-            .then(res => {
-              setDataTrain(res.data.extra.data_train)
-              setTableParamsTrain({
-                pagination: {
-                  current: 1,
-                  pageSize: 10,
-                },
-              })
-              setTotalTrain(res.data.extra.data_train.length)
-              setDataTest(res.data.extra.data_test)
-              setTableParamsTest({
-                pagination: {
-                  current: 1,
-                  pageSize: 10,
-                },
-              })
-              setTotalTest(res.data.extra.data_test.length)
-
-              console.log(res.data)
-
-              message.success('Data berhasil dipisahkan dengan rasio ' + training + ':' + testing)          
+          return await axios.put('/api/data-split', payload).then((res) => {
+            setDataTrain(res.data.extra.data_train)
+            setTableParamsTrain({
+              pagination: {
+                current: 1,
+                pageSize: 10,
+              },
             })
-        }
+            setTotalTrain(res.data.extra.data_train.length)
+            setDataTest(res.data.extra.data_test)
+            setTableParamsTest({
+              pagination: {
+                current: 1,
+                pageSize: 10,
+              },
+            })
+            setTotalTest(res.data.extra.data_test.length)
+
+            console.log(res.data)
+
+            message.success(
+              'Data berhasil dipisahkan dengan rasio ' +
+                training +
+                ':' +
+                testing
+            )
+          })
+        },
       })
     }
   }
 
-  const [dataTrain, setDataTrain] = useState<Database['svm_knn']['Tables']['data_train']['Row'][]>([])
+  const [dataTrain, setDataTrain] = useState<
+    Database['svm_knn']['Tables']['data_train']['Row'][]
+  >([])
   const [totalTrain, setTotalTrain] = useState(0)
-  const [dataTest, setDataTest] = useState<Database['svm_knn']['Tables']['data_test']['Row'][]>([])
+  const [dataTest, setDataTest] = useState<
+    Database['svm_knn']['Tables']['data_test']['Row'][]
+  >([])
   const [loadingTrain, setLoadingTrain] = useState(false)
   const [tableParamsTrain, setTableParamsTrain] = useState<TableParams>({
     pagination: {
@@ -163,12 +191,14 @@ const DataSplit = () => {
     orderBy: params.sortField,
     order: params.sortOrder === 'ascend' ? 'asc' : 'desc',
     ...params.filters,
-    reference: window.localStorage.getItem('reference')
+    reference: window.localStorage.getItem('reference'),
   })
 
   const fetchDataTrain = () => {
     setLoadingTrain(true)
-    fetch(`/api/data-train?${QueryString.stringify(parseParams(tableParamsTrain))}`)
+    fetch(
+      `/api/data-train?${QueryString.stringify(parseParams(tableParamsTrain))}`
+    )
       .then((res) => res.json())
       .then((res) => {
         setDataTrain(res.data ?? [])
@@ -190,7 +220,9 @@ const DataSplit = () => {
   }
   const fetchDataTest = () => {
     setLoadingTest(true)
-    fetch(`/api/data-test?${QueryString.stringify(parseParams(tableParamsTest))}`)
+    fetch(
+      `/api/data-test?${QueryString.stringify(parseParams(tableParamsTest))}`
+    )
       .then((res) => res.json())
       .then((res) => {
         setDataTest(res.data)
@@ -225,7 +257,9 @@ const DataSplit = () => {
     JSON.stringify(tableParamsTest.filters),
   ])
 
-  const handleTableChangeTrain: TableProps<Database['svm_knn']['Tables']['data_train']['Row']>['onChange'] = (pagination, filters, sorter) => {
+  const handleTableChangeTrain: TableProps<
+    Database['svm_knn']['Tables']['data_train']['Row']
+  >['onChange'] = (pagination, filters, sorter) => {
     setTableParamsTrain({
       pagination,
       filters,
@@ -237,7 +271,9 @@ const DataSplit = () => {
       setDataTrain([])
     }
   }
-  const handleTableChangeTest: TableProps<Database['svm_knn']['Tables']['data_test']['Row']>['onChange'] = (pagination, filters, sorter) => {
+  const handleTableChangeTest: TableProps<
+    Database['svm_knn']['Tables']['data_test']['Row']
+  >['onChange'] = (pagination, filters, sorter) => {
     setTableParamsTest({
       pagination,
       filters,
@@ -257,15 +293,15 @@ const DataSplit = () => {
     if (form) {
       form.setFieldsValue({
         training: model.train_percentage || 80,
-        testing: 100 - (model.train_percentage || 80)
+        testing: 100 - (model.train_percentage || 80),
       })
     }
   }, [model.train_percentage, form])
 
-  useEffect(()=>{
+  useEffect(() => {
     //To prevent hydration error in next js when initial view contains input html
     setIsClient(true)
-  },[])
+  }, [])
 
   return (
     <div>
@@ -273,19 +309,19 @@ const DataSplit = () => {
       {messageContext}
 
       <h2 className="text-xl font-bold">Data Split</h2>
-      {isClient ?        
+      {isClient ? (
         <Form
           form={form}
-          layout='horizontal'
+          layout="horizontal"
           labelCol={{ span: 8 }}
           // initialValues={{
           //   training: model.train_percentage || 80,
           //   testing: 20
           // }}
-          className='w-full sm:w-max'
+          className="w-full sm:w-max"
           onFinish={handleSubmit}
         >
-          <Form.Item 
+          <Form.Item
             name="training"
             label="Data Training"
             rules={[
@@ -297,15 +333,15 @@ const DataSplit = () => {
                 type: 'number',
                 min: 0,
                 max: 100,
-                message: 'Data Training harus diisi dengan angka 0-100'
-              }
+                message: 'Data Training harus diisi dengan angka 0-100',
+              },
             ]}
           >
             <InputNumber
-              type='number'
-              placeholder='Data Training (%)'
+              type="number"
+              placeholder="Data Training (%)"
               addonAfter="%"
-              className='w-full sm:w-max'
+              className="w-full sm:w-max"
               onKeyUp={(e) => {
                 const value = e.currentTarget.valueAsNumber || 0
                 const testing = 100 - value
@@ -325,9 +361,9 @@ const DataSplit = () => {
             ]}
           >
             <InputNumber
-              placeholder='Data Testing (%)'
+              placeholder="Data Testing (%)"
               addonAfter="%"
-              className='w-full sm:w-max'
+              className="w-full sm:w-max"
               readOnly
             />
           </Form.Item>
@@ -336,13 +372,17 @@ const DataSplit = () => {
             <Button
               type="primary"
               htmlType="submit"
-              disabled={training === model.train_percentage && dataTrain.length > 0}
+              disabled={
+                training === model.train_percentage && dataTrain.length > 0
+              }
             >
               Split Data
             </Button>
           </Form.Item>
         </Form>
-      : <></>}
+      ) : (
+        <></>
+      )}
       <div>
         <h3 className="text-lg font-bold">Data Latih</h3>
 

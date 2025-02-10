@@ -1,6 +1,14 @@
 'use client'
 
-import { Button, Divider, Modal, Table, TableProps, Form, InputNumber } from 'antd'
+import {
+  Button,
+  Divider,
+  Modal,
+  Table,
+  TableProps,
+  Form,
+  InputNumber,
+} from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import { useEffect, useState } from 'react'
 import qs from 'qs'
@@ -8,32 +16,34 @@ import { useStoreActions, useStoreState } from '@/state/hooks'
 import KNN from '@/models/knn'
 import kualitas from '@/helpers/kualitas'
 import axios from 'axios'
-import { Database } from '@/types/database'
 import TextPrimary from '../text-primary'
 import ClassificationReport from '@/models/classification-report'
 
 interface DataType {
-  id: number;
-  pm10: number;
-  pm2_5: number;
-  so2: number;
-  co: number;
-  o3: number;
-  no2: number;
-  kualitas: string;
-  actual?: string;
-  prediction?: string;
+  id: number
+  pm10: number
+  pm2_5: number
+  so2: number
+  co: number
+  o3: number
+  no2: number
+  kualitas: string
+  actual?: string
+  prediction?: string
 }
 
 interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: SorterResult<DataType>['field'];
-  sortOrder?: SorterResult<DataType>['order'];
-  filters?: Record<string, FilterValue | null>;
+  pagination?: TablePaginationConfig
+  sortField?: SorterResult<DataType>['field']
+  sortOrder?: SorterResult<DataType>['order']
+  filters?: Record<string, FilterValue | null>
 }
 
-type ColumnsType<T extends object = object> = TableProps<T>['columns'];
-type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
+type ColumnsType<T extends object = object> = TableProps<T>['columns']
+type TablePaginationConfig = Exclude<
+  TableProps<DataType>['pagination'],
+  boolean
+>
 
 const PengujianKNN = () => {
   const [modal, modalContext] = Modal.useModal()
@@ -44,7 +54,15 @@ const PengujianKNN = () => {
   const [form] = Form.useForm()
 
   const [data, setData] = useState<DataType[]>([])
-  const [report, setReport] = useState<{ label: string; precision: string; recall: string; f1: string; support: string; }[]>()
+  const [report, setReport] = useState<
+    {
+      label: string
+      precision: string
+      recall: string
+      f1: string
+      support: string
+    }[]
+  >()
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
   const [modalLoading, setModalLoading] = useState(false)
@@ -68,16 +86,24 @@ const PengujianKNN = () => {
   })
 
   const fetchData = async () => {
-    if(!reference) return
+    if (!reference) return
     setLoading(true)
 
     try {
-      let res = await fetch(`${selfUrl}/api/data-prediction-knn?${qs.stringify({...parseParams(tableParams), reference})}`)
-      .then((res) => res.json())
+      let res = await fetch(
+        `${selfUrl}/api/data-prediction-knn?${qs.stringify({
+          ...parseParams(tableParams),
+          reference,
+        })}`
+      ).then((res) => res.json())
 
-      if(!(res.total)){
-        res = await fetch(`${selfUrl}/api/data-test?${qs.stringify({...parseParams(tableParams), reference})}`)
-          .then((res) => res.json())
+      if (!res.total) {
+        res = await fetch(
+          `${selfUrl}/api/data-test?${qs.stringify({
+            ...parseParams(tableParams),
+            reference,
+          })}`
+        ).then((res) => res.json())
       }
 
       setData(res.data)
@@ -89,53 +115,70 @@ const PengujianKNN = () => {
           total: res.total,
         },
       })
-      
     } catch (error) {
       console.error('Error fetching data:', error)
       setLoading(false)
     }
   }
 
-  useEffect(()=>{fetchData()}, [
+  useEffect(() => {
+    fetchData()
+  }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams.sortOrder,
     tableParams.sortField,
     JSON.stringify(tableParams.filters),
-    model.reference
+    model.reference,
   ])
 
-  useEffect(()=>{
-    if(model?.knn_report && Array.isArray(model?.knn_report)){
-      //@ts-ignore
+  useEffect(() => {
+    if (model?.knn_report && Array.isArray(model?.knn_report)) {
+      //@ts-expect-error difference type
       setReport(model.knn_report)
     }
-  },[model])
+  }, [model])
 
   const handleProcessTesting = async () => {
-    if(!reference) return
-    let dataTrain = predictionKnn;
+    if (!reference) return
+    let dataTrain = predictionKnn
     setModalLoading(true)
 
-    if(!dataTrain.length){
-      dataTrain = await axios.get(`/api/data-prediction-svm/all${reference ? `?reference=${reference}` : ''}`)
+    if (!dataTrain.length) {
+      dataTrain = await axios
+        .get(
+          `/api/data-prediction-svm/all${
+            reference ? `?reference=${reference}` : ''
+          }`
+        )
         .then((res) => res.data.data)
     }
 
-    if(!dataTrain.length) {
+    if (!dataTrain.length) {
       modal.error({
         title: 'Pengujian Gagal',
-        content: 'Data latih baru tidak tersedia, lakukan pelatihan (SVM) terlebih dahulu!',
+        content:
+          'Data latih baru tidak tersedia, lakukan pelatihan (SVM) terlebih dahulu!',
       })
 
       setModalLoading(false)
-      return;
+      return
     }
-    
-    const test = await axios.get(`/api/data-test/all${reference ? `?reference=${reference}` : ''}`)
+
+    const test = await axios
+      .get(`/api/data-test/all${reference ? `?reference=${reference}` : ''}`)
       .then((res) => res.data.data as DataType[])
 
-    const cleanTest = test.filter(item => ((item.pm10 !== null && item.pm2_5 !== null && item.so2 !== null && item.co !== null && item.o3 !== null && item.no2 !== null) ? true : false))
+    const cleanTest = test.filter((item) =>
+      item.pm10 !== null &&
+      item.pm2_5 !== null &&
+      item.so2 !== null &&
+      item.co !== null &&
+      item.o3 !== null &&
+      item.no2 !== null
+        ? true
+        : false
+    )
 
     const k = form.getFieldValue('k_value') as number
     const knn = new KNN(k)
@@ -151,7 +194,7 @@ const PengujianKNN = () => {
     const y = dataTrain.map((item) => kualitas.transform(item.prediction!))
 
     console.log('Training KNN...')
-    knn.fit(X,y)
+    knn.fit(X, y)
     console.log('Training done')
 
     const XTest = cleanTest.map((item) => [
@@ -173,26 +216,40 @@ const PengujianKNN = () => {
     // console.log('Records : ', knn.getMostCommonRecords())
 
     const report = new ClassificationReport(yTest, prediction)
-    
+
     console.log(report.printReport())
-    setReport(report.report().map(item => ({...item, label: !isNaN(parseInt(item.label)) ? kualitas.detransform(parseInt(item.label)) : item.label})))
+    setReport(
+      report.report().map((item) => ({
+        ...item,
+        label: !isNaN(parseInt(item.label))
+          ? kualitas.detransform(parseInt(item.label))
+          : item.label,
+      }))
+    )
 
     console.log('Saving model...')
     putModel({
       ...model,
       knn_report: report.report(),
       model: {
-        //@ts-expect-error
+        //@ts-expect-error the model type is json but get object
         ...model?.model,
-        knn: {distance : knn.getDistanceRecords()}
+        knn: { distance: knn.getDistanceRecords() },
       },
     })
 
-    const dataWithPrediction = cleanTest.map((item, index)=> ({...item, actual: item.kualitas, prediction: kualitas.detransform(prediction[index])}))
+    const dataWithPrediction = cleanTest.map((item, index) => ({
+      ...item,
+      actual: item.kualitas,
+      prediction: kualitas.detransform(prediction[index]),
+    }))
 
     try {
-      await axios.put('/api/data-prediction-knn', JSON.stringify({data : dataWithPrediction, reference}))
-     
+      await axios.put(
+        '/api/data-prediction-knn',
+        JSON.stringify({ data: dataWithPrediction, reference })
+      )
+
       modal.success({
         title: 'Pengujian Selesai',
         content: 'Proses pengujian dengan KNN berhasil dilakukan.',
@@ -268,7 +325,7 @@ const PengujianKNN = () => {
       <h2 className="text-xl font-bold">Pengujian (KNN)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={()=>setModalVisible(true)}>
+        <Button type="primary" onClick={() => setModalVisible(true)}>
           Proses Pengujian
         </Button>
       </div>
@@ -297,45 +354,43 @@ const PengujianKNN = () => {
         onCancel={() => setModalVisible(false)}
         closable={!modalLoading}
       >
-        <article
-          className='text-justify mb-2'
-        >
+        <article className="text-justify mb-2">
           <p>
-            Setelah didapatakan <TextPrimary>data latih baru</TextPrimary> dari proses SVM,
-            <TextPrimary> data latih baru</TextPrimary> tersebut digunakan sebagai <TextPrimary>data latih</TextPrimary> KNN. 
-            Kemudian model yang dihasilkan akan digunakan untuk memprediksi <TextPrimary>data uji</TextPrimary>.
+            Setelah didapatakan <TextPrimary>data latih baru</TextPrimary> dari
+            proses SVM,
+            <TextPrimary> data latih baru</TextPrimary> tersebut digunakan
+            sebagai <TextPrimary>data latih</TextPrimary> KNN. Kemudian model
+            yang dihasilkan akan digunakan untuk memprediksi{' '}
+            <TextPrimary>data uji</TextPrimary>.
           </p>
         </article>
         <Form form={form} onFinish={handleProcessTesting}>
           <Form.Item className="text-center">
-          <Form.Item
-            name={'k_value'}
-            label='Nilai K'
-            rules={[
-              {
-                pattern: /^[0-9]+(\.[0-9]+)?$/,
-                message: 'Harus berupa angka',
-              },
-              // {
-              //   message: 'Harus lebih besar dari 0',
-              //   validator: (_, value) => {
-              //     if (value === null) {
-              //       return Promise.resolve()
-              //     }
+            <Form.Item
+              name={'k_value'}
+              label="Nilai K"
+              rules={[
+                {
+                  pattern: /^[0-9]+(\.[0-9]+)?$/,
+                  message: 'Harus berupa angka',
+                },
+                // {
+                //   message: 'Harus lebih besar dari 0',
+                //   validator: (_, value) => {
+                //     if (value === null) {
+                //       return Promise.resolve()
+                //     }
 
-              //     if (value <= 0) {
-              //       return Promise.reject('Harus lebih besar dari 0')
-              //     }
-              //     return Promise.resolve()
-              //   }
-              // },
-            ]}
-          >
-            <InputNumber
-              placeholder={`Default = 3`}
-              type='number'
-            />
-          </Form.Item>
+                //     if (value <= 0) {
+                //       return Promise.reject('Harus lebih besar dari 0')
+                //     }
+                //     return Promise.resolve()
+                //   }
+                // },
+              ]}
+            >
+              <InputNumber placeholder={'Default = 3'} type="number" />
+            </Form.Item>
             <Button type="primary" htmlType="submit" loading={modalLoading}>
               Uji Sekarang!
             </Button>
@@ -343,11 +398,7 @@ const PengujianKNN = () => {
         </Form>
         {report?.length ? (
           <>
-            <h1
-              className='subtitle'
-            >
-              Laporan Klasifikasi
-            </h1>
+            <h1 className="subtitle">Laporan Klasifikasi</h1>
             <Table
               dataSource={report}
               rowKey={(record) => record.label}
@@ -356,7 +407,16 @@ const PengujianKNN = () => {
                   title: '',
                   dataIndex: 'label',
                   key: 'label',
-                  render: (value) => !value.includes('avg') ? <span className='font-black'>{isNaN(value) ? value : kualitas.detransform(parseInt(value))}</span> : value
+                  render: (value) =>
+                    !value.includes('avg') ? (
+                      <span className="font-black">
+                        {isNaN(value)
+                          ? value
+                          : kualitas.detransform(parseInt(value))}
+                      </span>
+                    ) : (
+                      value
+                    ),
                 },
                 {
                   title: 'Presisi',
@@ -377,12 +437,14 @@ const PengujianKNN = () => {
                   title: '',
                   dataIndex: 'support',
                   key: 'support',
-                }
+                },
               ]}
               pagination={false}
             />
           </>
-        ) : <></>}
+        ) : (
+          <></>
+        )}
       </Modal>
     </div>
   )
