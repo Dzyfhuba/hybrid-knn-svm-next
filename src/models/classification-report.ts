@@ -38,9 +38,6 @@ class ClassificationReport {
       matrix[trueIdx][predIdx] += 1
     }
 
-    console.log('matrix')
-    console.table(matrix)
-
     return matrix
   }
 
@@ -119,6 +116,18 @@ class ClassificationReport {
   getF1Score(cls?: string | number, average: AverageMethod = 'macro'): number {
     if (cls) return this.getClassMetrics(cls).f1
     return this.getAverageMetrics(average).f1
+  }
+
+  getConfusionMatrix() {
+    const matrix: { [key: string]: { [key: string]: string | number } } = {}
+    this.classes.forEach((cls, idx) => {
+      const row: { [key: string]: string | number } = {}
+      this.classes.forEach((predCls, predIdx) => {
+        row[`Predicted ${predCls}`] = this.confusionMatrix[idx][predIdx]
+      })
+      matrix[`Actual ${cls}`] = row
+    })
+    return matrix
   }
 
   printReport(digits: number = 2): string {
