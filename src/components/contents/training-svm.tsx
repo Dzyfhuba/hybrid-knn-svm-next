@@ -150,7 +150,7 @@ const TrainingSVM = () => {
       sorter: true,
     },
     {
-      title: 'Kualitas',
+      title: 'Aktual',
       dataIndex: data?.[0]?.actual ? 'actual' : 'kualitas',
       sorter: true,
       filters: [
@@ -225,6 +225,8 @@ const TrainingSVM = () => {
     const prediction = svm.predict(X)
     console.log('Prediction:', prediction)
 
+    console.log('loss history', svm.getLosshistory())
+
     const report = new ClassificationReport(y, prediction)
 
     console.log(report.printReport())
@@ -267,7 +269,7 @@ const TrainingSVM = () => {
   return (
     <div>
       {modalContext}
-      <h2 className="text-xl font-bold">Pelatihan (SVM)</h2>
+      <h2 className="text-xl font-bold pt-10">Pelatihan (SVM)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={() => setModalVisible(true)}>
@@ -295,10 +297,8 @@ const TrainingSVM = () => {
       <Modal
         open={modalVisible}
         title="Proses Pelatihan (SVM)"
-        onCancel={() => setModalVisible(false)}
-        onOk={() => {
-          console.log()
-        }}
+        footer={null}
+        onCancel={() => LoadingTraining ? null : setModalVisible(false)}
         afterOpenChange={(open) => {
           if (open) {
             fetchModel()

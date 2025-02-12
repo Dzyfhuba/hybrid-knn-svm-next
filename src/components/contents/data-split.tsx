@@ -308,7 +308,7 @@ const DataSplit = () => {
       {modalContext}
       {messageContext}
 
-      <h2 className="text-xl font-bold">Data Split</h2>
+      <h2 className="text-xl font-bold pt-10">Data Split</h2>
       {isClient ? (
         <Form
           form={form}

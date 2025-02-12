@@ -67,6 +67,10 @@ class Linear {
   private dot(X: number[], weights: number[]): number {
     return X.reduce((acc, x, i) => acc + x * weights[i], 0)
   }
+
+  getLosshistory(){
+    return this.lossHistory
+  }
   
   getTrainedResults() {
     return {
@@ -126,6 +130,13 @@ class MultiClass {
       console.log(`  Weights: ${model['weights']}`)
       console.log(`  Bias: ${model['bias']}`)
     })
+  }
+
+  getLosshistory(){
+    return this.models.map((model, i) => ({
+      class: this.classes[i],
+      data: model.getLosshistory(),
+    }))
   }
 
   getTrainedResults() {

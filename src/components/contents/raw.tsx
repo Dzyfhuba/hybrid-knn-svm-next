@@ -210,7 +210,7 @@ const Raw = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold">Data Mentah</h2>
+      <h2 className="text-xl font-bold pt-10">Data Mentah</h2>
       <Divider />
       <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
         <Button

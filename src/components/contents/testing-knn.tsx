@@ -65,7 +65,7 @@ const PengujianKNN = () => {
   >()
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
-  const [modalLoading, setModalLoading] = useState(false)
+  const [loadingTesting, setLoadingTesting] = useState(false)
   const [tableParams, setTableParams] = useState<TableParams>({
     pagination: {
       current: 1,
@@ -142,7 +142,7 @@ const PengujianKNN = () => {
   const handleProcessTesting = async () => {
     if (!reference) return
     let dataTrain = predictionKnn
-    setModalLoading(true)
+    setLoadingTesting(true)
 
     if (!dataTrain.length) {
       dataTrain = await axios
@@ -161,7 +161,7 @@ const PengujianKNN = () => {
           'Data latih baru tidak tersedia, lakukan pelatihan (SVM) terlebih dahulu!',
       })
 
-      setModalLoading(false)
+      setLoadingTesting(false)
       return
     }
 
@@ -234,7 +234,7 @@ const PengujianKNN = () => {
       model: {
         //@ts-expect-error the model type is json but get object
         ...model?.model,
-        knn: { distance: knn.getDistanceRecords() },
+        knn: { distance: knn.getDistanceRecords(), k },
       },
     })
 
@@ -261,7 +261,7 @@ const PengujianKNN = () => {
         content: 'Terjadi kesalahan saat melakukan proses pengujian.',
       })
     } finally {
-      setModalLoading(false)
+      setLoadingTesting(false)
       setData(dataWithPrediction.reverse())
     }
   }
@@ -303,7 +303,7 @@ const PengujianKNN = () => {
       sorter: true,
     },
     {
-      title: 'Kualitas',
+      title: 'Aktual',
       dataIndex: data?.[0]?.actual ? 'actual' : 'kualitas',
       sorter: true,
       filters: [
@@ -322,7 +322,7 @@ const PengujianKNN = () => {
   return (
     <div>
       {modalContext}
-      <h2 className="text-xl font-bold">Pengujian (KNN)</h2>
+      <h2 className="text-xl font-bold pt-10">Pengujian (KNN)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={() => setModalVisible(true)}>
@@ -351,8 +351,7 @@ const PengujianKNN = () => {
         open={modalVisible}
         title="Proses Pengujian"
         footer={null}
-        onCancel={() => setModalVisible(false)}
-        closable={!modalLoading}
+        onCancel={() => !loadingTesting && setModalVisible(false)}
       >
         <article className="text-justify mb-2">
           <p>
@@ -391,7 +390,7 @@ const PengujianKNN = () => {
             >
               <InputNumber placeholder={'Default = 3'} type="number" />
             </Form.Item>
-            <Button type="primary" htmlType="submit" loading={modalLoading}>
+            <Button type="primary" htmlType="submit" loading={loadingTesting}>
               Uji Sekarang!
             </Button>
           </Form.Item>

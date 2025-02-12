@@ -193,6 +193,8 @@ class ClassificationReport {
       { label: 'weighted avg', method: 'weighted' },
       { label: 'micro avg', method: 'micro' }
     ]
+
+    data.push({label: 'accuracy', precision: this.getAccuracy().toFixed(digits), recall: '', f1: '', support: ''})
     
     macros.forEach(({ label, method }) => {
       const metrics = this.getAverageMetrics(method as AverageMethod)
@@ -205,8 +207,6 @@ class ClassificationReport {
       })
     })
 
-    // data.push({label: 'accuracy', precision: '', recall: '', f1: '', support: this.getAccuracy().toFixed(digits)})
-    
     return data
   }
 }
