@@ -5,7 +5,6 @@ class ClassificationReport {
   private classes: (string | number)[]
   private labelMap: Map<(string | number), number>
   private support: number[]
-  private predictionClasses: (string | number)[]
 
   constructor(private trueLabels: (string | number)[], private predictedLabels: (string | number)[]) {
     if (trueLabels.length !== predictedLabels.length) {
@@ -20,26 +19,23 @@ class ClassificationReport {
       throw new Error('No classes found in input labels')
     }
 
-    this.predictionClasses = this.getUniqueSortedLabels(predictedLabels)
-
     this.labelMap = new Map(this.classes.map((cls, idx) => [cls, idx]))
-    this.confusionMatrix = this.createConfusionMatrix()
+    this.confusionMatrix = this.createConfusionMatrix(trueLabels, predictedLabels)
     this.support = this.calculateSupport()
   }
 
-  private getUniqueSortedLabels(labels: (string|number)[]): (string | number)[] {
+  private getUniqueSortedLabels(labels: (string | number)[]): (string | number)[] {
     const allLabels = [...new Set(labels)]
     return allLabels.sort()
   }
 
-  private createConfusionMatrix(): number[][] {
-    const matrix = Array.from({ length: this.classes.length }, 
-      () => new Array(this.classes.length).fill(0))
+  private createConfusionMatrix(trueLabels: (string | number)[], predictedLabels: (string | number)[]): number[][] {
+    const matrix = this.classes.map(() => Array(this.classes.length).fill(0))
 
-    for (let i = 0; i < this.trueLabels.length; i++) {
-      const trueIdx = this.labelMap.get(this.trueLabels[i])!
-      const predIdx = this.labelMap.get(this.predictedLabels[i])!
-      matrix[trueIdx][predIdx]++
+    for (let i = 0; i < trueLabels.length; i++) {
+      const trueIdx = this.labelMap.get(trueLabels[i])!
+      const predIdx = this.labelMap.get(predictedLabels[i])!
+      matrix[trueIdx][predIdx] += 1
     }
 
     return matrix
@@ -52,14 +48,14 @@ class ClassificationReport {
   private getClassMetrics(cls: string | number) {
     const idx = this.labelMap.get(cls)!
     const tp = this.confusionMatrix[idx][idx]
-    const fp = this.confusionMatrix.reduce((sum, row, i) => 
+    const fp = this.confusionMatrix.reduce((sum, row, i) =>
       i !== idx ? sum + row[idx] : sum, 0)
-    const fn = this.confusionMatrix[idx].reduce((sum, val, j) => 
+    const fn = this.confusionMatrix[idx].reduce((sum, val, j) =>
       j !== idx ? sum + val : sum, 0)
 
     const precision = tp + fp === 0 ? 0 : tp / (tp + fp)
     const recall = tp + fn === 0 ? 0 : tp / (tp + fn)
-    const f1 = precision + recall === 0 ? 0 : 
+    const f1 = precision + recall === 0 ? 0 :
       (2 * (precision * recall)) / (precision + recall)
 
     return { precision, recall, f1 }
@@ -122,11 +118,23 @@ class ClassificationReport {
     return this.getAverageMetrics(average).f1
   }
 
+  getConfusionMatrix() {
+    const matrix: { [key: string]: { [key: string]: string | number } } = {}
+    this.classes.forEach((cls, idx) => {
+      const row: { [key: string]: string | number } = {}
+      this.classes.forEach((predCls, predIdx) => {
+        row[`Predicted ${predCls}`] = this.confusionMatrix[idx][predIdx]
+      })
+      matrix[`Actual ${cls}`] = row
+    })
+    return matrix
+  }
+
   printReport(digits: number = 2): string {
     const headers = ['', 'Precision', 'Recall', 'F1-Score', 'Support']
-    
+
     // Convert all values to strings explicitly
-    const rows = this.predictionClasses.map((cls, idx) => {
+    const rows = this.classes.map((cls, idx) => {
       const metrics = this.getClassMetrics(cls)
       return [
         cls.toString(),  // Convert class label to string
@@ -155,7 +163,7 @@ class ClassificationReport {
     })
 
     const allRows = [...rows, ...avgMetrics]
-    
+
     // Calculate column widths using string values
     const colWidths = headers.map((_, i) =>
       Math.max(...allRows.map(row => String(row[i]).length), headers[i].length)
@@ -163,7 +171,7 @@ class ClassificationReport {
 
     const divider = colWidths.map(w => '-'.repeat(w)).join('-|-')
     const headerRow = headers.map((h, i) => h.padEnd(colWidths[i])).join(' | ')
-    
+
     // Ensure all values are treated as strings during padding
     const report = [
       headerRow,
@@ -178,7 +186,7 @@ class ClassificationReport {
 
   report(digits: number = 2) {
     // return as array of objects
-    const data = this.predictionClasses.map((cls, idx) => {
+    const data = this.classes.map((cls, idx) => {
       const metrics = this.getClassMetrics(cls)
       return {
         label: cls.toString(),
@@ -189,12 +197,24 @@ class ClassificationReport {
       }
     })
     const macros = [
+      { label: 'accuracy', method: 'accuracy' },
       { label: 'macro avg', method: 'macro' },
       { label: 'weighted avg', method: 'weighted' },
       { label: 'micro avg', method: 'micro' }
     ]
-    
+
     macros.forEach(({ label, method }) => {
+      if (label === 'accuracy') {
+        data.push({
+          label,
+          precision: this.getAccuracy().toFixed(digits),
+          recall: '',
+          f1: '',
+          support: ''
+        })
+        return
+      }
+
       const metrics = this.getAverageMetrics(method as AverageMethod)
       data.push({
         label,
@@ -206,7 +226,7 @@ class ClassificationReport {
     })
 
     // data.push({label: 'accuracy', precision: '', recall: '', f1: '', support: this.getAccuracy().toFixed(digits)})
-    
+
     return data
   }
 }

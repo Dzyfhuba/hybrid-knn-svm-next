@@ -154,9 +154,17 @@ export async function PUT(request: NextRequest) {
 
   //insert datas
   const res = await supabase.from('prediction_svm').insert(payload.data?.data)
-
   if (res.error) {
     return response.internalServerError({ message: res.error.message })
+  }
+
+  // remove prediction_knn where model_id
+  const del2 = await supabase
+    .from('prediction_knn')
+    .delete()
+    .eq('model_id', model.id)
+  if (del2.error) {
+    return response.internalServerError({ message: del2.error.message })
   }
 
   return response.ok({})

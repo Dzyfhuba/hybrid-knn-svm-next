@@ -217,6 +217,8 @@ const TrainingSVM = () => {
       item.no2,
     ]).filter((item) => item.every((i) => i !== null))
     const y = train.map((item) => kualitas.transform(item.kualitas!))
+    console.log('Count Values:')
+    console.table([...new Set(y)].map((item) => ({label: item, count: y.filter((i) => i === item).length})))
 
     console.log('Training SVM...')
     svm.fit(X, y)
@@ -224,6 +226,11 @@ const TrainingSVM = () => {
 
     const prediction = svm.predict(X)
     console.log('Prediction:', prediction)
+
+    // count prediction unique value
+    const unique = [...new Set(prediction)]
+    console.log('count unique prediction:')
+    console.table(unique.map((item) => ({label: item, count: prediction.filter((i) => i === item).length})))
 
     const report = new ClassificationReport(y, prediction)
 
@@ -257,7 +264,7 @@ const TrainingSVM = () => {
     } finally {
       // setDataActual(train.map(item => item.kualitas!))
       // setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
-      setPredictionKnn(dataWithPrediction)
+      setPredictionKnn([])
       setData(dataWithPrediction.reverse() as DataType[])
   
       setLoadingTraining(false)
