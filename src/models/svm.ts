@@ -6,17 +6,20 @@ class Linear {
   private bias: number
   private lossHistory: number[] = []
   private checkpointInterval: number
+  private console: ('class' | 'loss' | 'final loss' | 'none' | 'all')[] = ['all']
 
   constructor({
     learningRate = 0.001,
     regularization = 1.0,
     epochs = 1000,
     checkpointInterval = 100,
+    console = ['all'] as ('class' | 'loss' | 'final loss' | 'none' | 'all')[],
   }) {
     this.learningRate = learningRate
     this.regularization = regularization
     this.epochs = epochs
     this.checkpointInterval = checkpointInterval
+    this.console = console
 
     this.weights = []
     this.bias = 0
@@ -43,11 +46,15 @@ class Linear {
 
       this.lossHistory.push(this.computeLoss(X, y_))
       if (epoch % this.checkpointInterval === 0) {
-        console.log(`Epoch ${epoch}, Loss: ${this.lossHistory[this.lossHistory.length - 1]}`)
+        if (this.console.includes('loss') || this.console.includes('all')) {
+          console.log(`Epoch ${epoch}, Loss: ${this.lossHistory[this.lossHistory.length - 1]}`)
+        }
       }
     }
 
-    console.log(`Training complete. Final Loss: ${this.lossHistory[this.lossHistory.length - 1]}`)
+    if (this.console.includes('final loss') || this.console.includes('all')) {
+      console.log(`Epoch ${this.epochs}, Loss: ${this.lossHistory[this.lossHistory.length - 1]}`)
+    }
   }
 
   private computeLoss(X: number[][], y: number[]): number {
@@ -87,29 +94,35 @@ class MultiClass {
   private models: Linear[] = []
   private classes: number[] = []
   private checkpointInterval: number
+  private console: ('class' | 'loss' | 'final loss' | 'none' | 'all')[] = ['all']
 
   constructor({
     learningRate = 0.001,
     regularization = 1.0,
     epochs = 1000,
     checkpointInterval = 100,
+    console = ['all'] as ('class' | 'loss' | 'final loss' | 'none' | 'all')[],
   }) {
     this.learningRate = learningRate
     this.regularization = regularization
     this.epochs = epochs
     this.checkpointInterval = checkpointInterval
+    this.console = console
   }
 
   fit(X: number[][], y: number[]) {
     this.classes = Array.from(new Set(y))
     for (const cls of this.classes) {
       const yBinary = y.map(label => label === cls ? 1 : -1)
-      console.log(`Training class ${cls} vs all`)
+      if (this.console.includes('class') || this.console.includes('all')) {
+        console.log(`Training class ${cls} vs all`)
+      }
       const model = new Linear({
         learningRate: this.learningRate,
         regularization: this.regularization,
         epochs: this.epochs,
         checkpointInterval: this.checkpointInterval,
+        console: this.console,
       })
       model.fit(X, yBinary)
       this.models.push(model)
