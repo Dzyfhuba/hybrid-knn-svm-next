@@ -5,6 +5,7 @@ class Linear {
   private weights: number[]
   private bias: number
   private lossHistory: number[] = []
+  private lossHistoryCheckpoint: number[] = []
   private checkpointInterval: number
   private console: ('class' | 'loss' | 'final loss' | 'none' | 'all')[] = ['all']
 
@@ -48,12 +49,14 @@ class Linear {
       if (epoch % this.checkpointInterval === 0) {
         if (this.console.includes('loss') || this.console.includes('all')) {
           console.log(`Epoch ${epoch}, Loss: ${this.lossHistory[this.lossHistory.length - 1]}`)
+          this.lossHistoryCheckpoint.push(this.lossHistory[this.lossHistory.length - 1])
         }
       }
     }
 
     if (this.console.includes('final loss') || this.console.includes('all')) {
       console.log(`Epoch ${this.epochs}, Loss: ${this.lossHistory[this.lossHistory.length - 1]}`)
+      this.lossHistoryCheckpoint.push(this.lossHistory[this.lossHistory.length - 1])
     }
   }
 
@@ -77,6 +80,10 @@ class Linear {
 
   getLosshistory(){
     return this.lossHistory
+  }
+
+  getLosshistoryCheckpoint(){
+    return this.lossHistoryCheckpoint
   }
   
   getTrainedResults() {
@@ -152,6 +159,13 @@ class MultiClass {
     }))
   }
 
+  getLosshistoryCheckpoint(){
+    return this.models.map((model, i) => ({
+      class: this.classes[i],
+      data: model.getLosshistoryCheckpoint(),
+    }))
+  }
+
   getTrainedResults() {
     return {
       learningRate: this.learningRate,
@@ -160,6 +174,7 @@ class MultiClass {
       checkpointInterval: this.checkpointInterval,
       models: this.models.map(model => model.getTrainedResults()),
       classes: this.classes,
+      lossHistoryCheckpoint : this.getLosshistoryCheckpoint()
     }
   }
 }

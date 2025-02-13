@@ -49,7 +49,7 @@ const PengujianKNN = () => {
   const [modal, modalContext] = Modal.useModal()
   const model = useStoreState((state) => state.model)
   const putModel = useStoreActions((actions) => actions.putModel)
-  const predictionKnn = useStoreState((state) => state.predictionKnn)
+  const predictionSvm = useStoreState((state) => state.predictionSvm)
   const reference = model.reference
   const [form] = Form.useForm()
 
@@ -141,7 +141,7 @@ const PengujianKNN = () => {
 
   const handleProcessTesting = async () => {
     if (!reference) return
-    let dataTrain = predictionKnn
+    let dataTrain = predictionSvm
     setLoadingTesting(true)
 
     if (!dataTrain.length) {
@@ -232,7 +232,7 @@ const PengujianKNN = () => {
       ...model,
       knn_report: report.report(),
       model: {
-        //@ts-expect-error the model type is json but get object
+        //// @ts-expect-error the model type is json but get object
         ...model?.model,
         knn: { distance: knn.getDistanceRecords(), k },
       },

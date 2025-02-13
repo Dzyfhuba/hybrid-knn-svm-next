@@ -48,12 +48,12 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "data_test_model_id_fkey"
-            columns: ["model_id"]
+            foreignKeyName: 'data_test_model_id_fkey'
+            columns: ['model_id']
             isOneToOne: false
-            referencedRelation: "model"
-            referencedColumns: ["id"]
-          },
+            referencedRelation: 'model'
+            referencedColumns: ['id']
+          }
         ]
       }
       data_train: {
@@ -95,12 +95,12 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "data_train_model_id_fkey"
-            columns: ["model_id"]
+            foreignKeyName: 'data_train_model_id_fkey'
+            columns: ['model_id']
             isOneToOne: false
-            referencedRelation: "model"
-            referencedColumns: ["id"]
-          },
+            referencedRelation: 'model'
+            referencedColumns: ['id']
+          }
         ]
       }
       model: {
@@ -116,7 +116,18 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: number
-          model?: Json | null
+          model?: {
+            svm?: {
+              learningRate: number
+              regularization: number
+              epochs: number
+              checkpointInterval: number
+              models: { weights: number[]; bias: number }[]
+              classes: number[]
+              lossHistoryCheckpoint: {class: number; data: number[]}[]
+            }
+            knn?: { [key: string]: any }
+          } | null
           reference?: string | null
           svm_report?: Json | null
           knn_report?: Json | null
