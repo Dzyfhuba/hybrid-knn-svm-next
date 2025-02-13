@@ -1,10 +1,19 @@
 'use client'
 
-import { Button, Divider, GetProp, message, Modal, Table, TableProps } from 'antd'
+import {
+  Button,
+  Divider,
+  GetProp,
+  message,
+  Modal,
+  Table,
+  TableProps,
+} from 'antd'
 import { SorterResult } from 'antd/es/table/interface'
 import { useEffect, useState } from 'react'
 import qs from 'qs'
 import ModalForm from './form'
+import ModalImportData from './modal-import-data'
 
 interface DataType {
   id: number
@@ -28,6 +37,7 @@ type ColumnsType<T extends object = object> = TableProps<T>['columns']
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
+  const [modal, modalContext] = Modal.useModal()
   const [data, setData] = useState<DataType[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -82,7 +92,11 @@ const Raw = () => {
     JSON.stringify(tableParams.filters),
   ])
 
-  const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
+  const handleTableChange: TableProps<DataType>['onChange'] = (
+    pagination,
+    filters,
+    sorter
+  ) => {
     setTableParams({
       pagination,
       filters,
@@ -96,7 +110,7 @@ const Raw = () => {
   }
 
   const handleDelete = (id: number) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Konfirmasi Penghapusan',
       content: 'Apakah Anda yakin ingin menghapus data ini?',
       okText: 'Ya',
@@ -210,7 +224,11 @@ const Raw = () => {
 
   return (
     <div>
-      <h2 className="text-xl font-bold pt-10">Data Mentah</h2>
+      {modalContext}
+      <div className="flex justify-between items-center pt-10">
+        <h2 className="text-xl font-bold">Data Mentah</h2>
+        <ModalImportData onUploadSuccess={() => fetchData()} />
+      </div>
       <Divider />
       <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
         <Button
