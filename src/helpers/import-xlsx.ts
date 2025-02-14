@@ -8,11 +8,11 @@ export function reader(file: File) {
   console.log('reader')
 
   return new Promise<ArrayBuffer>((resolve) => {
-    let reader = new FileReader()
+    const reader = new FileReader()
 
     reader.onload = function (event) {
       if (!event?.target?.result) return
-      let arrayBuffer = event?.target?.result as ArrayBuffer
+      const arrayBuffer = event?.target?.result as ArrayBuffer
       //   let array = new Uint8Array(arrayBuffer)
 
       //   // Display some information about the file
@@ -37,15 +37,15 @@ export async function excelToDataRawFormat(file: File) {
   }
 
   const res = await reader(file)
-  let workbook = XLSX.read(res)
+  const workbook = XLSX.read(res)
   //   const names = workbook.SheetNames
   const sheets = workbook.Sheets
 
-  let dataArray: DataType[] = []
+  const dataArray: DataType[] = []
 
   //loop the sheets
   for (const keySheet in sheets) {
-    let dataItemObj: DataType = {}
+    const dataItemObj: DataType = {}
 
     //loop the items of sheet
     for (const keySheetItem in sheets[keySheet]) {
@@ -137,8 +137,8 @@ export async function excelToDataRawFormat(file: File) {
 }
 
 export async function downloadTemplateExcel() {
-  let wb = XLSX.utils.book_new()
-  let ws = XLSX.utils.aoa_to_sheet([['No', 'PM10', 'PM2.5', 'SO2', 'CO', 'O3', 'NO2', 'Kualitas']])
+  const wb = XLSX.utils.book_new()
+  const ws = XLSX.utils.aoa_to_sheet([['No', 'PM10', 'PM2.5', 'SO2', 'CO', 'O3', 'NO2', 'Kualitas']])
 
   XLSX.utils.book_append_sheet(wb, ws, 'Data')
 

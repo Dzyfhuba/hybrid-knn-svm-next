@@ -6,7 +6,7 @@ import {
 } from '@/helpers/import-xlsx'
 import { Button, Modal, notification, Table, Upload, UploadFile } from 'antd'
 import { ColumnsType } from 'antd/es/table'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { Database } from '@/types/database'
 
@@ -101,6 +101,7 @@ const ModalImportData = (props: Props) => {
         })
       }
     } catch (error) {
+      console.log(error)
       notify.error({ message: 'Gagal upload data' })
     } finally {
       setLoadingUpload(false)
