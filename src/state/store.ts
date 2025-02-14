@@ -7,8 +7,8 @@ export interface GlobalState {
   putModel: Thunk<GlobalState, Database['svm_knn']['Tables']['model']['Insert']>
   setModel: Action<GlobalState, ((model: GlobalState['model']) => GlobalState['model']) | GlobalState['model']>
   fetchModel: Thunk<GlobalState>
-  predictionKnn : Database['svm_knn']['Tables']['prediction_knn']['Row'][]
-  setPredictionKnn : Action<GlobalState, ((model: GlobalState['predictionKnn']) => GlobalState['predictionKnn']) | GlobalState['predictionKnn']>
+  predictionSvm : Database['svm_knn']['Tables']['prediction_svm']['Row'][]
+  setPredictionSvm : Action<GlobalState, ((model: GlobalState['predictionSvm']) => GlobalState['predictionSvm']) | GlobalState['predictionSvm']>
 }
 
 const store = createStore<GlobalState>({
@@ -30,9 +30,9 @@ const store = createStore<GlobalState>({
     if(data.item?.reference) localStorage.setItem('reference', data.item.reference)
     actions.setModel(data.item)
   }),
-  predictionKnn : [],
-  setPredictionKnn : action((state, payload) => {
-    state.predictionKnn = typeof payload === 'function' ? payload(state.predictionKnn) : payload
+  predictionSvm : [],
+  setPredictionSvm : action((state, payload) => {
+    state.predictionSvm = typeof payload === 'function' ? payload(state.predictionSvm) : payload
   }),
 })
 

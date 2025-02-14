@@ -203,6 +203,7 @@ class ClassificationReport {
       { label: 'micro avg', method: 'micro' }
     ]
 
+    
     macros.forEach(({ label, method }) => {
       if (label === 'accuracy') {
         data.push({
@@ -224,8 +225,6 @@ class ClassificationReport {
         support: this.support.reduce((a, b) => a + b, 0).toString()
       })
     })
-
-    // data.push({label: 'accuracy', precision: '', recall: '', f1: '', support: this.getAccuracy().toFixed(digits)})
 
     return data
   }

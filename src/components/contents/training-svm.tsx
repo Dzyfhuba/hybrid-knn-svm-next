@@ -5,48 +5,72 @@ import ClassificationReport from '@/models/classification-report'
 import SVM from '@/models/svm'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Database } from '@/types/database'
-import { Button, Divider, Form, InputNumber, Modal, Table, TableProps } from 'antd'
+import {
+  Button,
+  Divider,
+  Form,
+  InputNumber,
+  Modal,
+  Table,
+  TableProps,
+} from 'antd'
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import qs from 'qs'
 import { useEffect, useState } from 'react'
 import TextPrimary from '../text-primary'
+import dynamic from 'next/dynamic'
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
 interface DataType {
-  id: number;
-  pm10: number;
-  pm2_5: number;
-  so2: number;
-  co: number;
-  o3: number;
-  no2: number;
-  kualitas: string;
-  actual?: string;
-  prediction?: string;
+  id: number
+  pm10: number
+  pm2_5: number
+  so2: number
+  co: number
+  o3: number
+  no2: number
+  kualitas: string
+  actual?: string
+  prediction?: string
 }
 
 interface TableParams {
-  pagination?: TablePaginationConfig;
-  sortField?: SorterResult<DataType>['field'];
-  sortOrder?: SorterResult<DataType>['order'];
-  filters?: Record<string, FilterValue | null>;
+  pagination?: TablePaginationConfig
+  sortField?: SorterResult<DataType>['field']
+  sortOrder?: SorterResult<DataType>['order']
+  filters?: Record<string, FilterValue | null>
 }
 
-type ColumnsType<T extends object = object> = TableProps<T>['columns'];
-type TablePaginationConfig = Exclude<TableProps<DataType>['pagination'], boolean>;
+type ColumnsType<T extends object = object> = TableProps<T>['columns']
+type TablePaginationConfig = Exclude<
+  TableProps<DataType>['pagination'],
+  boolean
+>
 
 const TrainingSVM = () => {
   const [modal, modalContext] = Modal.useModal()
   const [data, setData] = useState<DataType[]>([])
   // const [dataActual, setDataActual] = useState<string[]>()
   // const [dataPrediction, setDataPrediction] = useState<string[]>()
-  const [report, setReport] = useState<{ label: string; precision: string; recall: string; f1: string; support: string; }[]>()
   const model = useStoreState((state) => state.model)
   const fetchModel = useStoreActions((actions) => actions.fetchModel)
   const putModel = useStoreActions((actions) => actions.putModel)
   const reference = model.reference
-  const setPredictionKnn = useStoreActions((actions) => actions.setPredictionKnn)
+  const setPredictionSvm = useStoreActions(
+    (actions) => actions.setPredictionSvm
+  )
   const [form] = Form.useForm()
+  const lossHistories = model.model?.svm?.lossHistoryCheckpoint ?? []
+  const svmModel = model.model?.svm
+  const report =
+    (model?.svm_report as {
+      label: string
+      precision: string
+      recall: string
+      f1: string
+      support: string
+    }[]) ?? []
 
   const [loading, setLoading] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
@@ -71,14 +95,24 @@ const TrainingSVM = () => {
   })
 
   const fetchData = async () => {
-    if(!reference) return
+    if (!reference) return
     setLoading(true)
 
     try {
-      let res = await fetch(`${selfUrl}/api/data-prediction-svm?${qs.stringify({...parseParams(tableParams), reference})}`).then((res) => res.json())
-      
-      if(!(res.total)){
-        res = await fetch(`${selfUrl}/api/data-train?${qs.stringify({...parseParams(tableParams), reference})}`).then((res) => res.json())
+      let res = await fetch(
+        `${selfUrl}/api/data-prediction-svm?${qs.stringify({
+          ...parseParams(tableParams),
+          reference,
+        })}`
+      ).then((res) => res.json())
+
+      if (!res.total) {
+        res = await fetch(
+          `${selfUrl}/api/data-train?${qs.stringify({
+            ...parseParams(tableParams),
+            reference,
+          })}`
+        ).then((res) => res.json())
       }
 
       setData(res.data)
@@ -90,28 +124,22 @@ const TrainingSVM = () => {
           total: res.total,
         },
       })
-      
     } catch (error) {
       console.error('Error fetching data:', error)
       setLoading(false)
     }
   }
 
-  useEffect(()=>{fetchData()}, [
+  useEffect(() => {
+    fetchData()
+  }, [
     tableParams.pagination?.current,
     tableParams.pagination?.pageSize,
     tableParams.sortOrder,
     tableParams.sortField,
     JSON.stringify(tableParams.filters),
-    model.reference
+    model.reference,
   ])
-
-  useEffect(()=>{
-    if(model?.svm_report && Array.isArray(model?.svm_report)){
-      //@ts-expect-error difference type
-      setReport(model.svm_report)
-    }
-  },[model])
 
   const columns: ColumnsType<DataType> = [
     {
@@ -150,24 +178,14 @@ const TrainingSVM = () => {
       sorter: true,
     },
     {
-      title: 'Kualitas',
+      title: 'Aktual',
       dataIndex: data?.[0]?.actual ? 'actual' : 'kualitas',
       sorter: true,
-      filters: [
-        { text: 'BAIK', value: 'BAIK' },
-        { text: 'SEDANG', value: 'SEDANG' },
-        { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      ],
     },
     {
       title: 'Prediksi',
       dataIndex: 'prediction',
       // sorter: true,
-      // filters: [
-      //   { text: 'BAIK', value: 'BAIK' },
-      //   { text: 'SEDANG', value: 'SEDANG' },
-      //   { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      // ],
     },
   ]
 
@@ -179,26 +197,38 @@ const TrainingSVM = () => {
   }
 
   const handleTrain = async () => {
-    if(!reference) return
+    if (!reference) return
     setLoadingTraining(true)
 
     // load data
-    const train = await axios.get(`/api/data-train/all${reference ? `?reference=${reference}` : ''}`)
-      .then((res) => res.data.data as Database['svm_knn']['Tables']['data_train']['Row'][])
+    const train = await axios
+      .get(`/api/data-train/all${reference ? `?reference=${reference}` : ''}`)
+      .then(
+        (res) =>
+          res.data.data as Database['svm_knn']['Tables']['data_train']['Row'][]
+      )
 
-    if(!train.length) {
+    if (!train.length) {
       modal.error({
         title: 'Pengujian Gagal',
-        content: 'Data latih tidak tersedia, lakukan pembagian data terlebih dahulu!',
+        content:
+          'Data latih tidak tersedia, lakukan pembagian data terlebih dahulu!',
       })
       setLoadingTraining(false)
       return
     }
 
-    const learningRate = form.getFieldValue('learning_rate') as number || defaultParams.learningRate
-    const regularization = form.getFieldValue('regularization') as number || defaultParams.regularization
-    const epochs = form.getFieldValue('epochs') as number || defaultParams.epochs
-    const checkpointInterval = form.getFieldValue('checkpoint_interval') as number || defaultParams.checkpointInterval
+    const learningRate =
+      (form.getFieldValue('learning_rate') as number) ||
+      defaultParams.learningRate
+    const regularization =
+      (form.getFieldValue('regularization') as number) ||
+      defaultParams.regularization
+    const epochs =
+      (form.getFieldValue('epochs') as number) || defaultParams.epochs
+    const checkpointInterval =
+      (form.getFieldValue('checkpoint_interval') as number) ||
+      defaultParams.checkpointInterval
 
     console.log('SVM Construction...')
     const svm = new SVM.MultiClass({
@@ -208,17 +238,24 @@ const TrainingSVM = () => {
       checkpointInterval,
     })
 
-    const X = train.map((item) => [
-      item.pm10,
-      item.pm2_5,
-      item.so2,
-      item.co,
-      item.o3,
-      item.no2,
-    ]).filter((item) => item.every((i) => i !== null))
+    const X = train
+      .map((item) => [
+        item.pm10,
+        item.pm2_5,
+        item.so2,
+        item.co,
+        item.o3,
+        item.no2,
+      ])
+      .filter((item) => item.every((i) => i !== null))
     const y = train.map((item) => kualitas.transform(item.kualitas!))
     console.log('Count Values:')
-    console.table([...new Set(y)].map((item) => ({label: item, count: y.filter((i) => i === item).length})))
+    console.table(
+      [...new Set(y)].map((item) => ({
+        label: item,
+        count: y.filter((i) => i === item).length,
+      }))
+    )
 
     console.log('Training SVM...')
     svm.fit(X, y)
@@ -230,27 +267,40 @@ const TrainingSVM = () => {
     // count prediction unique value
     const unique = [...new Set(prediction)]
     console.log('count unique prediction:')
-    console.table(unique.map((item) => ({label: item, count: prediction.filter((i) => i === item).length})))
+    console.table(
+      unique.map((item) => ({
+        label: item,
+        count: prediction.filter((i) => i === item).length,
+      }))
+    )
 
     const report = new ClassificationReport(y, prediction)
 
     console.log(report.printReport())
-    setReport(report.report().map(item => ({...item, label: !isNaN(parseInt(item.label)) ? kualitas.detransform(parseInt(item.label)) : item.label})))
 
     console.log('Saving model...')
     putModel({
       ...model,
       svm_report: report.report(),
       model: {
+        ////@ts-expect-error the model type is json but get object
+        ...model?.model,
         svm: svm.getTrainedResults(),
       },
     })
 
-    const dataWithPrediction = train.map((item, index) => ({...item, actual: item.kualitas, prediction: kualitas.detransform(prediction[index])}))
+    const dataWithPrediction = train.map((item, index) => ({
+      ...item,
+      actual: item.kualitas,
+      prediction: kualitas.detransform(prediction[index]),
+    }))
 
     try {
-      await axios.put('/api/data-prediction-svm', JSON.stringify({data : dataWithPrediction, reference}))
-     
+      await axios.put(
+        '/api/data-prediction-svm',
+        JSON.stringify({ data: dataWithPrediction, reference })
+      )
+
       modal.success({
         title: 'Pelatihan Selesai',
         content: 'Proses pelatihan dengan SVM berhasil dilakukan.',
@@ -264,9 +314,9 @@ const TrainingSVM = () => {
     } finally {
       // setDataActual(train.map(item => item.kualitas!))
       // setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
-      setPredictionKnn([])
+      setPredictionSvm(dataWithPrediction)
       setData(dataWithPrediction.reverse() as DataType[])
-  
+
       setLoadingTraining(false)
     }
   }
@@ -274,7 +324,7 @@ const TrainingSVM = () => {
   return (
     <div>
       {modalContext}
-      <h2 className="text-xl font-bold">Pelatihan (SVM)</h2>
+      <h2 className="text-xl font-bold pt-10">Pelatihan (SVM)</h2>
       <Divider />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={() => setModalVisible(true)}>
@@ -302,34 +352,29 @@ const TrainingSVM = () => {
       <Modal
         open={modalVisible}
         title="Proses Pelatihan (SVM)"
-        onCancel={() => setModalVisible(false)}
-        onOk={() => {
-          console.log()
-        }}
+        footer={null}
+        onCancel={() => (LoadingTraining ? null : setModalVisible(false))}
         afterOpenChange={(open) => {
           if (open) {
             fetchModel()
           }
         }}
       >
-        <article
-          className='text-justify'
-        >
+        <article className="text-justify">
           <p>
-            Proses pelatihan metode Hybrid SVM-KNN memerlukan proses pelatihan SVM terhadap <TextPrimary>data latih</TextPrimary>.
-            Kemudian model yang dihasilkan akan digunakan untuk memprediksi <TextPrimary>data latih baru</TextPrimary>.
-            <TextPrimary> Data latih baru</TextPrimary> tersebut akan digunakan sebagai <TextPrimary>data latih</TextPrimary> KNN.
+            Proses pelatihan metode Hybrid SVM-KNN memerlukan proses pelatihan
+            SVM terhadap <TextPrimary>data latih</TextPrimary>. Kemudian model
+            yang dihasilkan akan digunakan untuk memprediksi{' '}
+            <TextPrimary>data latih baru</TextPrimary>.
+            <TextPrimary> Data latih baru</TextPrimary> tersebut akan digunakan
+            sebagai <TextPrimary>data latih</TextPrimary> KNN.
           </p>
         </article>
 
-        <Form
-          labelCol={{ span: 8 }}
-          onFinish={handleTrain}
-          form={form}
-        >
+        <Form labelCol={{ span: 8 }} onFinish={handleTrain} form={form}>
           <Form.Item
             name={'learning_rate'}
-            label='Laju Pembelajaran'
+            label="Laju Pembelajaran"
             rules={[
               {
                 pattern: /^[0-9]+(\.[0-9]+)?$/,
@@ -346,7 +391,7 @@ const TrainingSVM = () => {
                     return Promise.reject('Harus lebih besar dari 0')
                   }
                   return Promise.resolve()
-                }
+                },
               },
               {
                 message: 'Tidak boleh lebih dari 1',
@@ -355,19 +400,19 @@ const TrainingSVM = () => {
                     return Promise.reject('Harus lebih kecil dari 1')
                   }
                   return Promise.resolve()
-                }
+                },
               },
             ]}
-            extra='Laju pembelajaran adalah seberapa cepat model belajar'
+            extra="Laju pembelajaran adalah seberapa cepat model belajar"
           >
             <InputNumber
               placeholder={`Default = ${defaultParams.learningRate}`}
-              type='number'
+              type="number"
             />
           </Form.Item>
           <Form.Item
             name={'regularization'}
-            label='Regulasi'
+            label="Regulasi"
             rules={[
               {
                 pattern: /^[0-9]+(\.[0-9]+)?$/,
@@ -384,7 +429,7 @@ const TrainingSVM = () => {
                     return Promise.reject('Harus lebih besar dari 0')
                   }
                   return Promise.resolve()
-                }
+                },
               },
               {
                 message: 'Tidak boleh lebih dari 1',
@@ -393,19 +438,19 @@ const TrainingSVM = () => {
                     return Promise.reject('Harus lebih kecil dari 1')
                   }
                   return Promise.resolve()
-                }
+                },
               },
             ]}
-            extra='Regulasi adalah seberapa besar model menghindari overfitting'
+            extra="Regulasi adalah seberapa besar model menghindari overfitting"
           >
             <InputNumber
               placeholder={`Default = ${defaultParams.regularization}`}
-              type='number'
+              type="number"
             />
           </Form.Item>
           <Form.Item
             name={'epochs'}
-            label='Epochs'
+            label="Epochs"
             rules={[
               {
                 pattern: /^[0-9]+$/,
@@ -418,7 +463,7 @@ const TrainingSVM = () => {
                     return Promise.reject('Harus lebih kecil dari 10000000')
                   }
                   return Promise.resolve()
-                }
+                },
               },
               {
                 message: 'Tidak boleh lebih kecil dari 1',
@@ -431,20 +476,20 @@ const TrainingSVM = () => {
                     return Promise.reject('Harus lebih besar dari 1')
                   }
                   return Promise.resolve()
-                }
-              }
+                },
+              },
             ]}
-            extra='Epochs adalah seberapa banyak model belajar'
+            extra="Epochs adalah seberapa banyak model belajar"
           >
             <InputNumber
-              type='number'
+              type="number"
               placeholder={`Default = ${defaultParams.epochs}`}
             />
           </Form.Item>
           <Form.Item
             name={'checkpoint_interval'}
-            label='Checkpoint Interval'
-            extra='Checkpoint Interval adalah seberapa sering model menyimpan checkpoint'
+            label="Checkpoint Interval"
+            extra="Checkpoint Interval adalah seberapa sering model menyimpan checkpoint"
             rules={[
               {
                 pattern: /^[0-9]+$/,
@@ -458,47 +503,82 @@ const TrainingSVM = () => {
                   }
 
                   if (value < form.getFieldValue('epochs') / 10) {
-                    return Promise.reject('Tidak boleh kurang dari 10% jumlah epochs')
+                    return Promise.reject(
+                      'Tidak boleh kurang dari 10% jumlah epochs'
+                    )
                   }
                   return Promise.resolve()
-                }
+                },
               },
               {
                 message: 'Tidak boleh lebih dari 50% jumlah epochs',
                 validator: (_, value) => {
                   if (value > form.getFieldValue('epochs') / 2) {
-                    return Promise.reject('Tidak boleh lebih dari 50% jumlah epochs')
+                    return Promise.reject(
+                      'Tidak boleh lebih dari 50% jumlah epochs'
+                    )
                   }
                   return Promise.resolve()
-                }
-              }
+                },
+              },
             ]}
           >
             <InputNumber
-              type='number'
+              type="number"
               placeholder={`Default = ${Math.round(defaultParams.epochs / 10)}`}
             />
           </Form.Item>
-          <Form.Item
-            className='text-center'
-          >
-            <Button
-              type="primary"
-              htmlType='submit'
-              loading={LoadingTraining}
-            >
+          <Form.Item className="text-center">
+            <Button type="primary" htmlType="submit" loading={LoadingTraining}>
               Latih Sekarang!
             </Button>
           </Form.Item>
         </Form>
 
+        {typeof window !== 'undefined' &&
+        model.model?.svm?.lossHistoryCheckpoint?.length ? (
+          <div className="mb-5">
+            <Chart
+              type="line"
+              options={{
+                theme: { mode: 'dark' },
+                title: { text: 'Riwayat Loss' },
+                stroke: {
+                  width: 2,
+                  curve: 'straight',
+                },
+                colors: ['#008ffb', '#00e396', '#ff5555'], // [2,1,3]  //#cd6012
+                markers: { shape: 'circle', size: 1 },
+                grid: {
+                  show: false,
+                },
+                xaxis: {
+                  title: { text: 'Epoch' },
+                  labels: {
+                    formatter: (value) =>
+                      isNaN(parseInt(value))
+                        ? value
+                        : (
+                            (parseInt(value) - 1) *
+                            (svmModel?.checkpointInterval ?? 1)
+                          ).toString(),
+                  },
+                },
+                yaxis: { title: { text: 'Loss' }, decimalsInFloat: 2 },
+              }}
+              series={lossHistories.map((item) => ({
+                name: kualitas.detransform(item.class),
+                data: item.data,
+              }))}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
+
         {report?.length ? (
           <>
-            <h1
-              className='subtitle'
-            >
-              Laporan Klasifikasi
-            </h1>
+            <h1 className="subtitle">Laporan Klasifikasi</h1>
             <Table
               dataSource={report}
               rowKey={(record) => record.label}
@@ -507,7 +587,16 @@ const TrainingSVM = () => {
                   title: '',
                   dataIndex: 'label',
                   key: 'label',
-                  render: (value) => !value.includes('avg') ? <span className='font-black'>{isNaN(value) ? value : kualitas.detransform(parseInt(value))}</span> : value
+                  render: (value) =>
+                    !value.includes('avg') ? (
+                      <span className="font-black">
+                        {isNaN(value)
+                          ? value
+                          : kualitas.detransform(parseInt(value))}
+                      </span>
+                    ) : (
+                      value
+                    ),
                 },
                 {
                   title: 'Presisi',
@@ -528,12 +617,14 @@ const TrainingSVM = () => {
                   title: '',
                   dataIndex: 'support',
                   key: 'support',
-                }
+                },
               ]}
               pagination={false}
             />
           </>
-        ) : <></>}
+        ) : (
+          <></>
+        )}
       </Modal>
     </div>
   )

@@ -4,7 +4,8 @@ const Footer = () => {
   return (
     <FooterBase
     >
-      Footer
+      <p>Hybrid SVM-KNN</p>
+      <p>Oleh : Dimas Lintang Nugroho</p>
     </FooterBase>
   )
 }
