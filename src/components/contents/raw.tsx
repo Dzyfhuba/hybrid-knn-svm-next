@@ -188,11 +188,11 @@ const Raw = () => {
       title: 'Kualitas',
       dataIndex: 'kualitas',
       sorter: true,
-      filters: [
-        { text: 'BAIK', value: 'BAIK' },
-        { text: 'SEDANG', value: 'SEDANG' },
-        { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      ],
+      // filters: [
+      //   { text: 'BAIK', value: 'BAIK' },
+      //   { text: 'SEDANG', value: 'SEDANG' },
+      //   { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
+      // ],
     },
     {
       title: 'Aksi',

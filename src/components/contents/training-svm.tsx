@@ -181,21 +181,11 @@ const TrainingSVM = () => {
       title: 'Aktual',
       dataIndex: data?.[0]?.actual ? 'actual' : 'kualitas',
       sorter: true,
-      filters: [
-        { text: 'BAIK', value: 'BAIK' },
-        { text: 'SEDANG', value: 'SEDANG' },
-        { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      ],
     },
     {
       title: 'Prediksi',
       dataIndex: 'prediction',
       // sorter: true,
-      // filters: [
-      //   { text: 'BAIK', value: 'BAIK' },
-      //   { text: 'SEDANG', value: 'SEDANG' },
-      //   { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      // ],
     },
   ]
 

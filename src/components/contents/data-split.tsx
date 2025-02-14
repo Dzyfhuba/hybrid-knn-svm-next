@@ -84,11 +84,6 @@ const DataSplit = () => {
       title: 'Kualitas',
       dataIndex: 'kualitas',
       sorter: true,
-      filters: [
-        { text: 'BAIK', value: 'BAIK' },
-        { text: 'SEDANG', value: 'SEDANG' },
-        { text: 'TIDAK SEHAT', value: 'TIDAK SEHAT' },
-      ],
     },
   ]
 
@@ -337,17 +332,23 @@ const DataSplit = () => {
               },
             ]}
           >
-            <InputNumber
+            <InputNumber<number>
               type="number"
               placeholder="Data Training (%)"
               addonAfter="%"
               className="w-full sm:w-max"
-              onKeyUp={(e) => {
-                const value = e.currentTarget.valueAsNumber || 0
-                const testing = 100 - value
-                setTraining(value)
+              onChange={(value) => {
+                const _value = value ?? 0
+                const testing = 100 - _value
+                setTraining(_value)
                 form.setFieldsValue({ testing })
               }}
+              // onKeyUp={(e) => {
+              //   const value = e.currentTarget.valueAsNumber || 0
+              //   const testing = 100 - value
+              //   setTraining(value)
+              //   form.setFieldsValue({ testing })
+              // }}
             />
           </Form.Item>
           <Form.Item

@@ -1,6 +1,9 @@
 'use client'
 
-import { excelToDataRawFormat } from '@/helpers/import-xlsx'
+import {
+  downloadTemplateExcel,
+  excelToDataRawFormat,
+} from '@/helpers/import-xlsx'
 import { Button, Modal, notification, Table, Upload, UploadFile } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { useEffect, useState } from 'react'
@@ -194,8 +197,15 @@ const ModalImportData = (props: Props) => {
             onChange={(pagination) => {
               setTableCurrentPage(pagination.current ?? 1)
             }}
+            className='mb-2'
           />
         </>
+        <Button
+          type="dashed"
+          onClick={() => downloadTemplateExcel()}
+        >
+          Download Template Excel
+        </Button>
       </Modal>
     </>
   )

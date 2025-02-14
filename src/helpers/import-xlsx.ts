@@ -135,3 +135,12 @@ export async function excelToDataRawFormat(file: File) {
   // console.log(dataArray, sheets)
   return dataArray
 }
+
+export async function downloadTemplateExcel() {
+  let wb = XLSX.utils.book_new()
+  let ws = XLSX.utils.aoa_to_sheet([['No', 'PM10', 'PM2.5', 'SO2', 'CO', 'O3', 'NO2', 'Kualitas']])
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Data')
+
+  XLSX.writeFile(wb, 'template.xlsx')
+}
