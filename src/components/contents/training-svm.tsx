@@ -541,6 +541,9 @@ const TrainingSVM = () => {
             <Chart
               type="line"
               options={{
+                chart: {
+                  toolbar: { show: false },
+                },
                 theme: { mode: 'dark' },
                 title: { text: 'Riwayat Loss' },
                 stroke: {

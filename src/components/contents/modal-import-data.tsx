@@ -25,6 +25,10 @@ const ModalImportData = (props: Props) => {
   const [fileImport, setFileImport] = useState<UploadFile | null>(null)
   const [loadingFileImport, setLoadingFileImport] = useState(false)
   const [loadingUpload, setLoadingUpload] = useState(false)
+  const [errorImport, setErrorImport] = useState<{
+    message: string
+    errors: { column: string; description: string }[]
+  } | null>(null)
 
   const fileList = fileImport ? [fileImport] : []
 
@@ -67,10 +71,19 @@ const ModalImportData = (props: Props) => {
 
   const handleImportFile = async (file?: File) => {
     setLoadingFileImport(true)
+    let errorData = null
     if (file) {
-      const rawData = await excelToDataRawFormat(file)
-      setDataImport(rawData)
+      try {
+        const rawData = await excelToDataRawFormat(file)
+        setDataImport(rawData)
+      } catch (error) {
+        const _error = error as { errors: []; message: string }
+        setDataImport([])
+        errorData = { errors: _error?.errors, message: _error?.message }
+      }
     } else setDataImport([])
+
+    setErrorImport(errorData)
     setLoadingFileImport(false)
   }
 
@@ -130,25 +143,20 @@ const ModalImportData = (props: Props) => {
         }}
         title="Impor Data Excel"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() => {
+          setIsModalOpen(false)
+
+          //reset data on modal close
+          setDataImport([])
+          setErrorImport(null)
+          setFileImport(null)
+          setTableCurrentPage(1)
+        }}
         footer={null}
       >
         <div className="my-10">
           <p className="mb-2">Pilih File Excel:</p>
           <div className="flex justify-between gap-2">
-            {/* <Input
-              type="file"
-              accept=".xlsx,.xls"
-              className="cursor-pointer"
-              onChange={async (value) => {
-                setDataImport([])
-                console.log('onchange')
-                const file = value.target.files?.[0]
-                if (file) handleImportFile(file)
-
-                console.log(file)
-              }}
-            /> */}
             <Upload
               className="w-full"
               beforeUpload={(file) => {
@@ -184,6 +192,23 @@ const ModalImportData = (props: Props) => {
         </div>
 
         <>
+          {errorImport ? (
+            <div className="mb-10">
+              <b className="capitalize text-red-500">{errorImport.message}</b>
+              <p></p>
+              <div className='max-h-80 overflow-auto'>
+                Column Error :{' '}
+                {errorImport.errors?.map((item, index) => (
+                  <span key={index}>
+                    <b>{item?.column}</b>
+                    <span className="opacity-60"> ({item?.description}).</span>
+                    {errorImport.errors?.length > index + 1 ? ' | ' : ''}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <Table<DataType>
             columns={columns}
             rowKey={(record) => record.id ?? Math.random()}
@@ -192,19 +217,16 @@ const ModalImportData = (props: Props) => {
             loading={loadingFileImport || loadingUpload}
             caption={
               dataImport.length > 0
-                ? `Total Data: ${dataImport.length} (terseleksi)`
+                ? `Total Data: ${dataImport.length}`
                 : 'Format Data Excel'
             }
             onChange={(pagination) => {
               setTableCurrentPage(pagination.current ?? 1)
             }}
-            className='mb-2'
+            className="mb-2"
           />
         </>
-        <Button
-          type="dashed"
-          onClick={() => downloadTemplateExcel()}
-        >
+        <Button type="dashed" onClick={() => downloadTemplateExcel()}>
           Download Template Excel
         </Button>
       </Modal>
