@@ -197,7 +197,7 @@ const DataSplit = () => {
       .then((res) => res.json())
       .then((res) => {
         setDataTrain(res.data ?? [])
-        console.log(res.total)
+        // console.log(res.total)
         setTotalTrain(res.total)
         setLoadingTrain(false)
         setTableParamsTrain({

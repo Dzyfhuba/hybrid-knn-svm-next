@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Checkbox,
   Divider,
   GetProp,
   message,
@@ -14,6 +15,8 @@ import { useEffect, useState } from 'react'
 import qs from 'qs'
 import ModalForm from './form'
 import ModalImportData from './modal-import-data'
+import { useStoreState } from '@/state/hooks'
+import axios from 'axios'
 
 interface DataType {
   id: number
@@ -37,7 +40,10 @@ type ColumnsType<T extends object = object> = TableProps<T>['columns']
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
+  const session = useStoreState((state) => state.session)
   const [modal, modalContext] = Modal.useModal()
+
+  const [isClient, setIsClient] = useState(false)
   const [data, setData] = useState<DataType[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -49,6 +55,8 @@ const Raw = () => {
   })
   const [isModalopen, setIsModalopen] = useState(false)
   const [editData, setEditData] = useState<DataType | null>(null)
+  const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([])
+  const [allIdRawData, setAllIdRawData] = useState<number[]>([])
 
   const selfUrl =
     typeof window === 'undefined'
@@ -67,7 +75,7 @@ const Raw = () => {
     fetch(`${selfUrl}/api/raw?${qs.stringify(parseParams(tableParams))}`)
       .then((res) => res.json())
       .then((res) => {
-        setData(res.data)
+        setData(res.data ?? [])
         setLoading(false)
         setTotal(res.total)
         setTableParams({
@@ -91,6 +99,20 @@ const Raw = () => {
     tableParams?.sortField,
     JSON.stringify(tableParams.filters),
   ])
+
+  const fetchAllIdRawData = () => {
+    axios
+      .get('/api/raw/all/id')
+      .then((res) =>
+        setAllIdRawData(res.data.data?.map((item: { id: string }) => item.id))
+      )
+      .catch(() => {})
+  }
+
+  useEffect(() => {
+    fetchAllIdRawData()
+    setIsClient(true)
+  }, [])
 
   const handleTableChange: TableProps<DataType>['onChange'] = (
     pagination,
@@ -119,6 +141,7 @@ const Raw = () => {
         try {
           const response = await fetch(`/api/raw?id=${id}`, {
             method: 'DELETE',
+            headers: { Authorization: session.token ?? '' },
           })
 
           if (!response.ok) {
@@ -128,6 +151,7 @@ const Raw = () => {
 
           message.success('Data berhasil dihapus')
           fetchData()
+          fetchAllIdRawData()
         } catch (error) {
           if (error instanceof Error) {
             console.error('Error pada handleDelete:', error.message)
@@ -140,13 +164,39 @@ const Raw = () => {
     })
   }
 
-  // const handleExport = () => {
-  //   console.log('Export data triggered')
-  // }
+  const handleDeleteSelectedData = () => {
+    modal.confirm({
+      title: 'Konfirmasi Penghapusan',
+      content: `Apakah Anda yakin ingin menghapus ${selectedRowKeys.length} data ini?`,
+      okText: 'Ya',
+      cancelText: 'Batal',
+      onOk: async () => {
+        try {
+          const response = await fetch('/api/raw/all', {
+            method: 'DELETE',
+            body: JSON.stringify(selectedRowKeys),
+          })
 
-  // const handleImport = () => {
-  //   console.log('Import data triggered')
-  // }
+          if (!response.ok) {
+            const errorText = await response.text()
+            throw new Error(`Gagal menghapus data: ${errorText}`)
+          }
+
+          message.success('Data berhasil dihapus')
+          setSelectedRowKeys([])
+          fetchData()
+          fetchAllIdRawData()
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error('Error pada handleDelete:', error.message)
+            message.error(error.message)
+          } else {
+            message.error('Terjadi kesalahan')
+          }
+        }
+      },
+    })
+  }
 
   const columns: ColumnsType<DataType> = [
     {
@@ -196,29 +246,32 @@ const Raw = () => {
     },
     {
       title: 'Aksi',
-      render: (_, record) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button
-            type="primary"
-            style={{ borderRadius: '4px' }}
-            onClick={() => {
-              setEditData(record)
-              setIsModalopen(true)
-            }}
-          >
-            Edit
-          </Button>
+      render: (_, record) =>
+        isClient && session.token ? (
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              type="primary"
+              style={{ borderRadius: '4px' }}
+              onClick={() => {
+                setEditData(record)
+                setIsModalopen(true)
+              }}
+            >
+              Edit
+            </Button>
 
-          <Button
-            type="primary"
-            danger
-            style={{ borderRadius: '4px' }}
-            onClick={() => handleDelete(record.id)}
-          >
-            Hapus
-          </Button>
-        </div>
-      ),
+            <Button
+              type="primary"
+              danger
+              style={{ borderRadius: '4px' }}
+              onClick={() => handleDelete(record.id)}
+            >
+              Hapus
+            </Button>
+          </div>
+        ) : (
+          <></>
+        ),
     },
   ]
 
@@ -227,20 +280,34 @@ const Raw = () => {
       {modalContext}
       <div className="flex justify-between items-center pt-10">
         <h2 className="text-xl font-bold">Data Mentah</h2>
-        <ModalImportData onUploadSuccess={() => fetchData()} />
+        {isClient && !session.isLoading && session.token ? (
+          <ModalImportData
+            totalCurrentData={total}
+            onUploadSuccess={() => {
+              fetchData()
+              fetchAllIdRawData()
+            }}
+          />
+        ) : (
+          <></>
+        )}
       </div>
       <Divider />
       <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
-        <Button
-          type="primary"
-          onClick={() => {
-            setEditData(null)
-            setIsModalopen(true)
-          }}
-          style={{ marginBottom: 16 }}
-        >
-          Tambah Data
-        </Button>
+        {isClient && session.token ? (
+          <Button
+            type="primary"
+            onClick={() => {
+              setEditData(null)
+              setIsModalopen(true)
+            }}
+            style={{ marginBottom: 16 }}
+          >
+            Tambah Data
+          </Button>
+        ) : (
+          <></>
+        )}
         {/* <Button type="primary" onClick={handleExport}>
           Ekspor Data
         </Button>
@@ -256,7 +323,62 @@ const Raw = () => {
         loading={loading}
         onChange={handleTableChange}
         scroll={{ x: 1000 }}
-        caption={data.length > 0 ? `Total Data: ${total}` : undefined}
+        caption={
+          <div>
+            {data.length > 0 ? `Total Data: ${total}` : undefined}
+
+            {session.token && selectedRowKeys.length ? (
+              <div className="mt-2 space-x-5">
+                <span>Dipilih: {selectedRowKeys.length}</span>
+                <Button
+                  type="primary"
+                  size="small"
+                  danger
+                  style={{ borderRadius: '4px' }}
+                  onClick={handleDeleteSelectedData}
+                >
+                  Hapus data yang dipilih
+                </Button>
+              </div>
+            ) : (
+              ''
+            )}
+          </div>
+        }
+        rowSelection={{
+          columnTitle() {
+            return (
+              <Checkbox
+                disabled={loading}
+                indeterminate={
+                  selectedRowKeys.length &&
+                  selectedRowKeys.length !== allIdRawData.length
+                    ? true
+                    : false
+                }
+                onChange={(e) => {
+                  if (e.target.checked) setSelectedRowKeys(allIdRawData)
+                  else setSelectedRowKeys([])
+                }}
+                checked={
+                  !!(
+                    selectedRowKeys.length &&
+                    selectedRowKeys.length == allIdRawData.length
+                  )
+                }
+              ></Checkbox>
+            )
+          },
+          selectedRowKeys: selectedRowKeys,
+          onSelect: (record, isSelect) => {
+            //for manual fillter select data
+            const newSelectedRowKeys = isSelect
+              ? [...selectedRowKeys, record.id]
+              : selectedRowKeys.filter((key) => key !== record.id)
+
+            setSelectedRowKeys(newSelectedRowKeys)
+          },
+        }}
       />
       <ModalForm
         open={isModalopen}
@@ -269,6 +391,7 @@ const Raw = () => {
           setIsModalopen(false)
           setEditData(null)
           fetchData()
+          fetchAllIdRawData()
         }}
         editData={editData || undefined}
       />

@@ -7,6 +7,8 @@ type Props = {
   children?: React.ReactNode
 }
 
+store.dispatch.fetchSession()
+
 const ClientWrapper = (props: Props) => {
   // if (typeof window !== 'undefined') {
   return (

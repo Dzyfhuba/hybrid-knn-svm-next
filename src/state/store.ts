@@ -1,3 +1,4 @@
+import supabase from '@/libraries/supabase'
 import { Database } from '@/types/database'
 import axios from 'axios'
 import { action, Action, createStore, thunk, Thunk } from 'easy-peasy'
@@ -9,6 +10,9 @@ export interface GlobalState {
   fetchModel: Thunk<GlobalState>
   predictionSvm : Database['svm_knn']['Tables']['prediction_svm']['Row'][]
   setPredictionSvm : Action<GlobalState, ((model: GlobalState['predictionSvm']) => GlobalState['predictionSvm']) | GlobalState['predictionSvm']>
+  session: {token: string | null, isLoading: boolean, email: string}
+  setSession: Action<GlobalState, {token: string | null, isLoading: boolean, email: string}>
+  fetchSession: Thunk<GlobalState>
 }
 
 const store = createStore<GlobalState>({
@@ -34,6 +38,16 @@ const store = createStore<GlobalState>({
   setPredictionSvm : action((state, payload) => {
     state.predictionSvm = typeof payload === 'function' ? payload(state.predictionSvm) : payload
   }),
+  session: {token: null, isLoading: true, email: ''},
+  setSession : action((state, payload) => {
+    state.session = {token: payload.token, email: payload.email, isLoading: payload.isLoading}
+  }),
+  fetchSession: thunk(async (actions) => {
+    const { data, error } = await supabase.auth.getSession()
+    console.log(data)
+    if(error == null && data.session !== null) actions.setSession({token: data.session.access_token, isLoading: false, email: data.session.user.email ?? ''})
+      else actions.setSession({token: null, isLoading: false, email: ''})
+  })
 })
 
 export default store

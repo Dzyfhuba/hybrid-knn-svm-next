@@ -4,20 +4,31 @@ import {
   downloadTemplateExcel,
   excelToDataRawFormat,
 } from '@/helpers/import-xlsx'
-import { Button, Modal, notification, Table, Upload, UploadFile } from 'antd'
+import {
+  Alert,
+  Button,
+  Modal,
+  notification,
+  Table,
+  Upload,
+  UploadFile,
+} from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { useState } from 'react'
 import { UploadOutlined } from '@ant-design/icons'
 import { Database } from '@/types/database'
+import { useStoreState } from '@/state/hooks'
 
 type Props = {
   onUploadSuccess?(): void
+  totalCurrentData?: number
 }
 
 type DataType = Database['svm_knn']['Tables']['raw']['Insert']
 
 const ModalImportData = (props: Props) => {
   const [notify, notificationContext] = notification.useNotification()
+  const session = useStoreState((state) => state.session)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [dataImport, setDataImport] = useState<DataType[]>([])
@@ -30,6 +41,9 @@ const ModalImportData = (props: Props) => {
     errors: { column: string; description: string }[]
   } | null>(null)
 
+  const dataMaximal = 5000
+  const totalData = (props.totalCurrentData ?? 0) + dataImport.length
+  const isDataOverCapacity = totalData > dataMaximal
   const fileList = fileImport ? [fileImport] : []
 
   const columns: ColumnsType<DataType> = [
@@ -97,6 +111,7 @@ const ModalImportData = (props: Props) => {
         method,
         headers: {
           'Content-Type': 'application/json',
+          Authorization: session.token ?? '',
         },
         body: JSON.stringify(data),
       })
@@ -181,7 +196,7 @@ const ModalImportData = (props: Props) => {
               </Button>
             </Upload>
             <Button
-              disabled={!dataImport.length}
+              disabled={!dataImport.length || isDataOverCapacity}
               type="primary"
               loading={loadingUpload}
               onClick={() => handleUploadData(dataImport)}
@@ -196,7 +211,7 @@ const ModalImportData = (props: Props) => {
             <div className="mb-10">
               <b className="capitalize text-red-500">{errorImport.message}</b>
               <p></p>
-              <div className='max-h-80 overflow-auto'>
+              <div className="max-h-80 overflow-auto">
                 Column Error :{' '}
                 {errorImport.errors?.map((item, index) => (
                   <span key={index}>
@@ -209,6 +224,22 @@ const ModalImportData = (props: Props) => {
             </div>
           ) : null}
 
+          <div className="text-gray-500 mb-5">
+            <p>Kapasitas data maksimal: {dataMaximal}</p>
+            <p>Jumlah data sekarang: {props.totalCurrentData}</p>
+            <p>Jumlah data impor: {dataImport.length}</p>
+            <p>Total data: {dataImport.length + (props.totalCurrentData??0)}</p>
+            {isDataOverCapacity ? (
+              <Alert
+                message="Total data melebihi kapasitas maksimal"
+                type="error"
+                showIcon
+              />
+            ) : (
+              <></>
+            )}
+          </div>
+
           <Table<DataType>
             columns={columns}
             rowKey={(record) => record.id ?? Math.random()}
@@ -217,7 +248,7 @@ const ModalImportData = (props: Props) => {
             loading={loadingFileImport || loadingUpload}
             caption={
               dataImport.length > 0
-                ? `Total Data: ${dataImport.length}`
+                ? `Jumlah Data Impor: ${dataImport.length}`
                 : 'Format Data Excel'
             }
             onChange={(pagination) => {

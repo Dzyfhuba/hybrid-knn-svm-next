@@ -278,17 +278,6 @@ const TrainingSVM = () => {
 
     console.log(report.printReport())
 
-    console.log('Saving model...')
-    putModel({
-      ...model,
-      svm_report: report.report(),
-      model: {
-        ////@ts-expect-error the model type is json but get object
-        ...model?.model,
-        svm: svm.getTrainedResults(),
-      },
-    })
-
     const dataWithPrediction = train.map((item, index) => ({
       ...item,
       actual: item.kualitas,
@@ -312,8 +301,17 @@ const TrainingSVM = () => {
         content: 'Terjadi kesalahan saat melakukan proses pelatihan.',
       })
     } finally {
-      // setDataActual(train.map(item => item.kualitas!))
-      // setDataPrediction(prediction.map((item) => kualitas.detransform(item)).reverse())
+      console.log('Saving model...')
+      putModel({
+        ...model,
+        svm_report: report.report(),
+        model: {
+          ////@ts-expect-error the model type is json but get object
+          ...model?.model,
+          svm: svm.getTrainedResults(),
+        },
+      })
+      
       setPredictionSvm(dataWithPrediction)
       setData(dataWithPrediction.reverse() as DataType[])
 

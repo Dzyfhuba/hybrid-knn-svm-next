@@ -57,6 +57,24 @@ export async function GET(request: NextRequest) {
 
 
 export async function POST(request: NextRequest) {
+  const AuthToken = request.headers.get('Authorization') ?? ''
+  const {error} = await supabase.auth.getUser(AuthToken)
+  if (error) {
+    return new Response(
+      JSON.stringify({
+        message: 'Not Authenticated',
+      }),
+      {
+        status: 401,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
+
+
+
   try {
     const body = await request.json()
     
@@ -108,6 +126,22 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const AuthToken = request.headers.get('Authorization') ?? ''
+  const {error: authError} = await supabase.auth.getUser(AuthToken)
+  if (authError) {
+    return new Response(
+      JSON.stringify({
+        message: 'Not Authenticated',
+      }),
+      {
+        status: 401,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
+
   const url = request.nextUrl
   const id = parseInt(url.searchParams.get('id') || '0')
   const body = await request.json()
@@ -158,6 +192,22 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const AuthToken = request.headers.get('Authorization') ?? ''
+  const {error} = await supabase.auth.getUser(AuthToken)
+  if (error) {
+    return new Response(
+      JSON.stringify({
+        message: 'Not Authenticated',
+      }),
+      {
+        status: 401,
+        headers: {
+          'content-type': 'application/json',
+        },
+      }
+    )
+  }
+
   try {
     const url = request.nextUrl
     const id = parseInt(url.searchParams.get('id') || '0')
