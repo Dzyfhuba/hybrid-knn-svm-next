@@ -1,6 +1,5 @@
 'use client'
 
-import supabase from '@/libraries/supabase'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Button } from 'antd'
 import { Footer as FooterBase } from 'antd/es/layout/layout'
@@ -9,7 +8,7 @@ import { useEffect, useState } from 'react'
 
 const Footer = () => {
   const session = useStoreState((state) => state.session)
-  const setSession = useStoreActions((actions) => actions.setSession)
+  const deleteSession = useStoreActions((actions) => actions.deleteSession)
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -29,8 +28,7 @@ const Footer = () => {
             <Button
               type="link"
               onClick={async () => {
-                await supabase.auth.signOut({ scope: 'global' })
-                setSession({ token: null, isLoading: false, email: '' })
+                deleteSession()
               }}
             >
               Logout

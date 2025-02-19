@@ -1,16 +1,17 @@
 'use client'
 
-import supabase from '@/libraries/supabase'
 import { useStoreActions, useStoreState } from '@/state/hooks'
 import { Button, Form, FormProps, Input } from 'antd'
 import { Content } from 'antd/es/layout/layout'
 import useNotification from 'antd/es/notification/useNotification'
+import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
 function Login() {
   const session = useStoreState((state) => state.session)
   const setSession = useStoreActions((actions) => actions.setSession)
   const [notification, notificationContex] = useNotification()
+  const [loading, setLoading] = useState(false)
 
   const [isClient, setIsClient] = useState(false)
 
@@ -22,25 +23,28 @@ function Login() {
     email: string
     password: string
   }>['onFinish'] = async (values) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    })
+    setLoading(true)
+    try {
+      const data = await axios.post(
+        '/api/login',
+        JSON.stringify({ email: values.email, password: values.password })
+      )
 
-    if (error) {
+      localStorage.setItem('session', JSON.stringify(data.data || ''))
+      setSession({
+        token: data.data?.access_token,
+        isLoading: false,
+        email: data.data?.user.email ?? '',
+      })
+      notification.success({ message: 'Login Success' })
+    } catch (error) {
       notification.error({
         message: 'Login Failed',
-        description: error.message,
+        //@ts-expect-error type not setup
+        description: error?.response.data.errors,
       })
-    }
-
-    if (error == null && data.session !== null) {
-      notification.success({ message: 'Login Success' })
-      setSession({
-        token: data.session?.access_token,
-        isLoading: false,
-        email: data.session?.user.email ?? '',
-      })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -66,7 +70,7 @@ function Login() {
             ) : (
               <div>
                 <h2 className="text-xl mb-5">Login Admin</h2>
-                <Form layout="vertical" onFinish={handleLogin}>
+                <Form disabled={loading} layout="vertical" onFinish={handleLogin}>
                   <Form.Item
                     name={'email'}
                     label="Email"
@@ -83,7 +87,7 @@ function Login() {
                   >
                     <Input.Password />
                   </Form.Item>
-                  <Button type="primary" htmlType="submit">
+                  <Button loading={loading} type="primary" htmlType="submit">
                     Login
                   </Button>
                 </Form>

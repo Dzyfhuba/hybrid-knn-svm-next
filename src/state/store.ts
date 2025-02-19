@@ -1,4 +1,3 @@
-import supabase from '@/libraries/supabase'
 import { Database } from '@/types/database'
 import axios from 'axios'
 import { action, Action, createStore, thunk, Thunk } from 'easy-peasy'
@@ -12,6 +11,7 @@ export interface GlobalState {
   setPredictionSvm : Action<GlobalState, ((model: GlobalState['predictionSvm']) => GlobalState['predictionSvm']) | GlobalState['predictionSvm']>
   session: {token: string | null, isLoading: boolean, email: string}
   setSession: Action<GlobalState, {token: string | null, isLoading: boolean, email: string}>
+  deleteSession: Action<GlobalState>
   fetchSession: Thunk<GlobalState>
 }
 
@@ -42,10 +42,21 @@ const store = createStore<GlobalState>({
   setSession : action((state, payload) => {
     state.session = {token: payload.token, email: payload.email, isLoading: payload.isLoading}
   }),
+  deleteSession : action((state, ) => {
+    localStorage.removeItem('session')
+    state.session = { token: '', email: '', isLoading: false }
+  }),
   fetchSession: thunk(async (actions) => {
-    const { data, error } = await supabase.auth.getSession()
-    console.log(data)
-    if(error == null && data.session !== null) actions.setSession({token: data.session.access_token, isLoading: false, email: data.session.user.email ?? ''})
+    // const { data, error } = await supabase.auth.getSession()
+    const data = JSON.parse(localStorage.getItem('session') ?? '')
+
+    //check token expiration
+    if(data && +new Date() > data.expires_at * 1000 ){
+      actions.deleteSession()
+      return
+    }
+
+    if(data) actions.setSession({token: data.access_token, isLoading: false, email: data.user.email ?? ''})
       else actions.setSession({token: null, isLoading: false, email: ''})
   })
 })
