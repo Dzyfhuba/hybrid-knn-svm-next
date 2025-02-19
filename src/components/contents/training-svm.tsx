@@ -17,9 +17,10 @@ import {
 import { FilterValue, SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import qs from 'qs'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import TextPrimary from '../text-primary'
 import dynamic from 'next/dynamic'
+import ButtonExportExcel from './button-export-excel'
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false })
 
 interface DataType {
@@ -311,7 +312,7 @@ const TrainingSVM = () => {
           svm: svm.getTrainedResults(),
         },
       })
-      
+
       setPredictionSvm(dataWithPrediction)
       setData(dataWithPrediction.reverse() as DataType[])
 
@@ -319,15 +320,53 @@ const TrainingSVM = () => {
     }
   }
 
+  const lossHistoryToExport = useMemo(() => {
+    const ransform = lossHistories[0]?.data.map((_, index) => {
+      const lossObj: Record<string, unknown> = {
+        Epoch: index * (svmModel?.checkpointInterval ?? 1),
+      }
+
+      for (const cls of lossHistories) {
+        lossObj[kualitas.detransform(cls.class)] = cls.data[index]
+      }
+
+      return lossObj
+    })
+
+    return ransform || []
+  }, [svmModel])
+
   return (
     <div>
       {modalContext}
       <h2 className="text-xl font-bold pt-10">Pelatihan (SVM)</h2>
       <Divider />
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4 flex justify-between items-center">
         <Button type="primary" onClick={() => setModalVisible(true)}>
           Proses Pelatihan
         </Button>
+        <ButtonExportExcel
+          url={`/api/data-prediction-svm/all${
+            reference ? `?reference=${reference}` : ''
+          }`}
+          fileName={`Pelatihan_SVM_${reference}`}
+          additionalData={[
+            {
+              sheetName: 'Report',
+              data:
+                report?.map((item) => ({
+                  ...item,
+                  label: isNaN(parseInt(item.label))
+                    ? item.label
+                    : kualitas.detransform(parseInt(item.label)),
+                })) || [],
+            },
+            {
+              sheetName: 'Loss History',
+              data: lossHistoryToExport,
+            },
+          ]}
+        />
       </div>
 
       <Table<DataType>

@@ -17,6 +17,7 @@ import ModalForm from './form'
 import ModalImportData from './modal-import-data'
 import { useStoreState } from '@/state/hooks'
 import axios from 'axios'
+import ButtonExportExcel from './button-export-excel'
 
 interface DataType {
   id: number
@@ -40,7 +41,7 @@ type ColumnsType<T extends object = object> = TableProps<T>['columns']
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
-  const session = useStoreState((state) => state.session)
+  const { session, model } = useStoreState((state) => state)
   const [modal, modalContext] = Modal.useModal()
 
   const [isClient, setIsClient] = useState(false)
@@ -293,7 +294,7 @@ const Raw = () => {
         )}
       </div>
       <Divider />
-      <div style={{ marginBottom: 16, display: 'flex', gap: '8px' }}>
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
         {isClient && session.token ? (
           <Button
             type="primary"
@@ -308,6 +309,10 @@ const Raw = () => {
         ) : (
           <></>
         )}
+        <ButtonExportExcel
+          fileName={`Data_Raw`}
+          url={'/api/raw?pageSize=5000'}
+        />
         {/* <Button type="primary" onClick={handleExport}>
           Ekspor Data
         </Button>
