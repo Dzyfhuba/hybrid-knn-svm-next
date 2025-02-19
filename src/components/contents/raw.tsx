@@ -41,7 +41,7 @@ type ColumnsType<T extends object = object> = TableProps<T>['columns']
 type TablePaginationConfig = Exclude<GetProp<TableProps, 'pagination'>, boolean>
 
 const Raw = () => {
-  const { session, model } = useStoreState((state) => state)
+  const { session } = useStoreState((state) => state)
   const [modal, modalContext] = Modal.useModal()
 
   const [isClient, setIsClient] = useState(false)
@@ -310,7 +310,7 @@ const Raw = () => {
           <></>
         )}
         <ButtonExportExcel
-          fileName={`Data_Raw`}
+          fileName={'Data_Raw'}
           url={'/api/raw?pageSize=5000'}
         />
         {/* <Button type="primary" onClick={handleExport}>

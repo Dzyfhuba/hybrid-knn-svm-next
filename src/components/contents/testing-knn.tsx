@@ -18,7 +18,6 @@ import kualitas from '@/helpers/kualitas'
 import axios from 'axios'
 import TextPrimary from '../text-primary'
 import ClassificationReport from '@/models/classification-report'
-import { exportToExcel } from '@/helpers/export-xlsx'
 import ButtonExportExcel from './button-export-excel'
 
 interface DataType {
