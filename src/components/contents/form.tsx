@@ -7,6 +7,7 @@ import ISPU from '@/models/ispu'
 import { Criterion } from '@/types/criterion'
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
+import { useStoreState } from '@/state/hooks'
 
 interface DataType {
   id: number;
@@ -29,6 +30,7 @@ interface ModalCreateProps {
 const ENABLE_IPSU_PREVIEW = parseInt(process.env.NEXT_PUBLIC_ENABLE_ISPU_PREVIEW || '0') === 1
 
 const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => {
+  const session = useStoreState((state) => state.session)
   const [form] = Form.useForm()
   const [notify, notificationContext] = notification.useNotification()
   const [loading, setLoading] = useState(false)
@@ -84,6 +86,7 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
         method,
         headers: {
           'Content-Type': 'application/json',
+          Authorization: session.token ?? '',
         },
         body: JSON.stringify(newData),
       })

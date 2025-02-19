@@ -18,6 +18,7 @@ import kualitas from '@/helpers/kualitas'
 import axios from 'axios'
 import TextPrimary from '../text-primary'
 import ClassificationReport from '@/models/classification-report'
+import ButtonExportExcel from './button-export-excel'
 
 interface DataType {
   id: number
@@ -227,17 +228,6 @@ const PengujianKNN = () => {
       }))
     )
 
-    console.log('Saving model...')
-    putModel({
-      ...model,
-      knn_report: report.report(),
-      model: {
-        //// @ts-expect-error the model type is json but get object
-        ...model?.model,
-        knn: { distance: knn.getDistanceRecords(), k },
-      },
-    })
-
     const dataWithPrediction = cleanTest.map((item, index) => ({
       ...item,
       actual: item.kualitas,
@@ -261,6 +251,17 @@ const PengujianKNN = () => {
         content: 'Terjadi kesalahan saat melakukan proses pengujian.',
       })
     } finally {
+      console.log('Saving model...')
+      putModel({
+        ...model,
+        knn_report: report.report(),
+        model: {
+          //// @ts-expect-error the model type is json but get object
+          ...model?.model,
+          knn: { distance: knn.getDistanceRecords(), k },
+        },
+      })
+
       setLoadingTesting(false)
       setData(dataWithPrediction.reverse())
     }
@@ -317,12 +318,32 @@ const PengujianKNN = () => {
   return (
     <div>
       {modalContext}
-      <h2 className="text-xl font-bold pt-10">Pengujian (KNN)</h2>
+      <div className="flex justify-between items-center pt-10">
+        <h2 className="text-xl font-bold">Pengujian (KNN)</h2>
+      </div>
       <Divider />
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4 flex justify-between items-center">
         <Button type="primary" onClick={() => setModalVisible(true)}>
           Proses Pengujian
         </Button>
+        <ButtonExportExcel
+          url={`/api/data-prediction-knn?pageSize=5000${
+            reference ? `&reference=${reference}` : ''
+          }`}
+          fileName={`Pengujian_KNN_${reference}`}
+          additionalData={[
+            {
+              sheetName: 'Report',
+              data:
+                report?.map((item) => ({
+                  ...item,
+                  label: isNaN(parseInt(item.label))
+                    ? item.label
+                    : kualitas.detransform(parseInt(item.label)),
+                })) || [],
+            },
+          ]}
+        />
       </div>
 
       <Table<DataType>

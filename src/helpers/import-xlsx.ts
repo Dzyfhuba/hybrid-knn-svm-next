@@ -15,14 +15,6 @@ export function reader(file: File) {
       const arrayBuffer = event?.target?.result as ArrayBuffer
       //   let array = new Uint8Array(arrayBuffer)
 
-      //   // Display some information about the file
-      //   let fileSize = arrayBuffer.byteLength
-      //   let bytes = []
-      //   for (let i = 0; i < Math.min(20, fileSize); i++) {
-      //     bytes.push(array[i])
-      //   }
-      //   console.log('ArrayBuffer:', arrayBuffer)
-
       resolve(arrayBuffer)
     }
 
@@ -42,6 +34,7 @@ export async function excelToDataRawFormat(file: File) {
   const sheets = workbook.Sheets
 
   const dataArray: DataType[] = []
+  const columnsError: { column: string; description: string }[] = []
 
   //loop the sheets
   for (const keySheet in sheets) {
@@ -87,19 +80,42 @@ export async function excelToDataRawFormat(file: File) {
               (columnAlphabet == 'H' && value == 'KUALITAS')
             )
           ) {
-            console.error('format tidak sesuai', `(kolom : ${columnAlphabet})`)
-            return [] //break
+            // console.error(
+            //   'template tidak sesuai',
+            //   `(kolom : ${columnAlphabet})`
+            // )
+            columnsError.push({
+              column: keySheetItem,
+              description: 'template tidak sesuai',
+            })
+            break
           }
         } else {
           const valueInNumber =
-            columnAlphabet == 'H' || columnAlphabet == 'A' //kolom kualitas & nomer
+            columnAlphabet == 'H' //kolom kualitas
               ? 0 // | value
               : isNaN(parseInt(value))
               ? null
               : parseFloat(value)
 
           //skip insert data when is null
-          if (valueInNumber == null) continue
+          if (valueInNumber == null || valueInNumber < 0) {
+            //remove history of object item
+            if (columnAlphabet == 'B') delete dataItemObj['pm10']
+            if (columnAlphabet == 'C') delete dataItemObj['pm2_5']
+            if (columnAlphabet == 'D') delete dataItemObj['so2']
+            if (columnAlphabet == 'E') delete dataItemObj['co']
+            if (columnAlphabet == 'F') delete dataItemObj['o3']
+            if (columnAlphabet == 'G') delete dataItemObj['no2']
+            // console.error('format tidak sesuai', `(kolom : ${keySheetItem})`)
+            columnsError.push({
+              column: keySheetItem,
+              description:
+                'format tidak sesuai, harus berupa angka dan bernilai positif',
+            })
+
+            continue
+          }
 
           //insert column data
           if (columnAlphabet == 'A') dataItemObj['id'] = dataArray.length + 1
@@ -120,6 +136,16 @@ export async function excelToDataRawFormat(file: File) {
               //check item/column length
               if (dataItemlength == totalColumn)
                 dataArray.push({ ...dataItemObj })
+            } else {
+              // console.error(
+              //   'format kualitas tidak sesuai',
+              //   `(kolom : ${keySheetItem})`
+              // )
+              columnsError.push({
+                column: keySheetItem,
+                description:
+                  'format kualitas tidak sesuai, kualitas terdiri dari ("Baik", "Sedang", "Tidak Sehat", "Sangat Tidak Sehat", "Berbahaya")',
+              })
             }
 
             //end of column
@@ -132,13 +158,18 @@ export async function excelToDataRawFormat(file: File) {
     break
   }
 
-  // console.log(dataArray, sheets)
-  return dataArray
+  return new Promise<DataType[]>((resolve, reject) => {
+    if (columnsError.length) {
+      reject({ message: 'Terdapat beberapa kesalahan format pada isi kolom!', errors: columnsError })
+    } else resolve(dataArray)
+  })
 }
 
 export async function downloadTemplateExcel() {
   const wb = XLSX.utils.book_new()
-  const ws = XLSX.utils.aoa_to_sheet([['No', 'PM10', 'PM2.5', 'SO2', 'CO', 'O3', 'NO2', 'Kualitas']])
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['No', 'PM10', 'PM2.5', 'SO2', 'CO', 'O3', 'NO2', 'Kualitas'],
+  ])
 
   XLSX.utils.book_append_sheet(wb, ws, 'Data')
 

@@ -26,11 +26,10 @@ export const metadata: Metadata = {
   description: process.env.NEXT_PUBLIC_APP_DESCRIPTION,
 }
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html lang="id">
@@ -45,12 +44,11 @@ export default function RootLayout({
           <AntProvider>
             <Layout>
               <Navigation />
-              <Layout
-              >
-                {children}
-              </Layout>
+              <Layout>{children}</Layout>
               <Divider />
-              <Footer />
+              <ClientWrapper>
+                <Footer />
+              </ClientWrapper>
             </Layout>
           </AntProvider>
         </AntdRegistry>

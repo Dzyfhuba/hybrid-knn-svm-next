@@ -15,6 +15,7 @@ import { SorterResult } from 'antd/es/table/interface'
 import axios from 'axios'
 import QueryString from 'qs'
 import { useEffect, useState } from 'react'
+import ButtonExportExcel from './button-export-excel'
 
 interface TableParams {
   pagination?: TablePaginationConfig
@@ -197,7 +198,7 @@ const DataSplit = () => {
       .then((res) => res.json())
       .then((res) => {
         setDataTrain(res.data ?? [])
-        console.log(res.total)
+        // console.log(res.total)
         setTotalTrain(res.total)
         setLoadingTrain(false)
         setTableParamsTrain({
@@ -385,7 +386,15 @@ const DataSplit = () => {
         <></>
       )}
       <div>
-        <h3 className="text-lg font-bold">Data Latih</h3>
+        <div className="flex justify-between">
+          <h3 className="text-lg font-bold">Data Latih</h3>
+          <ButtonExportExcel
+            fileName={`Data_Latih_${model.reference}`}
+            url={`/api/data-train/all${
+              model?.reference ? `?reference=${model.reference}` : ''
+            }`}
+          />
+        </div>
 
         <Table<Database['svm_knn']['Tables']['data_train']['Row']>
           columns={columns}
@@ -400,7 +409,15 @@ const DataSplit = () => {
       </div>
 
       <div>
-        <h3 className="text-lg font-bold">Data Uji</h3>
+        <div className="flex justify-between">
+          <h3 className="text-lg font-bold">Data Uji</h3>
+          <ButtonExportExcel
+            fileName={`Data_Uji_${model.reference}`}
+            url={`/api/data-test/all${
+              model?.reference ? `?reference=${model.reference}` : ''
+            }`}
+          />
+        </div>
 
         <Table<Database['svm_knn']['Tables']['data_test']['Row']>
           columns={columns}

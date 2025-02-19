@@ -9,6 +9,10 @@ export interface GlobalState {
   fetchModel: Thunk<GlobalState>
   predictionSvm : Database['svm_knn']['Tables']['prediction_svm']['Row'][]
   setPredictionSvm : Action<GlobalState, ((model: GlobalState['predictionSvm']) => GlobalState['predictionSvm']) | GlobalState['predictionSvm']>
+  session: {token: string | null, isLoading: boolean, email: string}
+  setSession: Action<GlobalState, {token: string | null, isLoading: boolean, email: string}>
+  deleteSession: Action<GlobalState>
+  fetchSession: Thunk<GlobalState>
 }
 
 const store = createStore<GlobalState>({
@@ -34,6 +38,27 @@ const store = createStore<GlobalState>({
   setPredictionSvm : action((state, payload) => {
     state.predictionSvm = typeof payload === 'function' ? payload(state.predictionSvm) : payload
   }),
+  session: {token: null, isLoading: true, email: ''},
+  setSession : action((state, payload) => {
+    state.session = {token: payload.token, email: payload.email, isLoading: payload.isLoading}
+  }),
+  deleteSession : action((state, ) => {
+    localStorage.removeItem('session')
+    state.session = { token: '', email: '', isLoading: false }
+  }),
+  fetchSession: thunk(async (actions) => {
+    // const { data, error } = await supabase.auth.getSession()
+    const data = JSON.parse(localStorage.getItem('session') ?? '')
+
+    //check token expiration
+    if(data && +new Date() > data.expires_at * 1000 ){
+      actions.deleteSession()
+      return
+    }
+
+    if(data) actions.setSession({token: data.access_token, isLoading: false, email: data.user.email ?? ''})
+      else actions.setSession({token: null, isLoading: false, email: ''})
+  })
 })
 
 export default store
