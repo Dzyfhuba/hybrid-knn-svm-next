@@ -224,8 +224,11 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
             label={field.label.toUpperCase()}
             rules={[
               { required: true, message: `${field.label.toUpperCase()} tidak boleh kosong` },
-              { pattern: /^\d*\.?\d*$/, message: `${field.label.toUpperCase()} harus berupa angka dan tidak boleh negatif` }, //decimal number
-              // { pattern: /^[0-9]+$/, message: `${field.label.toUpperCase()} tidak boleh negatif` },
+              { type: 'number', message: `${field.label.toUpperCase()} harus berupa angka` },
+              { validator: (_, value) => {
+                if (value <= 0 ) return Promise.reject(`${field.label.toUpperCase()} harus lebih dari 0`)
+                return Promise.resolve()
+              } },
             ]}
             extra={(
               <div
@@ -233,14 +236,15 @@ const ModalForm = ({ open, onCancel, onCreate, editData }: ModalCreateProps) => 
               />
             )}
           >
-            <InputNumber
+            <InputNumber<number>
               placeholder={`Masukkan ${field.label.toUpperCase()}`}
               type='number'
               addonAfter={field.unit}
               style={{ width: '100%' }}
               ref={idx === 0 ? autoFocusRef : undefined}
-              onKeyUp={(e) => {
-                const value = Number(e.currentTarget.value ?? 0)
+              onChange={(value) => {
+                // const value = Number(e.currentTarget.value ?? 0)
+                if (!value || value <= 0) return
                 const {
                   indexLower,
                   indexUpper,
